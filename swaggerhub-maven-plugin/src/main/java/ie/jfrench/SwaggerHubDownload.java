@@ -56,5 +56,4 @@ public class SwaggerHubDownload extends AbstractMojo {
         apiClient.getApiClient().addDefaultHeader("Authorization", token);
         return apiClient;
     }
-
 }
