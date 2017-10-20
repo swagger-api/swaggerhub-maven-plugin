@@ -9,9 +9,15 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 /**
- * Downbloads spec from SwaggerHub
+ * Downloads API definition from SwaggerHub
  */
 @Mojo(name = "download")
 public class SwaggerHubDownload extends AbstractMojo {
@@ -23,6 +29,8 @@ public class SwaggerHubDownload extends AbstractMojo {
     private String version;
     @Parameter(property = "download.token")
     private String token;
+    @Parameter(property = "download.outputFile")
+    private String outputFile;
 
     private APIsApi swaggerHubClient;
 
@@ -44,15 +52,18 @@ public class SwaggerHubDownload extends AbstractMojo {
         }
         getLog().info(swagger.toString());
 
-        swaggerHubClient.
-
-
+        Path path = Paths.get(outputFile);
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            writer.write(swagger.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private APIsApi getSwaggerHubClient() {
         final APIsApi apiClient = new APIsApi();
 
-        apiClient.getApiClient().setBasePath("https://api.swaggerhub.com/apis");
+        apiClient.getApiClient().setBasePath("https://api.swaggerhub.com");
         apiClient.getApiClient().addDefaultHeader("Authorization", token);
         return apiClient;
     }
