@@ -1,6 +1,7 @@
 package ie.jfrench;
 
 
+import com.google.gson.Gson;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.APIsApi;
@@ -8,6 +9,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import io.swagger.parser.SwaggerParser;
+import io.swagger.models.Swagger;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -37,24 +40,26 @@ public class SwaggerHubDownload extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         swaggerHubClient = getSwaggerHubClient();
 
-        getLog().info("Downloading from app.swaggerhub.com: " + api);
-        getLog().info("Downloading from app.swaggerhub.com: " + owner);
-        getLog().info("Downloading from app.swaggerhub.com: " + version);
-        getLog().info("Downloading from app.swaggerhub.com: " + token);
+        getLog().info("Downloading from app.swaggerhub.com"
+                + ": api-" + api
+                + ", owner-" + owner
+                + ", version-" + version
+                + ", outputFile-" + outputFile);
 
-        getLog().info(swaggerHubClient.getApiClient().getBasePath());
-
-        Object swagger = null;
+        Object swaggerObject = null;
+        String swaggerJson = null;
         try {
-            swagger = swaggerHubClient.getDefinition(owner, api, version);
+            swaggerObject = swaggerHubClient.getDefinition(owner, api, version);
+            Gson gson = new Gson();
+            swaggerJson = gson.toJson(swaggerObject);
         } catch (ApiException e) {
             e.printStackTrace();
         }
-        getLog().info(swagger.toString());
+        getLog().info(swaggerJson);
 
         Path path = Paths.get(outputFile);
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write(swagger.toString());
+            writer.write(swaggerJson);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -15,19 +15,66 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>ie.jfrench.swaggerhub</groupId>
+            <groupId>ie.jfrench</groupId>
             <artifactId>swaggerhub-maven-plugin</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>ie.jfrench.swaggerhub</groupId>
-                <artifactId>swaggerhub-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>swaggerhub-download</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>ie.jfrench</groupId>
+                        <artifactId>swaggerhub-maven-plugin</artifactId>
+                        <version>1.0-SNAPSHOT</version>
+                        <executions>
+                            <execution>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>download</goal>
+                                </goals>
+                                <configuration>
+                                    <api>HackathonTest</api>
+                                    <owner>john-french</owner>
+                                    <version>1.0.0</version>
+                                    <outputFile>HackathonTest.json</outputFile>
+                                    <token>${SWAGGERHUB_APIKEY}</token>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>swaggerhub-upload</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>ie.jfrench</groupId>
+                        <artifactId>swaggerhub-maven-plugin</artifactId>
+                        <version>1.0-SNAPSHOT</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>upload</goal>
+                                </goals>
+                                <configuration>
+                                    <api>HackathonTest</api>
+                                    <owner>john-french</owner>
+                                    <version>1.0.1-SNAPSHOT</version>
+                                    <inputFile>HackathonTest.json</inputFile>
+                                    <token>${SWAGGERHUB_APIKEY}</token>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
