@@ -15,7 +15,6 @@ swaggerhub-maven-plugin-test/target/
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip
