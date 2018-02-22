@@ -1,29 +1,15 @@
 package ie.jfrench;
 
 
-import com.google.gson.Gson;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.APIsApi;
-import io.swagger.util.Json;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import io.swagger.parser.SwaggerParser;
-import io.swagger.models.Swagger;
 
 
 /**
@@ -42,10 +28,10 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.inputFile")
     private String inputFile;
 
-    private APIsApi swaggerHubClient;
+    private SwaggerHubClient swaggerHubClient;
 
     public void execute() throws MojoExecutionException {
-        swaggerHubClient = getSwaggerHubClient();
+        swaggerHubClient = new SwaggerHubClient(token);
 
         getLog().info("Uploading to app.swaggerhub.com"
                 + ": api-" + api
@@ -54,32 +40,11 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", inputFile-" + inputFile);
 
         try {
-            Swagger swagger = new SwaggerParser().read(inputFile);
-
-            String swaggerString = String.valueOf(Files.readAllLines(Paths.get(inputFile)));
-//            String swaggerJson = Json.pretty(swagger);
-            getLog().info(swaggerString);
-
-//            JsonNode jsonNodeTree = new ObjectMapper().readTree(swaggerString);
-//            String swaggerYaml = new YAMLMapper().writeValueAsString(jsonNodeTree);
-//            new YAMLMapper().
-
-//            getLog().info(swaggerYaml);
-
-//            getLog().info(jsonNodeTree.toString());
-
-            swaggerHubClient.saveDefinition(owner, api, swaggerString, false, version, false);
-
-        } catch (ApiException | IOException e) {
-            e.printStackTrace();
+            String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
+            swaggerHubClient.saveDefinition(owner, api, version, content);
+        } catch (IOException e) {
+            getLog().error(e);
+            throw new MojoExecutionException("Failed to upload API definition", e);
         }
-    }
-
-    private APIsApi getSwaggerHubClient() {
-        final APIsApi apiClient = new APIsApi();
-
-        apiClient.getApiClient().setBasePath("https://api.swaggerhub.com");
-        apiClient.getApiClient().addDefaultHeader("Authorization", token);
-        return apiClient;
     }
 }

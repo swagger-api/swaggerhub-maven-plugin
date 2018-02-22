@@ -1,21 +1,13 @@
 package ie.jfrench;
 
 
-import com.google.gson.Gson;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.APIsApi;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import io.swagger.parser.SwaggerParser;
-import io.swagger.models.Swagger;
-
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -35,10 +27,9 @@ public class SwaggerHubDownload extends AbstractMojo {
     @Parameter(property = "download.outputFile")
     private String outputFile;
 
-    private APIsApi swaggerHubClient;
 
     public void execute() throws MojoExecutionException {
-        swaggerHubClient = getSwaggerHubClient();
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(token);
 
         getLog().info("Downloading from app.swaggerhub.com"
                 + ": api-" + api
@@ -46,30 +37,11 @@ public class SwaggerHubDownload extends AbstractMojo {
                 + ", version-" + version
                 + ", outputFile-" + outputFile);
 
-        Object swaggerObject = null;
-        String swaggerJson = null;
+        String swaggerJson = swaggerHubClient.getDefinition(owner, api, version);
         try {
-            swaggerObject = swaggerHubClient.getDefinition(owner, api, version);
-            Gson gson = new Gson();
-            swaggerJson = gson.toJson(swaggerObject);
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-        getLog().info(swaggerJson);
-
-        Path path = Paths.get(outputFile);
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write(swaggerJson);
+            Files.write(Paths.get(outputFile), swaggerJson.getBytes(Charset.forName("UTF-8")));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new MojoExecutionException("Failed to download API definition", e);
         }
-    }
-
-    private APIsApi getSwaggerHubClient() {
-        final APIsApi apiClient = new APIsApi();
-
-        apiClient.getApiClient().setBasePath("https://api.swaggerhub.com");
-        apiClient.getApiClient().addDefaultHeader("Authorization", token);
-        return apiClient;
     }
 }

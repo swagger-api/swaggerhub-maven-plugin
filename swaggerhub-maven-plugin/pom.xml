@@ -28,47 +28,11 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>3.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.smartbear.swaggerhub</groupId>
-      <artifactId>swaggerhub-api-client</artifactId>
-      <version>1.0.45</version>
-    </dependency>
-    <dependency>
-      <groupId>io.swagger</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <version>${swagger-core-version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.squareup.okhttp</groupId>
       <artifactId>okhttp</artifactId>
       <version>${okhttp-version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.squareup.okhttp</groupId>
-      <artifactId>logging-interceptor</artifactId>
-      <version>${okhttp-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>${gson-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>${jodatime-version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
@@ -252,5 +216,18 @@
       <name>project</name>
       <url>file:${project.basedir}/localMavenRepo</url>
     </repository>
-  </repositories>
+</repositories>
+
+      <distributionManagement>
+        <repository>
+            <id>swaggerhub.internal</id>
+            <name>SwaggerHub Internal Repository</name>
+            <url>https://nexus.swaggerhub.com/content/repositories/swaggerhub-internal/</url>
+        </repository>
+        <snapshotRepository>
+            <id>swaggerhub.snapshots</id>
+            <name>SwaggerHub Snapshot Repository</name>
+            <url>https://nexus.swaggerhub.com/content/repositories/swaggerhub-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
