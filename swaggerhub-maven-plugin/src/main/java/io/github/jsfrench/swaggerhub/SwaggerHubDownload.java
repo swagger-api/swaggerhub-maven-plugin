@@ -1,4 +1,4 @@
-package ie.jfrench;
+package io.github.jsfrench.swaggerhub;
 
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -16,28 +16,33 @@ import java.nio.file.Paths;
  */
 @Mojo(name = "download")
 public class SwaggerHubDownload extends AbstractMojo {
-    @Parameter(property = "download.owner")
+    @Parameter(property = "download.owner", required = true)
     private String owner;
-    @Parameter(property = "download.api")
+    @Parameter(property = "download.api", required = true)
     private String api;
-    @Parameter(property = "download.version")
+    @Parameter(property = "download.version", required = true)
     private String version;
+    @Parameter(property = "download.format", defaultValue = "json")
+    private String format;
+    @Parameter(property = "download.host", defaultValue = "api.swaggerhub.com")
+    private String host;
     @Parameter(property = "download.token")
     private String token;
-    @Parameter(property = "download.outputFile")
+    @Parameter(property = "download.outputFile", required = true)
     private String outputFile;
 
 
     public void execute() throws MojoExecutionException {
-        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(token);
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, token);
 
-        getLog().info("Downloading from app.swaggerhub.com"
+        getLog().info("Downloading from " + host
                 + ": api-" + api
                 + ", owner-" + owner
                 + ", version-" + version
+                + ", format-" + format
                 + ", outputFile-" + outputFile);
 
-        String swaggerJson = swaggerHubClient.getDefinition(owner, api, version);
+        String swaggerJson = swaggerHubClient.getDefinition(owner, api, version, format);
         try {
             Files.write(Paths.get(outputFile), swaggerJson.getBytes(Charset.forName("UTF-8")));
         } catch (IOException e) {

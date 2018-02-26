@@ -1,4 +1,4 @@
-package ie.jfrench;
+package io.github.jsfrench.swaggerhub;
 
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -17,31 +17,38 @@ import java.nio.file.Paths;
  */
 @Mojo(name = "upload")
 public class SwaggerHubUpload extends AbstractMojo {
-    @Parameter(property = "upload.owner")
+    @Parameter(property = "upload.owner", required = true)
     private String owner;
-    @Parameter(property = "upload.api")
+    @Parameter(property = "upload.api", required = true)
     private String api;
     @Parameter(property = "upload.version")
     private String version;
+    @Parameter(property = "upload.host", defaultValue = "api.swaggerhub.com")
+    private String host;
+    @Parameter(property = "upload.format", defaultValue = "json")
+    private String format;
     @Parameter(property = "upload.token")
     private String token;
-    @Parameter(property = "upload.inputFile")
+    @Parameter(property = "upload.inputFile", required = true)
     private String inputFile;
+    @Parameter(property = "upload.isPrivate", defaultValue = "false")
+    private Boolean isPrivate;
 
     private SwaggerHubClient swaggerHubClient;
 
     public void execute() throws MojoExecutionException {
-        swaggerHubClient = new SwaggerHubClient(token);
+        swaggerHubClient = new SwaggerHubClient(host, token);
 
-        getLog().info("Uploading to app.swaggerhub.com"
+        getLog().info("Uploading to " + host
                 + ": api-" + api
                 + ", owner-" + owner
                 + ", version-" + version
-                + ", inputFile-" + inputFile);
+                + ", inputFile-" + inputFile
+                + ", format-" + format);
 
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
-            swaggerHubClient.saveDefinition(owner, api, version, content);
+            swaggerHubClient.saveDefinition(owner, api, version, content, format);
         } catch (IOException e) {
             getLog().error(e);
             throw new MojoExecutionException("Failed to upload API definition", e);

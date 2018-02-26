@@ -6,23 +6,18 @@
     <artifactId>swaggerhub-maven-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
-
-    <name>swaggerhub-maven-plugin Maven Plugin</name>
-
-    <!-- FIXME change it to the project's website -->
-    <url>http://maven.apache.org</url>
+    <name>SwaggerHub Maven Plugin</name>
+    <url>https://github.com/jsfrench/swaggerhub-maven-plugin</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <swagger-core-version>1.5.9</swagger-core-version>
-        <okhttp-version>2.7.5</okhttp-version>
-        <gson-version>2.6.2</gson-version>
-        <jodatime-version>2.9.3</jodatime-version>
-        <!--<maven-plugin-version>1.0.0</maven-plugin-version>-->
-        <junit-version>4.12</junit-version>
+        <swagger-core.version>1.5.9</swagger-core.version>
+        <okhttp.version>2.7.5</okhttp.version>
+        <maven.version>3.3.9</maven.version>
+        <junit.version>4.12</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -30,142 +25,169 @@
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
             <artifactId>okhttp</artifactId>
-            <version>${okhttp-version}</version>
+            <version>${okhttp.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.3</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.2.3</version>
+            <version>${maven.version}</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.maven</groupId>-->
+            <!--<artifactId>maven-core</artifactId>-->
+            <!--<version>${maven.version}</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-core</artifactId>
-            <version>1.5.16</version>
+            <groupId>org.apache.maven.plugin-testing</groupId>
+            <artifactId>maven-plugin-testing-harness</artifactId>
+            <version>3.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
+        </dependency>
+        <!-- Required to avoid
+             java.lang.ClassNotFoundException: org.apache.maven.execution.MavenExecutionResult
+            when mvn test is run.
+        -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.version}</version>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-parser</artifactId>
-            <version>1.0.31</version>
+            <version>1.0.34</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>loggerPath</name>
-                            <value>conf/log4j.properties</value>
-                        </property>
-                    </systemProperties>
-                    <argLine>-Xms512m -Xmx1500m</argLine>
-                    <parallel>methods</parallel>
-                    <forkMode>pertest</forkMode>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-surefire-plugin</artifactId>-->
+                <!--<version>2.12</version>-->
+                <!--<configuration>-->
+                    <!--<systemProperties>-->
+                        <!--<property>-->
+                            <!--<name>loggerPath</name>-->
+                            <!--<value>conf/log4j.properties</value>-->
+                        <!--</property>-->
+                    <!--</systemProperties>-->
+                    <!--<argLine>-Xms512m -Xmx1500m</argLine>-->
+                    <!--<parallel>methods</parallel>-->
+                    <!--<forkMode>pertest</forkMode>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+
+            <!--<plugin>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy-dependencies</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<outputDirectory>${project.build.directory}/lib</outputDirectory>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
 
             <!-- attach test jar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.10</version>
-                <executions>
-                    <execution>
-                        <id>add_sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add_test_sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.2</version>
-                <configuration>
-                    <goalPrefix>swaggerhub-maven-plugin</goalPrefix>
-                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                </configuration>
-                <executions>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-jar-plugin</artifactId>-->
+                <!--<version>2.2</version>-->
+                <!--<executions>-->
                     <!--<execution>-->
-                    <!--<id>mojo-descriptor</id>-->
-                    <!--<goals>-->
-                    <!--<goal>descriptor</goal>-->
-                    <!--</goals>-->
+                        <!--<goals>-->
+                            <!--<goal>jar</goal>-->
+                            <!--<goal>test-jar</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>build-helper-maven-plugin</artifactId>-->
+                <!--<version>1.10</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>add_sources</id>-->
+                        <!--<phase>generate-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>add-source</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<sources>-->
+                                <!--<source>src/main/java</source>-->
+                            <!--</sources>-->
+                        <!--</configuration>-->
                     <!--</execution>-->
                     <!--<execution>-->
-                    <!--<id>help-goal</id>-->
-                    <!--<goals>-->
-                    <!--<goal>helpmojo</goal>-->
-                    <!--</goals>-->
+                        <!--<id>add_test_sources</id>-->
+                        <!--<phase>generate-test-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>add-test-source</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<sources>-->
+                                <!--<source>src/test/java</source>-->
+                            <!--</sources>-->
+                        <!--</configuration>-->
                     <!--</execution>-->
-                </executions>
-            </plugin>
+                <!--</executions>-->
+            <!--</plugin>-->
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+                <!--<version>2.10.4</version>-->
+            <!--</plugin>-->
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-plugin-plugin</artifactId>-->
+                <!--<version>3.2</version>-->
+                <!--<configuration>-->
+                    <!--<goalPrefix>swaggerhub-maven-plugin</goalPrefix>-->
+                    <!--<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--&lt;!&ndash;<execution>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<id>mojo-descriptor</id>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<goals>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<goal>descriptor</goal>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</goals>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</execution>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<execution>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<id>help-goal</id>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<goals>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<goal>helpmojo</goal>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</goals>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</execution>&ndash;&gt;-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
