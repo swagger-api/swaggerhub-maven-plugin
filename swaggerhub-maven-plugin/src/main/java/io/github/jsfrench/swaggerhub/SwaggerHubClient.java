@@ -24,14 +24,11 @@ public class SwaggerHubClient {
         HttpUrl httpUrl = getDownloadUrl(owner, api, version);
         MediaType mediaType = MediaType.parse("application/" + format);
 
-        final Request request = new Request.Builder()
-                .url(httpUrl)
-                .addHeader("Authorization", mediaType.toString())
-                .build();
+        Request requestBuilder = buildGetRequest(httpUrl, mediaType);
 
         final String jsonResponse;
         try {
-            final Response response = client.newCall(request).execute();
+            final Response response = client.newCall(requestBuilder).execute();
             if (!response.isSuccessful()) {
                 throw new MojoExecutionException(
                         String.format("Failed to save definition: %s", response.body().string())
@@ -45,16 +42,21 @@ public class SwaggerHubClient {
         return jsonResponse;
     }
 
+    private Request buildGetRequest(HttpUrl httpUrl, MediaType mediaType) {
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(httpUrl)
+                .addHeader("Accept", mediaType.toString());
+        if (token != null) {
+            requestBuilder.addHeader("Authorization", token);
+        }
+        return requestBuilder.build();
+    }
+
     public void saveDefinition(String owner, String api, String version, String swagger, String format) throws MojoExecutionException {
         HttpUrl httpUrl = getUploadUrl(owner, api, version);
+        MediaType mediaType = MediaType.parse("application/" + format);
 
-        final RequestBody body = RequestBody.create(MediaType.parse("application/" + format), swagger);
-
-        final Request request = new Request.Builder()
-                .url(httpUrl)
-                .addHeader("Authorization", token)
-                .post(body)
-                .build();
+        final Request request = buildPostRequest(httpUrl, mediaType, swagger);
 
         try {
             Response response = client.newCall(request).execute();
@@ -67,6 +69,15 @@ public class SwaggerHubClient {
             throw new MojoExecutionException("Failed to save definition", e);
         }
         return;
+    }
+
+    private Request buildPostRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
+        return new Request.Builder()
+                    .url(httpUrl)
+                    .addHeader("Content-Type", mediaType.toString())
+                    .addHeader("Authorization", token)
+                    .post(RequestBody.create(mediaType, content))
+                    .build();
     }
 
     private HttpUrl getDownloadUrl(String owner, String api, String version) {
