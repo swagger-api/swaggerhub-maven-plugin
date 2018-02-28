@@ -52,7 +52,13 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
-            swaggerHubClient.saveDefinition(owner, api, version, content, format);
+
+            SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
+                    .swagger(content)
+                    .format(format)
+                    .build();
+
+            swaggerHubClient.saveDefinition(swaggerHubRequest);
         } catch (IOException e) {
             getLog().error(e);
             throw new MojoExecutionException("Failed to upload API definition", e);

@@ -48,7 +48,11 @@ public class SwaggerHubDownload extends AbstractMojo {
                 + ", format-" + format
                 + ", outputFile-" + outputFile);
 
-        String swaggerJson = swaggerHubClient.getDefinition(owner, api, version, format);
+        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
+                .format(format)
+                .build();
+
+        String swaggerJson = swaggerHubClient.getDefinition(swaggerHubRequest);
         try {
             File file = new File(outputFile);
 

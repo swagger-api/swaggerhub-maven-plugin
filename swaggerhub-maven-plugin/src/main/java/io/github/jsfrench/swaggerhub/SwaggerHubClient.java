@@ -26,9 +26,9 @@ public class SwaggerHubClient {
         this.token = token;
     }
 
-    public String getDefinition(String owner, String api, String version, String format) throws MojoExecutionException {
-        HttpUrl httpUrl = getDownloadUrl(owner, api, version);
-        MediaType mediaType = MediaType.parse("application/" + format);
+    public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
+        HttpUrl httpUrl = getDownloadUrl(swaggerHubRequest);
+        MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
 
         Request requestBuilder = buildGetRequest(httpUrl, mediaType);
 
@@ -58,14 +58,14 @@ public class SwaggerHubClient {
         return requestBuilder.build();
     }
 
-    public void saveDefinition(String owner, String api, String version, String swagger, String format) throws MojoExecutionException {
-        HttpUrl httpUrl = getUploadUrl(owner, api, version);
-        MediaType mediaType = MediaType.parse("application/" + format);
+    public void saveDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
+        HttpUrl httpUrl = getUploadUrl(swaggerHubRequest);
+        MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
 
-        final Request request = buildPostRequest(httpUrl, mediaType, swagger);
+        final Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
 
         try {
-            Response response = client.newCall(request).execute();
+            Response response = client.newCall(httpRequest).execute();
             if (!response.isSuccessful()) {
                 throw new MojoExecutionException(
                         String.format("Failed to upload definition: %s", response.body().string())
@@ -86,29 +86,27 @@ public class SwaggerHubClient {
                     .build();
     }
 
-    private HttpUrl getDownloadUrl(String owner, String api, String version) {
-        return new HttpUrl.Builder()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .addPathSegment(APIS)
-                .addEncodedPathSegment(owner)
-                .addEncodedPathSegment(api)
-                .addEncodedPathSegment(version)
+    private HttpUrl getDownloadUrl(SwaggerHubRequest swaggerHubRequest) {
+        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+                .addEncodedPathSegment(swaggerHubRequest.getVersion())
                 .build();
     }
 
-    private HttpUrl getUploadUrl(String owner, String api, String version) {
+    private HttpUrl getUploadUrl(SwaggerHubRequest swaggerHubRequest) {
+        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+                .addEncodedQueryParameter("version", swaggerHubRequest.getVersion())
+                .addEncodedQueryParameter("isPrivate", Boolean.toString(swaggerHubRequest.isPrivate()))
+                .addEncodedQueryParameter("force", Boolean.toString(swaggerHubRequest.isForce()))
+                .build();
+    }
+
+    private HttpUrl.Builder getBaseUrl(String owner, String api) {
         return new HttpUrl.Builder()
                 .scheme(protocol)
                 .host(host)
                 .port(port)
                 .addPathSegment(APIS)
                 .addEncodedPathSegment(owner)
-                .addEncodedPathSegment(api)
-                .addEncodedQueryParameter("version", version)
-                .addEncodedQueryParameter("isPrivate", Boolean.toString(false))
-                .addEncodedQueryParameter("force", Boolean.toString(false))
-                .build();
+                .addEncodedPathSegment(api);
     }
 }
