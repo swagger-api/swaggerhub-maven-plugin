@@ -20,11 +20,6 @@ public class SwaggerHubDownloadTest extends BetterAbstractMojoTestCase {
         runTest(pom);
     }
 
-    public void testDownloadDev() throws Exception {
-        File pom = getTestFile("src/test/resources/testProjects/download-dev.xml");
-        runTest(pom);
-    }
-
     private void runTest(File pom) throws Exception {
         assertNotNull(pom);
         assertTrue( pom.exists() );
