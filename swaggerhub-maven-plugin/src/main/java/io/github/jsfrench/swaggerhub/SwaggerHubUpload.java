@@ -25,6 +25,10 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String version;
     @Parameter(property = "upload.host", defaultValue = "api.swaggerhub.com")
     private String host;
+    @Parameter(property = "upload.port", defaultValue = "443")
+    private int port;
+    @Parameter(property = "upload.protocol", defaultValue = "https")
+    private String protocol;
     @Parameter(property = "upload.format", defaultValue = "json")
     private String format;
     @Parameter(property = "upload.token")
@@ -37,7 +41,7 @@ public class SwaggerHubUpload extends AbstractMojo {
     private SwaggerHubClient swaggerHubClient;
 
     public void execute() throws MojoExecutionException {
-        swaggerHubClient = new SwaggerHubClient(host, token);
+        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
 
         getLog().info("Uploading to " + host
                 + ": api-" + api

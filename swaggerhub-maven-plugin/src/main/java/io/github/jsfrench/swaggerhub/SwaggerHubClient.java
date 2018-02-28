@@ -12,11 +12,16 @@ import java.io.IOException;
 public class SwaggerHubClient {
     private final OkHttpClient client;
     private final String host;
+    private final int port;
     private final String token;
+    private final String protocol;
 
-    public SwaggerHubClient(String host, String token) {
+
+    public SwaggerHubClient(String host, int port, String protocol, String token) {
         client = new OkHttpClient();
         this.host = host;
+        this.port = port;
+        this.protocol = protocol;
         this.token = token;
     }
 
@@ -31,13 +36,13 @@ public class SwaggerHubClient {
             final Response response = client.newCall(requestBuilder).execute();
             if (!response.isSuccessful()) {
                 throw new MojoExecutionException(
-                        String.format("Failed to save definition: %s", response.body().string())
+                        String.format("Failed to download definition: %s", response.body().string())
                 );
             } else {
                 jsonResponse = response.body().string();
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to save definition", e);
+            throw new MojoExecutionException("Failed to download definition", e);
         }
         return jsonResponse;
     }
@@ -62,11 +67,11 @@ public class SwaggerHubClient {
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
                 throw new MojoExecutionException(
-                        String.format("Failed to save definition: %s", response.body().string())
+                        String.format("Failed to upload definition: %s", response.body().string())
                 );
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to save definition", e);
+            throw new MojoExecutionException("Failed to upload definition", e);
         }
         return;
     }
@@ -82,8 +87,9 @@ public class SwaggerHubClient {
 
     private HttpUrl getDownloadUrl(String owner, String api, String version) {
         return new HttpUrl.Builder()
-                .scheme("https")
+                .scheme(protocol)
                 .host(host)
+                .port(port)
                 .addPathSegment("apis")
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api)
@@ -93,8 +99,9 @@ public class SwaggerHubClient {
 
     private HttpUrl getUploadUrl(String owner, String api, String version) {
         return new HttpUrl.Builder()
-                .scheme("https")
+                .scheme(protocol)
                 .host(host)
+                .port(port)
                 .addPathSegment("apis")
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api)

@@ -29,6 +29,10 @@ public class SwaggerHubDownload extends AbstractMojo {
     private String format;
     @Parameter(property = "download.host", defaultValue = "api.swaggerhub.com")
     private String host;
+    @Parameter(property = "download.port", defaultValue = "443")
+    private int port;
+    @Parameter(property = "download.protocol", defaultValue = "https")
+    private String protocol;
     @Parameter(property = "download.token")
     private String token;
     @Parameter(property = "download.outputFile", required = true)
@@ -36,7 +40,7 @@ public class SwaggerHubDownload extends AbstractMojo {
 
 
     public void execute() throws MojoExecutionException {
-        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, token);
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
         getLog().info("Downloading from " + host
                 + ": api-" + api
                 + ", owner-" + owner
