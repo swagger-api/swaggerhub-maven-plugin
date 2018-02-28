@@ -15,6 +15,7 @@ public class SwaggerHubClient {
     private final int port;
     private final String token;
     private final String protocol;
+    private static final String APIS = "apis";
 
 
     public SwaggerHubClient(String host, int port, String protocol, String token) {
@@ -90,7 +91,7 @@ public class SwaggerHubClient {
                 .scheme(protocol)
                 .host(host)
                 .port(port)
-                .addPathSegment("apis")
+                .addPathSegment(APIS)
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api)
                 .addEncodedPathSegment(version)
@@ -102,7 +103,7 @@ public class SwaggerHubClient {
                 .scheme(protocol)
                 .host(host)
                 .port(port)
-                .addPathSegment("apis")
+                .addPathSegment(APIS)
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api)
                 .addEncodedQueryParameter("version", version)

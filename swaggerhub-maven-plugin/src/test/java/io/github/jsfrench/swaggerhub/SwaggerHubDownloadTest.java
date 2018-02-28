@@ -21,7 +21,7 @@ public class SwaggerHubDownloadTest extends BetterAbstractMojoTestCase {
     }
 
     public void testDownload() throws Exception {
-        File pom = getTestFile("src/test/resources/testProject/download.xml");
+        File pom = getTestFile("src/test/resources/testProjects/download.xml");
         assertNotNull(pom);
         assertTrue( pom.exists() );
 
@@ -38,7 +38,7 @@ public class SwaggerHubDownloadTest extends BetterAbstractMojoTestCase {
     }
 
     public void testDownloadYaml() throws Exception {
-        File pom = getTestFile("src/test/resources/testProject/download-yaml.xml");
+        File pom = getTestFile("src/test/resources/testProjects/download-yaml.xml");
         assertNotNull(pom);
         assertTrue( pom.exists() );
 
