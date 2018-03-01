@@ -37,6 +37,8 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String inputFile;
     @Parameter(property = "upload.isPrivate", defaultValue = "false")
     private Boolean isPrivate;
+    @Parameter(property = "upload.force", defaultValue = "false")
+    private Boolean force;
 
     private SwaggerHubClient swaggerHubClient;
 
@@ -44,11 +46,13 @@ public class SwaggerHubUpload extends AbstractMojo {
         swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
 
         getLog().info("Uploading to " + host
-                + ": api-" + api
-                + ", owner-" + owner
-                + ", version-" + version
-                + ", inputFile-" + inputFile
-                + ", format-" + format);
+                + ": api: " + api
+                + ", owner: " + owner
+                + ", version: " + version
+                + ", inputFile: " + inputFile
+                + ", format: " + format
+                + ", isPrivate: " + isPrivate
+                + ", force: " + force);
 
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
@@ -56,6 +60,8 @@ public class SwaggerHubUpload extends AbstractMojo {
             SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
                     .swagger(content)
                     .format(format)
+                    .isPrivate(isPrivate)
+                    .force(force)
                     .build();
 
             swaggerHubClient.saveDefinition(swaggerHubRequest);

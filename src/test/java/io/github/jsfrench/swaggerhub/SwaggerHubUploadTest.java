@@ -37,6 +37,11 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         runTest(pom);
     }
 
+    public void testUploadPrivateForcel() throws Exception {
+        File pom = getTestFile("src/test/resources/testProjects/upload-private-force.xml");
+        runTest(pom);
+    }
+
     private void runTest(File pom) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
@@ -58,6 +63,9 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         String token = config.getChild("token").getValue();
         int port = Integer.parseInt(config.getChild("port").getValue());
         String format = config.getChild("format").getValue();
+        String isPrivate = config.getChild("isPrivate").getValue();
+        String force = config.getChild("force").getValue();
+
 
         startMockServer(port);
 
@@ -65,9 +73,10 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
         stubFor(post(url)
                 .withQueryParam("version", equalTo(version))
-                .withQueryParam("isPrivate", equalTo("false"))
-                .withQueryParam("force", equalTo("false"))
-                .withHeader("Content-Type", equalToIgnoreCase(String.format("application/%s; charset=UTF-8", format)))
+                .withQueryParam("isPrivate", equalTo(isPrivate != null ? isPrivate : "false"))
+                .withQueryParam("force", equalTo(force != null ? force : "false"))
+                .withHeader("Content-Type", equalToIgnoreCase(
+                        String.format("application/%s; charset=UTF-8", format != null ? format : "json")))
                 .withHeader("Authorization", equalTo(token))
                 .willReturn(created()));
 
