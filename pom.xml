@@ -83,6 +83,22 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                    <enableSshAgent>true</enableSshAgent>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <pushFeatures>true</pushFeatures>
+                    <pushReleases>true</pushReleases>
+                    <pushHotfixes>true</pushHotfixes>
+                    <noDeploy>true</noDeploy>
+                    <scmCommentPrefix>[jgitflow]</scmCommentPrefix>
+                    <username>${git.user}</username>
+                    <password>${git.password}</password>
+                </configuration>
+            </plugin>
             <!--<plugin>-->
                 <!--<groupId>org.apache.maven.plugins</groupId>-->
                 <!--<artifactId>maven-surefire-plugin</artifactId>-->
