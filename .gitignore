@@ -1,6 +1,5 @@
 .idea
-swaggerhub-maven-plugin/target/
-swaggerhub-maven-plugin-test/target/
+target/
 
 # Compiled class file
 *.class
