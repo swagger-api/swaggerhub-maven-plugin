@@ -3,7 +3,7 @@
 
     <groupId>io.github.jsfrench</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>SwaggerHub Maven Plugin</name>
     <url>https://github.com/jsfrench/swaggerhub-maven-plugin</url>
