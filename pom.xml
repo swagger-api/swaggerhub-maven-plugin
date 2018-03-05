@@ -3,7 +3,7 @@
 
     <groupId>io.github.jsfrench</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>maven-plugin</packaging>
     <name>SwaggerHub Maven Plugin</name>
     <description>A maven plugin for downloading and uploading Swagger/OAS definitions from/to SwaggerHub as
