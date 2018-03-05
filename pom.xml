@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.jsfrench</groupId>
@@ -6,7 +7,32 @@
     <version>1.0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>SwaggerHub Maven Plugin</name>
+    <description>A maven plugin for downloading and uploading Swagger/OAS definitions from/to SwaggerHub as
+        part of a build process.
+    </description>
     <url>https://github.com/jsfrench/swaggerhub-maven-plugin</url>
+
+    <scm>
+        <connection>scm:git:git://github.com:jsfrench/swaggerhub-maven-plugin.git</connection>
+        <developerConnection>scm:git:ssh://github.com:jsfrench/swaggerhub-maven-plugin.git</developerConnection>
+        <url>https://github.com/jsfrench/swaggerhub-maven-plugin/tree/master</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>John French</name>
+            <email>frenchE@gmail.com</email>
+            <organization>jsfrench</organization>
+            <organizationUrl>https://github.com/jsfrench</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
