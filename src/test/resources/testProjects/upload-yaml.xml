@@ -5,28 +5,13 @@
     <artifactId>swaggerhub-maven-plugin-test</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Test Download</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.jsfrench</groupId>
-            <artifactId>swaggerhub-maven-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
+    <name>Test Upload YAML</name>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>io.github.jsfrench</groupId>
                 <artifactId>swaggerhub-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
                 <configuration>
                     <host>localhost</host>
                     <port>8089</port>
