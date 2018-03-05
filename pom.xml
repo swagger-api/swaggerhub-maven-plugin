@@ -3,10 +3,35 @@
 
     <groupId>io.github.jsfrench</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>maven-plugin</packaging>
     <name>SwaggerHub Maven Plugin</name>
+    <description>A maven plugin for downloading and uploading Swagger/OAS definitions from/to SwaggerHub as
+        part of a build process.
+    </description>
     <url>https://github.com/jsfrench/swaggerhub-maven-plugin</url>
+
+    <scm>
+        <connection>scm:git:git://github.com:jsfrench/swaggerhub-maven-plugin.git</connection>
+        <developerConnection>scm:git:ssh://github.com:jsfrench/swaggerhub-maven-plugin.git</developerConnection>
+        <url>https://github.com/jsfrench/swaggerhub-maven-plugin/tree/master</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>John French</name>
+            <email>frenchE@gmail.com</email>
+            <organization>jsfrench</organization>
+            <organizationUrl>https://github.com/jsfrench</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -87,7 +112,7 @@
                     <pushFeatures>true</pushFeatures>
                     <pushReleases>true</pushReleases>
                     <pushHotfixes>true</pushHotfixes>
-                    <noDeploy>true</noDeploy>
+                    <noDeploy>false</noDeploy>
                     <scmCommentPrefix>[jgitflow]</scmCommentPrefix>
                     <username>${git.user}</username>
                     <password>${git.password}</password>
@@ -155,6 +180,10 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
 </project>
