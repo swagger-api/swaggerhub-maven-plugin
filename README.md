@@ -1,3 +1,5 @@
+![Maven Central](https://img.shields.io/maven-central/v/io.github.jsfrench/swaggerhub-maven-plugin.svg)
+![Travis](https://travis-ci.org/jsfrench/swaggerhub-maven-plugin.png?branch=develop)
 # swaggerhub-maven-plugin
 A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
 
