@@ -1,5 +1,5 @@
 # swaggerhub-maven-plugin
-A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) as part of a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
+A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
 
 ## Features
 * download/upload API definitions from/to SwaggerHub.
