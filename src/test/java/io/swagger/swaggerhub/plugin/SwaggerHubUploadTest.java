@@ -1,8 +1,7 @@
-package io.github.jsfrench.swaggerhub;
+package io.swagger.swaggerhub.plugin;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 

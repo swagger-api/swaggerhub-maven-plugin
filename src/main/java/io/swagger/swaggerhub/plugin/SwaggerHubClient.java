@@ -1,4 +1,4 @@
-package io.github.jsfrench.swaggerhub;
+package io.swagger.swaggerhub.plugin;
 
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;

@@ -1,4 +1,4 @@
-![Maven Central](https://img.shields.io/maven-central/v/io.github.jsfrench/swaggerhub-maven-plugin.svg)
+![Maven Central](https://img.shields.io/maven-central/v/io.swagger/swaggerhub-maven-plugin.svg)
 ![Travis](https://travis-ci.org/jsfrench/swaggerhub-maven-plugin.png?branch=develop)
 # swaggerhub-maven-plugin
 A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
@@ -31,7 +31,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
 * Download a public API definition in json format from SwaggerHub automatically as part of the default maven build lifecycle and save to a local file.
 ```xml
     <plugin>
-        <groupId>io.github.jsfrench</groupId>
+        <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
         <version>1.0.1</version>
         <executions>
@@ -71,7 +71,7 @@ Parameter | Description | Required | Default
 * Upload an API definition in json format as a public API in SwaggerHub.
 ```xml
     <plugin>
-        <groupId>io.github.jsfrench</groupId>
+        <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
         <version>1.0.1</version>
         <executions>
