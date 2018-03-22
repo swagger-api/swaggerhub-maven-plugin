@@ -1,5 +1,5 @@
-![Maven Central](https://img.shields.io/maven-central/v/io.swagger/swaggerhub-maven-plugin.svg)
-![Travis](https://travis-ci.org/jsfrench/swaggerhub-maven-plugin.png?branch=develop)
+[![Build Status](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin.svg)](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin)
 # swaggerhub-maven-plugin
 A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
 
@@ -21,7 +21,9 @@ The pattern of usage is likely to depend on whether a [code first or design firs
 ### Design First
 1. Write API definition (e.g. in Swagger Editor or SwaggerHub).
 2. Download API definition with swaggerhub-maven-plugin.
-3. Pass API definition to [swagger-codegen-maven-plugin](https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin) to generate API client and resource classes.
+3. Pass API definition to another Swagger tool e.g.
+    - [swagger-codegen-maven-plugin](https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin) to generate API client and resource classes.
+    - [swagger-inflector](https://github.com/swagger-api/swagger-inflector) to automatically wire up the API definition to the implementation and provide out-of-the-box mocking.
 
 
 
