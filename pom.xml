@@ -107,20 +107,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>external.atlassian.jgitflow</groupId>
-                <artifactId>jgitflow-maven-plugin</artifactId>
-                <version>1.0-m5.1</version>
-                <configuration>
-                    <enableSshAgent>true</enableSshAgent>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <pushFeatures>true</pushFeatures>
-                    <pushReleases>true</pushReleases>
-                    <pushHotfixes>true</pushHotfixes>
-                    <noDeploy>false</noDeploy>
-                    <scmCommentPrefix>[jgitflow]</scmCommentPrefix>
-                    <username>${git.user}</username>
-                    <password>${git.password}</password>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
