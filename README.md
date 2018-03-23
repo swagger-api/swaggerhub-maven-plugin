@@ -103,7 +103,6 @@ Parameter | Description | Required | Default
 **`token`** | SwaggerHub API key | true | -
 **`format`** | API definition format, `json` or `yaml` | false | `json`
 **`isPrivate`** | Defines whether the API should be private on SwaggerHub (using `true` requires a paid plan). | false | `false`
-**`force`** | | false | `false`
 **`host`** | URL of SwaggerHub API | false | `api.swaggerhub.com`
 **`protocol`** | Protocol for SwaggerHub API,`http` or `https` | false | `https`
 **`port`** | Port to access SwaggerHub API| false | `443`

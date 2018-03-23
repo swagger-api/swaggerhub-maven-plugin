@@ -5,7 +5,7 @@
     <artifactId>swaggerhub-maven-plugin-test</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Test Upload: Private, Force</name>
+    <name>Test Upload Private</name>
 
     <build>
         <plugins>
@@ -22,7 +22,6 @@
                     <inputFile>src/test/resources/TestAPI.json</inputFile>
                     <token>dUmMyTokEn.1234abc</token>
                     <isPrivate>true</isPrivate>
-                    <force>true</force>
                 </configuration>
             </plugin>
 
