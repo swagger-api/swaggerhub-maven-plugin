@@ -7,6 +7,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.IOException;
 
 public class SwaggerHubClient {
@@ -51,7 +52,8 @@ public class SwaggerHubClient {
     private Request buildGetRequest(HttpUrl httpUrl, MediaType mediaType) {
         Request.Builder requestBuilder = new Request.Builder()
                 .url(httpUrl)
-                .addHeader("Accept", mediaType.toString());
+                .addHeader("Accept", mediaType.toString())
+                .addHeader("User-Agent", "swaggerhub-maven-plugin");
         if (token != null) {
             requestBuilder.addHeader("Authorization", token);
         }
@@ -79,11 +81,12 @@ public class SwaggerHubClient {
 
     private Request buildPostRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
         return new Request.Builder()
-                    .url(httpUrl)
-                    .addHeader("Content-Type", mediaType.toString())
-                    .addHeader("Authorization", token)
-                    .post(RequestBody.create(mediaType, content))
-                    .build();
+                .url(httpUrl)
+                .addHeader("Content-Type", mediaType.toString())
+                .addHeader("Authorization", token)
+                .addHeader("User-Agent", "swaggerhub-maven-plugin")
+                .post(RequestBody.create(mediaType, content))
+                .build();
     }
 
     private HttpUrl getDownloadUrl(SwaggerHubRequest swaggerHubRequest) {

@@ -75,6 +75,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
                 .withHeader("Content-Type", equalToIgnoreCase(
                         String.format("application/%s; charset=UTF-8", format != null ? format : "json")))
                 .withHeader("Authorization", equalTo(token))
+                .withHeader("User-Agent", equalTo("swaggerhub-maven-plugin"))
                 .willReturn(created()));
 
         return url;
