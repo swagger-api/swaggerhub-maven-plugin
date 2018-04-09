@@ -4,10 +4,10 @@
 A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
 
 ## Features
-* download/upload API definitions from/to SwaggerHub.
-* supports `json` and `yaml` format for API definitions.
-* authenticate with API key for restricted operations (e.g downloading a private API definition). 
-* connects to SwaggerHub cloud by default or local SwaggerHub instance through optional configuration.
+* Download/upload API definitions from/to SwaggerHub.
+* Supports `json` and `yaml` format for API definitions.
+* Authenticate with API key for restricted operations (e.g downloading a private API definition). 
+* Connects to SwaggerHub cloud by default or local SwaggerHub instance through optional configuration.
 
 The pattern of usage is likely to depend on whether a [code first or design first](https://swaggerhub.com/blog/api-design/design-first-or-code-first-api-development/) approach is followed.
 
@@ -15,7 +15,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
 
 ### Code First
 1. Code API implementation.
-2. Automatically generate API definition from implementation, e.g. via annotations from [swagger-core](https://github.com/swagger-api/swagger-core), or [JAX-RS Analyzer](https://github.com/sdaschner/jaxrs-analyzer-maven-plugin/).
+2. Automatically generate API definition from implementation, e.g. via annotations from [swagger-core](https://github.com/swagger-api/swagger-core).
 3. Upload generated API definition to SwaggerHub with swaggerhub-maven-plugin.
 
 ### Design First
@@ -102,7 +102,7 @@ Parameter | Description | Required | Default
 **`inputFile`** | Local file containing the API definition in json or yaml format  | true | - 
 **`token`** | SwaggerHub API key | true | -
 **`format`** | API definition format, `json` or `yaml` | false | `json`
-**`isPrivate`** | Defines whether the API should be private on SwaggerHub (using `true` requires a paid plan). | false | `false`
+**`isPrivate`** | Defines whether the API should be private on SwaggerHub (using `true` requires a paid plan) | false | `false`
 **`host`** | URL of SwaggerHub API | false | `api.swaggerhub.com`
 **`protocol`** | Protocol for SwaggerHub API,`http` or `https` | false | `https`
 **`port`** | Port to access SwaggerHub API| false | `443`
