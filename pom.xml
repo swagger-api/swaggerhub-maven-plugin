@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.jsfrench</groupId>
+    <groupId>io.swagger</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
     <version>1.0.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
@@ -9,12 +9,12 @@
     <description>A maven plugin for downloading and uploading Swagger/OAS definitions from/to SwaggerHub as
         part of a build process.
     </description>
-    <url>https://github.com/jsfrench/swaggerhub-maven-plugin</url>
+    <url>https://github.com/swagger-api/swaggerhub-maven-plugin</url>
 
     <scm>
-        <connection>scm:git:git://github.com:jsfrench/swaggerhub-maven-plugin.git</connection>
-        <developerConnection>scm:git:ssh://github.com:jsfrench/swaggerhub-maven-plugin.git</developerConnection>
-        <url>https://github.com/jsfrench/swaggerhub-maven-plugin/tree/master</url>
+        <connection>scm:git:git://github.com:swagger-api/swaggerhub-maven-plugin.git</connection>
+        <developerConnection>scm:git:ssh://github.com:swagger-api/swaggerhub-maven-plugin.git</developerConnection>
+        <url>https://github.com/swagger-api/swaggerhub-maven-plugin/tree/master</url>
     </scm>
 
     <licenses>
@@ -26,10 +26,14 @@
 
     <developers>
         <developer>
+            <id>jsfrench</id>
             <name>John French</name>
             <email>frenchE@gmail.com</email>
-            <organization>jsfrench</organization>
-            <organizationUrl>https://github.com/jsfrench</organizationUrl>
+        </developer>
+        <developer>
+            <id>webron</id>
+            <name>Ron Ratovsky</name>
+            <email>webron@gmail.com</email>
         </developer>
     </developers>
 
@@ -103,20 +107,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>external.atlassian.jgitflow</groupId>
-                <artifactId>jgitflow-maven-plugin</artifactId>
-                <version>1.0-m5.1</version>
-                <configuration>
-                    <enableSshAgent>true</enableSshAgent>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <pushFeatures>true</pushFeatures>
-                    <pushReleases>true</pushReleases>
-                    <pushHotfixes>true</pushHotfixes>
-                    <noDeploy>false</noDeploy>
-                    <scmCommentPrefix>[jgitflow]</scmCommentPrefix>
-                    <username>${git.user}</username>
-                    <password>${git.password}</password>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

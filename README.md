@@ -1,5 +1,5 @@
-![Maven Central](https://img.shields.io/maven-central/v/io.github.jsfrench/swaggerhub-maven-plugin.svg)
-![Travis](https://travis-ci.org/jsfrench/swaggerhub-maven-plugin.png?branch=develop)
+[![Build Status](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin.svg)](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin)
 # swaggerhub-maven-plugin
 A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
 
@@ -21,7 +21,9 @@ The pattern of usage is likely to depend on whether a [code first or design firs
 ### Design First
 1. Write API definition (e.g. in Swagger Editor or SwaggerHub).
 2. Download API definition with swaggerhub-maven-plugin.
-3. Pass API definition to [swagger-codegen-maven-plugin](https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin) to generate API client and resource classes.
+3. Pass API definition to another Swagger tool e.g.
+    - [swagger-codegen-maven-plugin](https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin) to generate API client and resource classes.
+    - [swagger-inflector](https://github.com/swagger-api/swagger-inflector) to automatically wire up the API definition to the implementation and provide out-of-the-box mocking.
 
 
 
@@ -31,7 +33,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
 * Download a public API definition in json format from SwaggerHub automatically as part of the default maven build lifecycle and save to a local file.
 ```xml
     <plugin>
-        <groupId>io.github.jsfrench</groupId>
+        <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
         <version>1.0.1</version>
         <executions>
@@ -71,7 +73,7 @@ Parameter | Description | Required | Default
 * Upload an API definition in json format as a public API in SwaggerHub.
 ```xml
     <plugin>
-        <groupId>io.github.jsfrench</groupId>
+        <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
         <version>1.0.1</version>
         <executions>
@@ -101,7 +103,6 @@ Parameter | Description | Required | Default
 **`token`** | SwaggerHub API key | true | -
 **`format`** | API definition format, `json` or `yaml` | false | `json`
 **`isPrivate`** | Defines whether the API should be private on SwaggerHub (using `true` requires a paid plan). | false | `false`
-**`force`** | | false | `false`
 **`host`** | URL of SwaggerHub API | false | `api.swaggerhub.com`
 **`protocol`** | Protocol for SwaggerHub API,`http` or `https` | false | `https`
 **`port`** | Port to access SwaggerHub API| false | `443`
