@@ -1,4 +1,4 @@
-package io.github.jsfrench.swaggerhub;
+package io.swagger.swaggerhub.plugin;
 
 
 import org.apache.maven.plugin.AbstractMojo;

@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.github.jsfrench.swaggerhub</groupId>
+    <groupId>io.swagger.swaggerhub</groupId>
     <artifactId>swaggerhub-maven-plugin-test</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Test Upload: Private, Force</name>
+    <name>Test Upload Private</name>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>io.github.jsfrench</groupId>
+                <groupId>io.swagger</groupId>
                 <artifactId>swaggerhub-maven-plugin</artifactId>
                 <configuration>
                     <host>localhost</host>
@@ -22,7 +22,6 @@
                     <inputFile>src/test/resources/TestAPI.json</inputFile>
                     <token>dUmMyTokEn.1234abc</token>
                     <isPrivate>true</isPrivate>
-                    <force>true</force>
                 </configuration>
             </plugin>
 

@@ -1,8 +1,7 @@
-package io.github.jsfrench.swaggerhub;
+package io.swagger.swaggerhub.plugin;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
@@ -37,8 +36,8 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         runTest(pom);
     }
 
-    public void testUploadPrivateForcel() throws Exception {
-        File pom = getTestFile("src/test/resources/testProjects/upload-private-force.xml");
+    public void testUploadPrivate() throws Exception {
+        File pom = getTestFile("src/test/resources/testProjects/upload-private.xml");
         runTest(pom);
     }
 
@@ -64,7 +63,6 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         int port = Integer.parseInt(config.getChild("port").getValue());
         String format = config.getChild("format").getValue();
         String isPrivate = config.getChild("isPrivate").getValue();
-        String force = config.getChild("force").getValue();
 
 
         startMockServer(port);
@@ -74,10 +72,10 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         stubFor(post(url)
                 .withQueryParam("version", equalTo(version))
                 .withQueryParam("isPrivate", equalTo(isPrivate != null ? isPrivate : "false"))
-                .withQueryParam("force", equalTo(force != null ? force : "false"))
                 .withHeader("Content-Type", equalToIgnoreCase(
                         String.format("application/%s; charset=UTF-8", format != null ? format : "json")))
                 .withHeader("Authorization", equalTo(token))
+                .withHeader("User-Agent", equalTo("swaggerhub-maven-plugin"))
                 .willReturn(created()));
 
         return url;

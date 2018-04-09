@@ -1,4 +1,4 @@
-package io.github.jsfrench.swaggerhub;
+package io.swagger.swaggerhub.plugin;
 
 import io.swagger.models.Swagger;
 import io.swagger.parser.SwaggerParser;
