@@ -116,7 +116,7 @@
                     <pushFeatures>true</pushFeatures>
                     <pushReleases>true</pushReleases>
                     <pushHotfixes>true</pushHotfixes>
-                    <noDeploy>false</noDeploy>
+                    <noDeploy>true</noDeploy>
                     <scmCommentPrefix>[jgitflow]</scmCommentPrefix>
                     <username>${git.user}</username>
                     <password>${git.password}</password>
