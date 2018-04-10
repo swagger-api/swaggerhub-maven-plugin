@@ -35,7 +35,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
         <executions>
             <execution>
                 <phase>generate-resources</phase>
@@ -75,7 +75,7 @@ Parameter | Description | Required | Default
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
