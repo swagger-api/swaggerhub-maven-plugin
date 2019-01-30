@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -21,8 +20,10 @@ import java.nio.file.Paths;
 public class SwaggerHubDownload extends AbstractMojo {
     @Parameter(property = "download.owner", required = true)
     private String owner;
-    @Parameter(property = "download.api", required = true)
-    private String api;
+    @Parameter(property = "download.name", required = true)
+    private String name;
+    @Parameter(property = "download.type", defaultValue = "api")
+    private String type;
     @Parameter(property = "download.version", required = true)
     private String version;
     @Parameter(property = "download.format", defaultValue = "json")
@@ -42,13 +43,13 @@ public class SwaggerHubDownload extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
         getLog().info("Downloading from " + host
-                + ": api-" + api
+                + ": name-" + name
                 + ", owner-" + owner
                 + ", version-" + version
                 + ", format-" + format
                 + ", outputFile-" + outputFile);
 
-        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
+        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(name, owner, type, version)
                 .format(format)
                 .build();
 

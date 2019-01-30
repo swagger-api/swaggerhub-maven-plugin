@@ -2,15 +2,20 @@ package io.swagger.swaggerhub.plugin;
 
 
 public class SwaggerHubRequest {
-    private final String api;
+    private final String name;
     private final String owner;
+    private final String type;
     private final String version;
     private final String format;
     private final String swagger;
     private final boolean isPrivate;
 
-    public String getApi() {
-        return api;
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getOwner() {
@@ -34,8 +39,9 @@ public class SwaggerHubRequest {
     }
 
     private SwaggerHubRequest(Builder builder) {
-        this.api = builder.api;
+        this.name = builder.name;
         this.owner = builder.owner;
+        this.type = builder.type;
         this.version = builder.version;
         this.format = builder.format;
         this.swagger = builder.swagger;
@@ -43,16 +49,18 @@ public class SwaggerHubRequest {
     }
 
     public static class Builder {
-        private final String api;
+        private final String name;
         private final String owner;
+        private final String type;
         private final String version;
         private String format;
         private String swagger;
         private boolean isPrivate;
 
-        public Builder(String api, String owner, String version) {
-            this.api = api;
+        public Builder(String name, String owner, String type, String version) {
+            this.name = name;
             this.owner = owner;
+            this.type = type;
             this.version = version;
         }
 

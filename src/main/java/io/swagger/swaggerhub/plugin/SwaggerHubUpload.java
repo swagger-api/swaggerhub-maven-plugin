@@ -54,7 +54,7 @@ public class SwaggerHubUpload extends AbstractMojo {
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
 
-            SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
+            SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, "api", version)
                     .swagger(content)
                     .format(format)
                     .isPrivate(isPrivate)

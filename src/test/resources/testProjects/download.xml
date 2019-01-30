@@ -13,8 +13,10 @@
                 <groupId>io.swagger</groupId>
                 <artifactId>swaggerhub-maven-plugin</artifactId>
                 <configuration>
-                    <api>PetStoreAPI</api>
+                    <!--<name>PetStoreAPI</name>-->
+                    <name>testDomain</name>
                     <owner>jsfrench</owner>
+                    <type>domain</type>
                     <version>1.0.0</version>
                     <outputFile>target/test/petStoreAPI.json</outputFile>
                 </configuration>

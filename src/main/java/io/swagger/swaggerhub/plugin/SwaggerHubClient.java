@@ -30,7 +30,7 @@ public class SwaggerHubClient {
     public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
         HttpUrl httpUrl = getDownloadUrl(swaggerHubRequest);
         MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
-
+        System.out.println("***** URL " + httpUrl.toString());
         Request requestBuilder = buildGetRequest(httpUrl, mediaType);
 
         final String jsonResponse;
@@ -90,25 +90,38 @@ public class SwaggerHubClient {
     }
 
     private HttpUrl getDownloadUrl(SwaggerHubRequest swaggerHubRequest) {
-        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getName(), swaggerHubRequest.getType())
                 .addEncodedPathSegment(swaggerHubRequest.getVersion())
                 .build();
     }
 
     private HttpUrl getUploadUrl(SwaggerHubRequest swaggerHubRequest) {
-        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getName(), swaggerHubRequest.getType())
                 .addEncodedQueryParameter("version", swaggerHubRequest.getVersion())
                 .addEncodedQueryParameter("isPrivate", Boolean.toString(swaggerHubRequest.isPrivate()))
                 .build();
     }
 
-    private HttpUrl.Builder getBaseUrl(String owner, String api) {
-        return new HttpUrl.Builder()
+    private HttpUrl.Builder getBaseUrl(String owner, String name, String type) {
+        HttpUrl.Builder builder = new HttpUrl.Builder()
                 .scheme(protocol)
                 .host(host)
-                .port(port)
-                .addPathSegment(APIS)
-                .addEncodedPathSegment(owner)
-                .addEncodedPathSegment(api);
+                .port(port);
+        if (type.equalsIgnoreCase("api")) {
+            builder.addEncodedPathSegment(APIS);
+        } else {
+            builder.addEncodedPathSegment("domains");
+        }
+                builder.addEncodedPathSegment(owner);
+                builder.addEncodedPathSegment(name);
+
+        //        return new HttpUrl.Builder()
+//                .scheme(protocol)
+//                .host(host)
+//                .port(port)
+//                .addPathSegment(APIS)
+//                .addEncodedPathSegment(owner)
+//                .addEncodedPathSegment(name);
+        return builder;
     }
 }
