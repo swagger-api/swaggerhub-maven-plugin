@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin.svg)](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin)
 # swaggerhub-maven-plugin
-A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) from a maven build process, primarily to integrate with other OpenAPI/Swagger maven tooling.
+A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) definitions with a maven build process, using the [SwaggerHub API](https://app.swaggerhub.com/apis/swagger-hub/registry-api).
 
 ## Features
 * Download/upload API definitions from/to SwaggerHub.
@@ -15,7 +15,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
 
 ### Code First
 1. Code API implementation.
-2. Automatically generate API definition from implementation, e.g. via annotations from [swagger-core](https://github.com/swagger-api/swagger-core).
+2. Automatically generate API definition from implementation, e.g. via [swagger-core](https://github.com/swagger-api/swagger-core) [annotations](https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations) and [swagger maven plugin](https://github.com/swagger-api/swagger-core/tree/master/modules/swagger-maven-plugin). See also [swagger-core wiki](https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Getting-started)
 3. Upload generated API definition to SwaggerHub with swaggerhub-maven-plugin.
 
 ### Design First
@@ -35,7 +35,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
         <executions>
             <execution>
                 <phase>generate-resources</phase>
@@ -75,7 +75,7 @@ Parameter | Description | Required | Default
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -93,6 +93,55 @@ Parameter | Description | Required | Default
         </executions>
     </plugin>
 ```
+
+#### Example Usage together with `swagger-maven-plugin` (code first)
+
+
+```xml
+    <plugin>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-maven-plugin</artifactId>
+        <version>2.0.5</version>
+        <configuration>
+            <outputFileName>petStoreAPI</outputFileName>
+            <outputPath>${project.build.directory}</outputPath>
+            <outputFormat>JSON</outputFormat>
+            <resourcePackages>
+                <package>test.petstore</package>
+            </resourcePackages>
+            <prettyPrint>TRUE</prettyPrint>
+        </configuration>
+        <executions>
+            <execution>
+                <phase>compile</phase>
+                <goals>
+                    <goal>resolve</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>
+        <groupId>io.swagger</groupId>
+        <artifactId>swaggerhub-maven-plugin</artifactId>
+        <version>1.0.2</version>
+        <executions>
+            <execution>
+                <phase>deploy</phase>
+                <goals>
+                    <goal>upload</goal>
+                </goals>
+                <configuration>
+                    <api>PetStoreAPI</api>
+                    <owner>jsfrench</owner>
+                    <version>1.0.1-SNAPSHOT</version>
+                    <inputFile>target/petStoreAPI.json</inputFile>
+                    <token>${SWAGGERHUB_APIKEY}</token>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+```
+
 #### Parameters
 Parameter | Description | Required | Default
 --------- | ----------- | --------- | -------
