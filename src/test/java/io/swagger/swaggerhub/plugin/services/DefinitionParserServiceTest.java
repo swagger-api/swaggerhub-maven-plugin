@@ -10,7 +10,6 @@ import io.swagger.util.Yaml;
 import org.junit.Before;
 import org.junit.Test;
 
-
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
@@ -19,6 +18,8 @@ public class DefinitionParserServiceTest {
     private static DefinitionParserService definitionParserService;
     private Swagger swagger;
     private ObjectMapper objectMapper;
+
+    private static final String SAMPLE_DEFINITION_TITLE = "Sample Definition Title";
 
     @Before
     public void setupTestClass(){
@@ -125,6 +126,58 @@ public class DefinitionParserServiceTest {
 
         //When
         definitionParserService.getVersion(swaggerNode);
+
+        //Then
+        fail();
+    }
+
+    @Test
+    public void validJSONDefinition_canBeConvertedToJsonNode() throws DefinitionParsingException {
+        //Given
+        String validJson = String.format("{" +
+                " \"info\":{" +
+                "    \"title\": \"%s\" }" +
+                " }", SAMPLE_DEFINITION_TITLE);
+
+        //When
+        JsonNode definitionJsonNode = definitionParserService.convertDefinitionToJsonNode(validJson, DefinitionFileFormat.JSON);
+
+        //sThen
+        assertEquals(SAMPLE_DEFINITION_TITLE, definitionJsonNode.get("info").get("title").textValue());
+    }
+
+    @Test
+    public void validYamlDefinition_canBeConvertedToJsonNode() throws DefinitionParsingException {
+        //Given
+        String validYaml = String.format("info:\n" +
+                "   title: %s", SAMPLE_DEFINITION_TITLE);
+
+        //When
+        JsonNode definitionJsonNode = definitionParserService.convertDefinitionToJsonNode(validYaml, DefinitionFileFormat.YAML);
+
+        //sThen
+        assertEquals(SAMPLE_DEFINITION_TITLE, definitionJsonNode.get("info").get("title").textValue());
+    }
+
+    @Test(expected = DefinitionParsingException.class)
+    public void invalidJsonDefinition_throwsException_whenConvertingToJsonNode() throws DefinitionParsingException {
+        //Given
+        String invalidJson = "{ \"info\":       {title:@@£$!}}";
+
+        //When
+        definitionParserService.convertDefinitionToJsonNode(invalidJson, DefinitionFileFormat.JSON);
+
+        //Then
+        fail();
+    }
+
+    @Test(expected = DefinitionParsingException.class)
+    public void invalidYamlDefinition_throwsException_whenConvertingToJsonNode() throws DefinitionParsingException {
+        //Given
+        String invalidYaml = "\"info\":    version 1.0.0   title: Sample Definition Title}";
+
+        //When
+        definitionParserService.convertDefinitionToJsonNode(invalidYaml, DefinitionFileFormat.YAML);
 
         //Then
         fail();
