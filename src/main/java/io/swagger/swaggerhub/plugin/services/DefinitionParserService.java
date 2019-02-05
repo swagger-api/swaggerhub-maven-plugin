@@ -71,7 +71,7 @@ public class DefinitionParserService {
         }else if (definition.has("openapi")){
             return definition.get("openapi").textValue();
         }else{
-            throw new DefinitionParsingException("");
+            throw new DefinitionParsingException("Unable to validate the OAS version of the definition.");
         }
     }
 
