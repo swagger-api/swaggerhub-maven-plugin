@@ -2,11 +2,15 @@ package io.swagger.swaggerhub.plugin.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
+import io.swagger.util.Json;
+import io.swagger.util.Yaml;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
 
 
 /**
- * Service used to fetch definition features
+ * Service used to fetch features of a given API definition
  */
 public class DefinitionParserService {
 
@@ -35,7 +39,7 @@ public class DefinitionParserService {
      * @return
      * @throws DefinitionParsingException
      */
-    public String getVersion(JsonNode definition) throws DefinitionParsingException{
+    public String getVersion(JsonNode definition) throws DefinitionParsingException {
         String versionValue;
         try {
             versionValue = definition.get("info").get("version").asText();
@@ -45,4 +49,24 @@ public class DefinitionParserService {
 
         return versionValue.trim();
     }
+
+    /**
+     * Attempts to convert a given definition into JSON node object
+     * If this is possible, the definition is potentially valid can be parsed prior to upload.
+     * @param definition
+     * @return
+     */
+    public JsonNode convertDefinitionToJsonNode(String definition, DefinitionFileFormat definitionFileFormat) throws DefinitionParsingException {
+
+        try {
+            if (definitionFileFormat.equals(DefinitionFileFormat.YAML)) {
+                return Yaml.mapper().readTree(definition);
+            } else {
+                return Json.mapper().readTree(definition);
+            }
+        }catch (IOException e){
+            throw new DefinitionParsingException("Unable to parse definition prior to value extraction.", e);
+        }
+    }
+
 }
