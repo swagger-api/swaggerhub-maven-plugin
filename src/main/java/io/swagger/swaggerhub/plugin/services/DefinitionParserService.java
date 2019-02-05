@@ -65,7 +65,7 @@ public class DefinitionParserService {
                 return Json.mapper().readTree(definition);
             }
         }catch (IOException e){
-            throw new DefinitionParsingException("", e);
+            throw new DefinitionParsingException("Unable to parse definition prior to value extraction.", e);
         }
     }
 
