@@ -28,20 +28,26 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
     public void testUpload() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload.xml");
-        runTest(pom);
+        runTest(pom, "2.0");
     }
 
     public void testUploadYaml() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-yaml.xml");
-        runTest(pom);
+        runTest(pom, "2.0");
     }
+
+    public void testUploadOAS3Yaml() throws Exception {
+        File pom = getTestFile("src/test/resources/testProjects/upload-oas3-yaml.xml");
+        runTest(pom, "3.0.0");
+    }
+
 
     public void testUploadPrivate() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-private.xml");
-        runTest(pom);
+        runTest(pom, "2.0");
     }
 
-    private void runTest(File pom) throws Exception {
+    private void runTest(File pom, String oasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
 
@@ -49,13 +55,13 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         assertNotNull(swaggerHubUpload);
 
         final PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
-        UrlPathPattern url = setupServerMocking(config);
+        UrlPathPattern url = setupServerMocking(config, oasVersion);
 
         swaggerHubUpload.execute();
         verify(1, postRequestedFor(url));
     }
 
-    private UrlPathPattern setupServerMocking(PlexusConfiguration config) {
+    private UrlPathPattern setupServerMocking(PlexusConfiguration config, String oasVersion) {
         String api = config.getChild("api").getValue();
         String owner = config.getChild("owner").getValue();
         String version = config.getChild("version").getValue();
@@ -64,7 +70,6 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         String format = config.getChild("format").getValue();
         String isPrivate = config.getChild("isPrivate").getValue();
 
-
         startMockServer(port);
 
         UrlPathPattern url = urlPathEqualTo("/apis/" + owner + "/" + api);
@@ -72,6 +77,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         stubFor(post(url)
                 .withQueryParam("version", equalTo(version))
                 .withQueryParam("isPrivate", equalTo(isPrivate != null ? isPrivate : "false"))
+                .withQueryParam("oas", equalTo(oasVersion))
                 .withHeader("Content-Type", equalToIgnoreCase(
                         String.format("application/%s; charset=UTF-8", format != null ? format : "json")))
                 .withHeader("Authorization", equalTo(token))

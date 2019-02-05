@@ -1,15 +1,24 @@
 package io.swagger.swaggerhub.plugin;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
+import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
+import io.swagger.swaggerhub.plugin.services.DefinitionParserService;
+import io.swagger.util.Json;
+import io.swagger.util.Yaml;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import javax.print.attribute.standard.Destination;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
+import java.util.Optional;
 
 
 /**
@@ -53,15 +62,17 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
+            String oasVersion = DefinitionParserService.getOASVersion(DefinitionParserService.convertDefinitionToJsonNode(content, DefinitionFileFormat.valueOf(format.toUpperCase())));
 
             SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
                     .swagger(content)
                     .format(format)
                     .isPrivate(isPrivate)
+                    .oas(oasVersion)
                     .build();
 
             swaggerHubClient.saveDefinition(swaggerHubRequest);
-        } catch (IOException e) {
+        } catch (IOException | DefinitionParsingException e) {
             getLog().error(e);
             throw new MojoExecutionException("Failed to upload API definition", e);
         }
