@@ -4,6 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ public class DefinitionFileFinder {
      */
     public List<File> findDefinitionFiles(String directory, Optional<String> fileNameRegexPattern) throws IOException {
 
-        File directoryFile = new File(directory);
+        File directoryFile = Paths.get(directory).toFile();
         if(!directoryFile.exists()){
             throw new IOException(String.format("The given directory [%s] cannot be found", directory));
         }
