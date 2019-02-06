@@ -54,7 +54,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
-            String oasVersion = DefinitionParserService.getOASVersion(DefinitionParserService.convertDefinitionToJsonNode(content, DefinitionFileFormat.valueOf(format.toUpperCase())));
+            String oasVersion = DefinitionParserService.getOASVersion( DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
 
             SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
                     .swagger(content)
