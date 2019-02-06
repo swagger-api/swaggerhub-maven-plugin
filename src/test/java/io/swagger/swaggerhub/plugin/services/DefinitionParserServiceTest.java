@@ -154,7 +154,6 @@ public class DefinitionParserServiceTest {
 
         //Then
         assertEquals(oasVersion, "3.0.0");
-
     }
 
     @Test(expected = DefinitionParsingException.class)

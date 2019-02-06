@@ -41,13 +41,12 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         runTest(pom, "3.0.0");
     }
 
-
     public void testUploadPrivate() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-private.xml");
         runTest(pom, "2.0");
     }
 
-    private void runTest(File pom, String oasVersion) throws Exception {
+    private void runTest(File pom, String expectedOasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
 
@@ -55,7 +54,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         assertNotNull(swaggerHubUpload);
 
         final PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
-        UrlPathPattern url = setupServerMocking(config, oasVersion);
+        UrlPathPattern url = setupServerMocking(config, expectedOasVersion);
 
         swaggerHubUpload.execute();
         verify(1, postRequestedFor(url));
