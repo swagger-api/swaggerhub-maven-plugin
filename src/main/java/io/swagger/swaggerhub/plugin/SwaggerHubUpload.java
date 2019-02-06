@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * Uploads API definition to SwaggerHub
@@ -20,7 +21,7 @@ import java.nio.file.Paths;
 public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.owner", required = true)
     private String owner;
-    @Parameter(property = "upload.api", required = true)
+    @Parameter(property = "upload.api")
     private String api;
     @Parameter(property = "upload.version")
     private String version;
@@ -38,10 +39,17 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String inputFile;
     @Parameter(property = "upload.isPrivate", defaultValue = "false")
     private Boolean isPrivate;
+    @Parameter(property = "upload.definitionDirectory")
+    private String definitionDirectory;
+    @Parameter(property = "upload.definitionFileNameRegex")
+    private String definitionFileNameRegex;
+    @Parameter(property = "upload.uploadType")
+    private String uploadType;
 
     private SwaggerHubClient swaggerHubClient;
 
     public void execute() throws MojoExecutionException {
+
         swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
 
         getLog().info("Uploading to " + host
@@ -50,9 +58,16 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", version: " + version
                 + ", inputFile: " + inputFile
                 + ", format: " + format
-                + ", isPrivate: " + isPrivate);
+                + ", isPrivate: " + isPrivate
+                + ", definitionDirectory: " + definitionDirectory
+                + ", definitionFileNameRegex: " + definitionFileNameRegex
+                + ", uploadType: " + uploadType);
+
+        Optional<DefinitionUploadType> definitionUploadType = DefinitionUploadType.getByParamValue(uploadType);
+        definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile or directory.", uploadType)));
 
         try {
+
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
             String oasVersion = DefinitionParserService.getOASVersion( DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
 
@@ -64,6 +79,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .build();
 
             swaggerHubClient.saveDefinition(swaggerHubRequest);
+
         } catch (IOException | DefinitionParsingException e) {
             getLog().error(e);
             throw new MojoExecutionException("Failed to upload API definition", e);

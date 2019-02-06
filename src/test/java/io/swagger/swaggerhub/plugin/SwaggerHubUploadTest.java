@@ -3,7 +3,9 @@ package io.swagger.swaggerhub.plugin;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.junit.Test;
 
 import java.io.File;
 
@@ -23,27 +25,51 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        wireMockServer.stop();
+        if (null!= wireMockServer && wireMockServer.isRunning()) {
+            wireMockServer.stop();
+        }
     }
 
+    @Test
     public void testUpload() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload.xml");
         runTest(pom, "2.0");
     }
 
+    @Test
     public void testUploadYaml() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-yaml.xml");
         runTest(pom, "2.0");
     }
 
+    @Test
     public void testUploadOAS3Yaml() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-oas3-yaml.xml");
         runTest(pom, "3.0.0");
     }
 
+    @Test
     public void testUploadPrivate() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-private.xml");
         runTest(pom, "2.0");
+    }
+
+    @Test
+    public void testUploadFails_whenUploadTypeIsUnknown() throws Exception {
+        //Given
+        File pom = getTestFile("src/test/resources/testProjects/incorrect-upload-type.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        boolean executionFailure = false;
+
+        //When
+        try {
+            swaggerHubUpload.execute();
+        }catch (MojoExecutionException me){
+            executionFailure = true;
+        }
+
+        //Then
+        assertTrue(executionFailure);
     }
 
     private void runTest(File pom, String expectedOasVersion) throws Exception {
