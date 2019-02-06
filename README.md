@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin.svg)](https://travis-ci.org/swagger-api/swaggerhub-maven-plugin)
+[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.swagger.io/view/OSS%20-%20Java/job/oss-swaggerhub-maven-plugin.svg)](https://jenkins.swagger.io/view/OSS%20-%20Java/job/oss-swaggerhub-maven-plugin)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/io.swagger/swaggerhub-maven-plugin)
-# swaggerhub-maven-plugin
+# swaggerhub-maven-plugin <img src="https://raw.githubusercontent.com/swagger-api/swagger.io/wordpress/images/assets/SW-logo-clr.png" height="50" align="right">
 A simple maven plugin to access [SwaggerHub](https:\\swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) definitions with a maven build process, using the [SwaggerHub API](https://app.swaggerhub.com/apis/swagger-hub/registry-api).
 
 ## Features
@@ -35,7 +35,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>generate-resources</phase>
@@ -75,7 +75,7 @@ Parameter | Description | Required | Default
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -101,7 +101,7 @@ Parameter | Description | Required | Default
     <plugin>
         <groupId>io.swagger.core.v3</groupId>
         <artifactId>swagger-maven-plugin</artifactId>
-        <version>2.0.5</version>
+        <version>2.0.6</version>
         <configuration>
             <outputFileName>petStoreAPI</outputFileName>
             <outputPath>${project.build.directory}</outputPath>
@@ -123,7 +123,7 @@ Parameter | Description | Required | Default
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
