@@ -72,6 +72,60 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         assertTrue(executionFailure);
     }
 
+    @Test
+    public void testMultiDefinitionsAreUploaded_WhenSpecifyingDirectory() throws Exception {
+        //Given
+        String owner = "swaggerhubuser";
+        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
+
+        String isPrivate = config.getChild("isPrivate").getValue();
+        String token = config.getChild("token").getValue();
+        int port = Integer.parseInt(config.getChild("port").getValue());
+
+        startMockServer(port);
+
+        UrlPathPattern request1 = stubSaveDefinitionRequest(owner, "Test_API_1_Title_YAML", "1.0.1-SNAPSHOT", isPrivate, "3.0.0","yaml",token);
+        UrlPathPattern request2 = stubSaveDefinitionRequest(owner, "Test_API_2_JSON", "1.0.0",isPrivate, "2.0","json",token);
+        UrlPathPattern request3 = stubSaveDefinitionRequest(owner, "TEST_API_3_YML", "1.0.2-SNAPSHOT", isPrivate, "3.0.0", "yaml",token);
+
+        //When
+        swaggerHubUpload.execute();
+
+        //Then
+        verify(1, postRequestedFor(request1));
+        verify(1, postRequestedFor(request2));
+        verify(1, postRequestedFor(request3));
+    }
+
+    @Test
+    public void testMultiDefinitionsAreUploaded_WhenSpecifyingDirectoryAndRegexPattern() throws Exception {
+        //Given
+        String owner = "swaggerhubuser";
+        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions-with-regex.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
+
+        String isPrivate = config.getChild("isPrivate").getValue();
+        String token = config.getChild("token").getValue();
+        int port = Integer.parseInt(config.getChild("port").getValue());
+
+        startMockServer(port);
+
+        UrlPathPattern request1 = stubSaveDefinitionRequest(owner, "Test_API_1_Title_YAML", "1.0.1-SNAPSHOT", isPrivate, "3.0.0","yaml",token);
+        UrlPathPattern request2 = stubSaveDefinitionRequest(owner, "Test_API_2_JSON", "1.0.0",isPrivate, "2.0","json",token);
+        UrlPathPattern request3 = stubSaveDefinitionRequest(owner, "TEST_API_3_YML", "1.0.2-SNAPSHOT", isPrivate, "3.0.0", "yaml",token);
+
+        //When
+        swaggerHubUpload.execute();
+
+        //Then
+        verify(1, postRequestedFor(request1));
+        verify(1, postRequestedFor(request2));
+        verify(0, postRequestedFor(request3));
+    }
+
     private void runTest(File pom, String expectedOasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
@@ -97,8 +151,13 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
         startMockServer(port);
 
-        UrlPathPattern url = urlPathEqualTo("/apis/" + owner + "/" + api);
+        UrlPathPattern url = stubSaveDefinitionRequest(owner, api, version, isPrivate, oasVersion, format, token);
 
+        return url;
+    }
+
+    private UrlPathPattern stubSaveDefinitionRequest(String owner, String api, String version, String isPrivate, String oasVersion, String format, String token){
+        UrlPathPattern url = urlPathEqualTo("/apis/" + owner + "/" + api);
         stubFor(post(url)
                 .withQueryParam("version", equalTo(version))
                 .withQueryParam("isPrivate", equalTo(isPrivate != null ? isPrivate : "false"))
@@ -108,7 +167,6 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
                 .withHeader("Authorization", equalTo(token))
                 .withHeader("User-Agent", equalTo("swaggerhub-maven-plugin"))
                 .willReturn(created()));
-
         return url;
     }
 

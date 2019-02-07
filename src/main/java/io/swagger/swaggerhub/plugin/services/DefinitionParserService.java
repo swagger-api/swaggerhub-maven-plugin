@@ -2,8 +2,6 @@ package io.swagger.swaggerhub.plugin.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
-import io.swagger.util.Json;
-import io.swagger.util.Yaml;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -20,8 +18,7 @@ public class DefinitionParserService {
      * @param definition
      * @return
      */
-    public String getApiId(JsonNode definition) throws DefinitionParsingException {
-
+    public static String getApiId(JsonNode definition) throws DefinitionParsingException {
         String titleValue;
         try {
             titleValue = definition.get("info").get("title").asText();
@@ -39,7 +36,7 @@ public class DefinitionParserService {
      * @return
      * @throws DefinitionParsingException
      */
-    public String getVersion(JsonNode definition) throws DefinitionParsingException {
+    public static String getVersion(JsonNode definition) throws DefinitionParsingException {
         String versionValue;
         try {
             versionValue = definition.get("info").get("version").asText();
