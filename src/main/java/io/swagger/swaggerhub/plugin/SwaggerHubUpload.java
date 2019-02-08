@@ -41,7 +41,7 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String protocol;
     @Parameter(property = "upload.format", defaultValue = "json")
     private String format;
-    @Parameter(property = "upload.token")
+    @Parameter(property = "upload.token", required = true)
     private String token;
     @Parameter(property = "upload.inputFile")
     private String inputFile;
@@ -51,7 +51,7 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String definitionDirectory;
     @Parameter(property = "upload.definitionFileNameRegex")
     private String definitionFileNameRegex;
-    @Parameter(property = "upload.uploadType")
+    @Parameter(property = "upload.uploadType", required = true)
     private String uploadType;
 
     private SwaggerHubClient swaggerHubClient;
