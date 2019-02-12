@@ -1,16 +1,17 @@
 package io.swagger.swaggerhub.plugin;
 
-
+import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
+import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
+import io.swagger.swaggerhub.plugin.services.DefinitionParserService;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-
 
 /**
  * Uploads API definition to SwaggerHub
@@ -53,15 +54,17 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName("UTF-8"));
+            String oasVersion = DefinitionParserService.getOASVersion( DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
 
             SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
                     .swagger(content)
                     .format(format)
                     .isPrivate(isPrivate)
+                    .oas(oasVersion)
                     .build();
 
             swaggerHubClient.saveDefinition(swaggerHubRequest);
-        } catch (IOException e) {
+        } catch (IOException | DefinitionParsingException e) {
             getLog().error(e);
             throw new MojoExecutionException("Failed to upload API definition", e);
         }

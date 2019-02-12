@@ -56,16 +56,22 @@ public class DefinitionParserService {
      * @param definition
      * @return
      */
-    public JsonNode convertDefinitionToJsonNode(String definition, DefinitionFileFormat definitionFileFormat) throws DefinitionParsingException {
-
+    public static JsonNode convertDefinitionToJsonNode(String definition, DefinitionFileFormat definitionFileFormat) throws DefinitionParsingException {
         try {
-            if (definitionFileFormat.equals(DefinitionFileFormat.YAML)) {
-                return Yaml.mapper().readTree(definition);
-            } else {
-                return Json.mapper().readTree(definition);
-            }
+            return definitionFileFormat.getMapper().readTree(definition);
         }catch (IOException e){
             throw new DefinitionParsingException("Unable to parse definition prior to value extraction.", e);
+        }
+    }
+
+    public static String getOASVersion(JsonNode definition) throws DefinitionParsingException {
+
+        if (definition.has("swagger")) {
+            return definition.get("swagger").textValue();
+        }else if (definition.has("openapi")){
+            return definition.get("openapi").textValue();
+        }else{
+            throw new DefinitionParsingException("Unable to validate the OAS version of the definition.");
         }
     }
 
