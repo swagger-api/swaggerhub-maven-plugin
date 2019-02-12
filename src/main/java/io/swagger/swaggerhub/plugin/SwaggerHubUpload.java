@@ -56,6 +56,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     private SwaggerHubClient swaggerHubClient;
 
+    @Override
     public void execute() throws MojoExecutionException {
 
         swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
@@ -72,46 +73,71 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", uploadType: " + uploadType);
 
         Optional<DefinitionUploadType> definitionUploadType = DefinitionUploadType.getByParamValue(uploadType);
+        definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
+            executeUpload(type, inputFile, format, owner, isPrivate, api, version, definitionDirectory, definitionFileNameRegex);
+        }));
+
         definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile and directory.", uploadType)));
+    }
 
-        try {
-            if(definitionUploadType.get().equals(DefinitionUploadType.INPUT_FILE)) {
-                String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
-                String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
+    private void executeUpload(DefinitionUploadType definitionUploadType, String inputFile, String format, String owner,
+                               Boolean isPrivate, String api, String version, String definitionDirectory, String definitionFileNameRegex) throws MojoExecutionException {
 
-                SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
-                        .swagger(content)
-                        .format(format)
-                        .isPrivate(isPrivate)
-                        .oas(oasVersion)
-                        .build();
-
-                swaggerHubClient.saveDefinition(swaggerHubRequest);
-
-            }else if(definitionUploadType.get().equals(DefinitionUploadType.DIRECTORY)) {
-                DefinitionFileFinder.findDefinitionFiles(definitionDirectory, Optional.ofNullable(definitionFileNameRegex))
-                        .stream()
-                        .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
-                            SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file);
-                            getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), swaggerHubRequest.getApi()));
-                            swaggerHubClient.saveDefinition(swaggerHubRequest);
-                        }));
-            }
-
-        } catch (IOException | DefinitionParsingException e) {
-            throw new MojoExecutionException("Failed to upload API definition", e);
+        switch (definitionUploadType){
+            case INPUT_FILE:
+                executeInputFileBasedUpload(inputFile, format, owner, isPrivate, api, version);
+                break;
+            case DIRECTORY:
+                executeDirectoryBasedUpload(definitionDirectory, definitionFileNameRegex, owner, isPrivate);
+                break;
         }
     }
-    private SwaggerHubRequest createSwaggerHubRequest(File file) throws IOException, DefinitionParsingException {
+
+    private void executeInputFileBasedUpload(String inputFile, String format, String owner, Boolean isPrivate, String api, String version) throws MojoExecutionException {
+
+        getLog().info(String.format("Uploading API name [%s]", api));
+        try {
+            String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
+            String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
+            SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(content, owner, isPrivate, api, version, oasVersion, DefinitionFileFormat.getByFileExtensionType(format).get());
+            swaggerHubClient.saveDefinition(swaggerHubRequest);
+        } catch (DefinitionParsingException | IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
+
+    private void executeDirectoryBasedUpload(String definitionDirectory, String definitionFileNameRegex, String owner, Boolean isPrivate) throws MojoExecutionException {
+
+        try {
+            DefinitionFileFinder.findDefinitionFiles(definitionDirectory, Optional.ofNullable(definitionFileNameRegex))
+                    .stream()
+                    .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
+                        SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file, owner, isPrivate);
+                        getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), swaggerHubRequest.getApi()));
+                        swaggerHubClient.saveDefinition(swaggerHubRequest);
+                    }));
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
+
+    private SwaggerHubRequest createSwaggerHubRequest(File file, String owner, Boolean isPrivate) throws IOException, DefinitionParsingException {
 
         DefinitionFileFormat definitionFileFormat = DefinitionFileFormat.getByFileExtensionType(FilenameUtils.getExtension(file.getName())).get();
         ObjectMapper mapper = definitionFileFormat.getMapper();
-        String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), Charset.forName(UTF_8));
-        String api = DefinitionParserService.getApiId(mapper.readTree(content));
-        String oasVersion = DefinitionParserService.getOASVersion(mapper.readTree(content));
-        String version = DefinitionParserService.getVersion(mapper.readTree(content));
+        String fileContent = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), Charset.forName(UTF_8));
+        String api = DefinitionParserService.getApiId(mapper.readTree(fileContent));
+        String oasVersion = DefinitionParserService.getOASVersion(mapper.readTree(fileContent));
+        String version = DefinitionParserService.getVersion(mapper.readTree(fileContent));
+
+        return createSwaggerHubRequest(fileContent, owner, isPrivate, api, version, oasVersion, definitionFileFormat);
+    }
+
+    private SwaggerHubRequest createSwaggerHubRequest(String fileContent, String owner, Boolean isPrivate, String api, String version, String oasVersion,
+                                                      DefinitionFileFormat definitionFileFormat){
+
         SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
-                .swagger(content)
+                .swagger(fileContent)
                 .format(definitionFileFormat.getFileFormat())
                 .isPrivate(isPrivate)
                 .oas(oasVersion)
@@ -119,4 +145,6 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         return swaggerHubRequest;
     }
+
+
 }

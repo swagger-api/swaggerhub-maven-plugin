@@ -90,9 +90,11 @@ Definitions that don't have one of the following file extension types will be ig
 
  `definitionFileNameRegex` attempts to match on the filename without file extension. 
  If this parameter isn't specified, there will be an attempt to upload each file within the directory.
+ 
+ If any one of the definitions in the specified directory are unable to be uploaded, the build will fail and subsequent definitions will not be uploaded.
 
 #### Example Usage
-* Upload an a single API definition in json format as a public API in SwaggerHub via a specified input file.
+* Upload a single API definition in json format as a public API in SwaggerHub via a specified input file.
 ```xml
     <plugin>
         <groupId>io.swagger</groupId>
@@ -167,7 +169,7 @@ Definitions that don't have one of the following file extension types will be ig
 ```
 
 #### Example Usage
-* Upload an a multiple API definitions via a specified directory.
+* Upload multiple API definitions via a specified directory.
 ```xml
     <plugin>
         <groupId>io.swagger</groupId>
@@ -180,19 +182,16 @@ Definitions that don't have one of the following file extension types will be ig
                     <goal>upload</goal>
                 </goals>
                 <configuration>
-                    <api>PetStoreAPI</api>
                     <owner>jsfrench</owner>
-                    <version>1.0.1-SNAPSHOT</version>
-                    <inputFile>target/petStoreAPI.json</inputFile>
                     <token>${SWAGGERHUB_APIKEY}</token>
-                    <uploadType>inputFile</uploadType>
-                    <definitionDirectory></definitionDirectory>
+                    <uploadType>directory</uploadType>
+                    <definitionDirectory>${project.basedir}/api-definitions</definitionDirectory>
                 </configuration>
             </execution>
         </executions>
     </plugin>
 ```
-* Upload an a multiple API definitions via a specified directory and regex pattern to filter.
+* Upload multiple API definitions via a specified directory and regex pattern to filter.
 ```xml
     <plugin>
         <groupId>io.swagger</groupId>

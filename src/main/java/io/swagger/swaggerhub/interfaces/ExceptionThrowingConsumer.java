@@ -3,7 +3,8 @@ package io.swagger.swaggerhub.interfaces;
 import java.util.function.Consumer;
 
 /**
- * Consumer used throw an exception from the given funtion
+ * Consumer used throw an exception from the given function
+ * @see <a href="https://www.baeldung.com/java-lambda-exceptions">https://www.baeldung.com/java-lambda-exceptions</a></a>
  * @param <T>
  * @param <E>
  */
