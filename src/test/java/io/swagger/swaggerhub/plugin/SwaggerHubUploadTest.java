@@ -20,6 +20,18 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
+
+    private static final String API_1_TITLE = "Test_API_1_Title_YAML";
+    private static final String API_2_TITLE = "Test_API_2_JSON";
+    private static final String API_3_TITLE = "TEST_API_3_YML";
+    private static final String API_1_VERSION = "1.0.1-SNAPSHOT";
+    private static final String API_2_VERSION = "1.0.0";
+    private static final String API_3_VERSION = "1.0.2-SNAPSHOT";
+    private static final String OAS3 = "3.0.0";
+    private static final String OAS2 = "2.0";
+    private static final String YAML = "yaml";
+    private static final String JSON = "json";
+
     private WireMockServer wireMockServer;
 
     @Override
@@ -32,26 +44,27 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
     @Test
     public void testUpload() throws Exception {
-        File pom = getTestFile("src/test/resources/testProjects/upload.xml");
-        runTest(pom, "2.0");
+        File pom = getTestFile(
+                "src/test/resources/testProjects/upload.xml");
+        runTest(pom, OAS2);
     }
 
     @Test
     public void testUploadYaml() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-yaml.xml");
-        runTest(pom, "2.0");
+        runTest(pom, OAS2);
     }
 
     @Test
     public void testUploadOAS3Yaml() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-oas3-yaml.xml");
-        runTest(pom, "3.0.0");
+        runTest(pom, OAS3);
     }
 
     @Test
     public void testUploadPrivate() throws Exception {
         File pom = getTestFile("src/test/resources/testProjects/upload-private.xml");
-        runTest(pom, "2.0");
+        runTest(pom, OAS2);
     }
 
     @Test
@@ -66,7 +79,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
             swaggerHubUpload.execute();
         }catch (MojoExecutionException me){
             executionFailure = true;
-        }
+        } // @Test(expected = MojoExecutionException.class) is not working as expected. This catch is a workaround
 
         //Then
         assertTrue(executionFailure);
@@ -86,17 +99,17 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
         startMockServer(port);
 
-        UrlPathPattern request1 = stubSaveDefinitionRequest(owner, "Test_API_1_Title_YAML", "1.0.1-SNAPSHOT", isPrivate, "3.0.0","yaml",token);
-        UrlPathPattern request2 = stubSaveDefinitionRequest(owner, "Test_API_2_JSON", "1.0.0",isPrivate, "2.0","json",token);
-        UrlPathPattern request3 = stubSaveDefinitionRequest(owner, "TEST_API_3_YML", "1.0.2-SNAPSHOT", isPrivate, "3.0.0", "yaml",token);
+        UrlPathPattern definition1Request = stubSaveDefinitionRequest(owner, API_1_TITLE, API_1_VERSION, isPrivate, OAS3, YAML,token);
+        UrlPathPattern definition2Request = stubSaveDefinitionRequest(owner, API_2_TITLE, API_2_VERSION, isPrivate, OAS2, JSON,token);
+        UrlPathPattern definition3Request = stubSaveDefinitionRequest(owner, API_3_TITLE, API_3_VERSION, isPrivate, OAS3, YAML,token);
 
         //When
         swaggerHubUpload.execute();
 
         //Then
-        verify(1, postRequestedFor(request1));
-        verify(1, postRequestedFor(request2));
-        verify(1, postRequestedFor(request3));
+        verify(1, postRequestedFor(definition1Request));
+        verify(1, postRequestedFor(definition2Request));
+        verify(1, postRequestedFor(definition3Request));
     }
 
     @Test
@@ -113,17 +126,17 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
         startMockServer(port);
 
-        UrlPathPattern request1 = stubSaveDefinitionRequest(owner, "Test_API_1_Title_YAML", "1.0.1-SNAPSHOT", isPrivate, "3.0.0","yaml",token);
-        UrlPathPattern request2 = stubSaveDefinitionRequest(owner, "Test_API_2_JSON", "1.0.0",isPrivate, "2.0","json",token);
-        UrlPathPattern request3 = stubSaveDefinitionRequest(owner, "TEST_API_3_YML", "1.0.2-SNAPSHOT", isPrivate, "3.0.0", "yaml",token);
+        UrlPathPattern definition1Request = stubSaveDefinitionRequest(owner, API_1_TITLE, API_1_VERSION, isPrivate, OAS3, YAML,token);
+        UrlPathPattern definition2Request = stubSaveDefinitionRequest(owner, API_2_TITLE, API_2_VERSION, isPrivate, OAS2, JSON,token);
+        UrlPathPattern definition3Request = stubSaveDefinitionRequest(owner, API_3_TITLE, API_3_VERSION, isPrivate, OAS3, YAML,token);
 
         //When
         swaggerHubUpload.execute();
 
         //Then
-        verify(1, postRequestedFor(request1));
-        verify(1, postRequestedFor(request2));
-        verify(0, postRequestedFor(request3));
+        verify(1, postRequestedFor(definition1Request));
+        verify(1, postRequestedFor(definition2Request));
+        verify(0, postRequestedFor(definition3Request));
     }
 
     private void runTest(File pom, String expectedOasVersion) throws Exception {

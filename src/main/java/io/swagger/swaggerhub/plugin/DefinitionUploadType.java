@@ -19,10 +19,15 @@ public enum DefinitionUploadType {
         return paramValue;
     }
 
-    public static Optional<DefinitionUploadType> getByParamValue(String value){
+    /**
+     * Returns the appropriate enum by matching the given input to the enums param value
+     * @param userInputValue
+     * @return
+     */
+    public static Optional<DefinitionUploadType> getByParamValue(String userInputValue){
 
         return EnumSet.allOf(DefinitionUploadType.class).stream()
-                .filter(doesUploadTypeMatchUserInput(value))
+                .filter(doesUploadTypeMatchUserInput(userInputValue))
                 .findFirst();
     }
 

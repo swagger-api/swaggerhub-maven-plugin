@@ -1,6 +1,7 @@
 package io.swagger.swaggerhub.plugin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.swaggerhub.interfaces.ExceptionThrowingConsumer;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
@@ -17,7 +18,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Uploads API definition to SwaggerHub
@@ -72,7 +72,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", uploadType: " + uploadType);
 
         Optional<DefinitionUploadType> definitionUploadType = DefinitionUploadType.getByParamValue(uploadType);
-        definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile or directory.", uploadType)));
+        definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile and directory.", uploadType)));
 
         try {
             if(definitionUploadType.get().equals(DefinitionUploadType.INPUT_FILE)) {
@@ -91,27 +91,17 @@ public class SwaggerHubUpload extends AbstractMojo {
             }else if(definitionUploadType.get().equals(DefinitionUploadType.DIRECTORY)) {
                 DefinitionFileFinder.findDefinitionFiles(definitionDirectory, Optional.ofNullable(definitionFileNameRegex))
                         .stream()
-                        .forEach(uploadFileDefinitionFromDirectory());
+                        .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
+                            SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file);
+                            getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), swaggerHubRequest.getApi()));
+                            swaggerHubClient.saveDefinition(swaggerHubRequest);
+                        }));
             }
 
         } catch (IOException | DefinitionParsingException e) {
-            getLog().error(e);
             throw new MojoExecutionException("Failed to upload API definition", e);
         }
     }
-
-    private Consumer<File> uploadFileDefinitionFromDirectory(){
-        return file -> {
-            try {
-                SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file);
-                getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), swaggerHubRequest.getApi()));
-                swaggerHubClient.saveDefinition(swaggerHubRequest);
-            } catch (MojoExecutionException | IOException | DefinitionParsingException e ) {
-                getLog().error(String.format("Error when attempting to upload API definition [%s]", file.getName()), e);
-            }
-        };
-    }
-
     private SwaggerHubRequest createSwaggerHubRequest(File file) throws IOException, DefinitionParsingException {
 
         DefinitionFileFormat definitionFileFormat = DefinitionFileFormat.getByFileExtensionType(FilenameUtils.getExtension(file.getName())).get();

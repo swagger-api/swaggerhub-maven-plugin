@@ -23,7 +23,7 @@ public class DefinitionParserService {
         try {
             titleValue = definition.get("info").get("title").asText();
         }catch (NullPointerException ne){
-            throw new DefinitionParsingException("Unable to fetch a valid API ID", ne);
+            throw new DefinitionParsingException("Unable to fetch a valid API ID. Info and/or Title is missing from the given definition.", ne);
         }
 
         return titleValue.replaceAll("\\W", StringUtils.SPACE).trim().replaceAll("\\s","_");
@@ -41,7 +41,7 @@ public class DefinitionParserService {
         try {
             versionValue = definition.get("info").get("version").asText();
         }catch (NullPointerException ne){
-            throw new DefinitionParsingException("Unable to fetch the version", ne);
+            throw new DefinitionParsingException("Unable to fetch the version. Info and/or Title is missing from the given definition.", ne);
         }
 
         return versionValue.trim();
