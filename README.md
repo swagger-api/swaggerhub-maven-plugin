@@ -35,7 +35,7 @@ The pattern of usage is likely to depend on whether a [code first or design firs
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>generate-resources</phase>
@@ -97,7 +97,7 @@ Definitions that don't have one of the following file extension types will be ig
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -146,7 +146,7 @@ Definitions that don't have one of the following file extension types will be ig
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -172,7 +172,7 @@ Definitions that don't have one of the following file extension types will be ig
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -197,7 +197,7 @@ Definitions that don't have one of the following file extension types will be ig
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
