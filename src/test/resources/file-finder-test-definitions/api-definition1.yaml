@@ -1,0 +1,5 @@
+openapi: 3.0.0
+servers: []
+info:
+  version: "1.0.1-SNAPSHOT"
+  title: "Test API 1 Title YAML"

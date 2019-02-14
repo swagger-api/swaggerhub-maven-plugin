@@ -1,0 +1,5 @@
+openapi: 3.0.0
+servers: []
+info:
+  version: "1.0.2-SNAPSHOT"
+  title: "TEST API 3 YML"

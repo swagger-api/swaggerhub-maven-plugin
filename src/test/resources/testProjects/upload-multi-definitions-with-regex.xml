@@ -5,7 +5,7 @@
     <artifactId>swaggerhub-maven-plugin-test</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Test Upload</name>
+    <name>Test Upload YAML</name>
 
     <build>
         <plugins>
@@ -16,16 +16,13 @@
                     <host>localhost</host>
                     <port>8089</port>
                     <protocol>http</protocol>
-                    <api>TestAPI</api>
-                    <owner>testUser</owner>
-                    <version>1.1.0</version>
-                    <inputFile>src/test/resources/TestAPI.json</inputFile>
+                    <owner>swaggerhubuser</owner>
                     <token>dUmMyTokEn.1234abc</token>
-                    <uploadType>inputFile</uploadType>
+                    <uploadType>directory</uploadType>
+                    <definitionDirectory>src/test/resources/file-finder-test-definitions</definitionDirectory>
+                    <definitionFileNameRegex>^api-\w*</definitionFileNameRegex>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 </project>

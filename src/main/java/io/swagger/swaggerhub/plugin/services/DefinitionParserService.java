@@ -2,8 +2,6 @@ package io.swagger.swaggerhub.plugin.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
-import io.swagger.util.Json;
-import io.swagger.util.Yaml;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -20,13 +18,12 @@ public class DefinitionParserService {
      * @param definition
      * @return
      */
-    public String getApiId(JsonNode definition) throws DefinitionParsingException {
-
+    public static String getApiId(JsonNode definition) throws DefinitionParsingException {
         String titleValue;
         try {
             titleValue = definition.get("info").get("title").asText();
         }catch (NullPointerException ne){
-            throw new DefinitionParsingException("Unable to fetch a valid API ID", ne);
+            throw new DefinitionParsingException("Unable to fetch a valid API ID. Info and/or Title is missing from the given definition.", ne);
         }
 
         return titleValue.replaceAll("\\W", StringUtils.SPACE).trim().replaceAll("\\s","_");
@@ -39,12 +36,12 @@ public class DefinitionParserService {
      * @return
      * @throws DefinitionParsingException
      */
-    public String getVersion(JsonNode definition) throws DefinitionParsingException {
+    public static String getVersion(JsonNode definition) throws DefinitionParsingException {
         String versionValue;
         try {
             versionValue = definition.get("info").get("version").asText();
         }catch (NullPointerException ne){
-            throw new DefinitionParsingException("Unable to fetch the version", ne);
+            throw new DefinitionParsingException("Unable to fetch the version. Info and/or Title is missing from the given definition.", ne);
         }
 
         return versionValue.trim();

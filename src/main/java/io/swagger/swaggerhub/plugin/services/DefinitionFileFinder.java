@@ -4,9 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +12,6 @@ import java.util.Optional;
  * Service to search for and load definition files contained within downstream projects directory
  */
 public class DefinitionFileFinder {
-
-    private String[] supportedFileExtensions = {"json", "yml", "yaml"};
 
     /**
      * Given a directory and the optional regex pattern, find API definitions.
@@ -25,9 +21,10 @@ public class DefinitionFileFinder {
      * @return
      * @throws IOException - Returned when the directory specified cannot be found
      */
-    public List<File> findDefinitionFiles(String directory, Optional<String> fileNameRegexPattern) throws IOException {
+    public static List<File> findDefinitionFiles(String directory, Optional<String> fileNameRegexPattern) throws IOException {
 
-        File directoryFile = Paths.get(directory).toFile();
+
+        File directoryFile = new File(directory);
         if(!directoryFile.exists()){
             throw new IOException(String.format("The given directory [%s] cannot be found", directory));
         }
@@ -40,8 +37,7 @@ public class DefinitionFileFinder {
             String fileExtension = FilenameUtils.getExtension(childFile.getName());
             String fileNameWithoutExtension = FilenameUtils.removeExtension(childFile.getName());
 
-            boolean fileExtensionTypeIsSupported = Arrays.stream(supportedFileExtensions)
-                    .anyMatch(supportExtension -> fileExtension.equals(supportExtension));
+            boolean fileExtensionTypeIsSupported = DefinitionFileFormat.getByFileExtensionType(fileExtension).isPresent();
 
             if(!fileExtensionTypeIsSupported){
                 continue;
@@ -59,5 +55,4 @@ public class DefinitionFileFinder {
 
         return files;
     }
-
 }
