@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -82,7 +80,7 @@ public class SwaggerHubClientTest {
                 .target(target)
                 .token(token);
 
-        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest(requestBuilder);
+        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
 
         String requestUrl = String.format("/plugins/configurations/%s/%s/%s/%s?oas=%s", owner, api, version, scmProvider, oas);
         stubFor(put(requestUrl).willReturn(created()));
