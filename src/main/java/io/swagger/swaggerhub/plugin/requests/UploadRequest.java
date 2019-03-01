@@ -1,7 +1,7 @@
-package io.swagger.swaggerhub.plugin;
+package io.swagger.swaggerhub.plugin.requests;
 
 
-public class SwaggerHubRequest {
+public class UploadRequest {
     private final String api;
     private final String owner;
     private final String version;
@@ -36,7 +36,7 @@ public class SwaggerHubRequest {
 
     public String getOas() { return oas; }
 
-    private SwaggerHubRequest(Builder builder) {
+    private UploadRequest(Builder builder) {
         this.api = builder.api;
         this.owner = builder.owner;
         this.version = builder.version;
@@ -81,8 +81,8 @@ public class SwaggerHubRequest {
             return this;
         }
 
-        public SwaggerHubRequest build() {
-            return new SwaggerHubRequest(this);
+        public UploadRequest build() {
+            return new UploadRequest(this);
         }
 
     }

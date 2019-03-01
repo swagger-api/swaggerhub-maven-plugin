@@ -1,14 +1,18 @@
 package io.swagger.swaggerhub.plugin;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import io.swagger.swaggerhub.plugin.requests.UploadRequest;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class SwaggerHubClient {
     private final OkHttpClient client;
@@ -27,9 +31,9 @@ public class SwaggerHubClient {
         this.token = token;
     }
 
-    public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
-        HttpUrl httpUrl = getDownloadUrl(swaggerHubRequest);
-        MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
+    public String getDefinition(UploadRequest uploadRequest) throws MojoExecutionException {
+        HttpUrl httpUrl = getDownloadUrl(uploadRequest);
+        MediaType mediaType = MediaType.parse("application/" + uploadRequest.getFormat());
 
         Request requestBuilder = buildGetRequest(httpUrl, mediaType);
 
@@ -60,11 +64,11 @@ public class SwaggerHubClient {
         return requestBuilder.build();
     }
 
-    public void saveDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
-        HttpUrl httpUrl = getUploadUrl(swaggerHubRequest);
-        MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
+    public void saveDefinition(UploadRequest uploadRequest) throws MojoExecutionException {
+        HttpUrl httpUrl = getUploadUrl(uploadRequest);
+        MediaType mediaType = MediaType.parse("application/" + uploadRequest.getFormat());
 
-        final Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
+        final Request httpRequest = buildPostRequest(httpUrl, mediaType, uploadRequest.getSwagger());
 
         try {
             Response response = client.newCall(httpRequest).execute();
@@ -79,6 +83,19 @@ public class SwaggerHubClient {
         return;
     }
 
+    public Optional<Response> saveIntegrationPluginOfType(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) throws JsonProcessingException {
+
+        HttpUrl httpUrl = getSaveIntegrationPluginConfigURL(saveSCMPluginConfigRequest);
+        MediaType mediaType = MediaType.parse("application/json");
+        Request httpRequest = buildPutRequest(httpUrl, mediaType, saveSCMPluginConfigRequest.getRequestBody());
+        try {
+            return Optional.ofNullable(client.newCall(httpRequest).execute());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+
+    }
+
     private Request buildPostRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
         return new Request.Builder()
                 .url(httpUrl)
@@ -89,21 +106,47 @@ public class SwaggerHubClient {
                 .build();
     }
 
-    private HttpUrl getDownloadUrl(SwaggerHubRequest swaggerHubRequest) {
-        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
-                .addEncodedPathSegment(swaggerHubRequest.getVersion())
+    private Request buildPutRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
+        return new Request.Builder()
+                .url(httpUrl)
+                .addHeader("Content-Type", mediaType.toString())
+                .addHeader("Authorization", token)
+                .addHeader("User-Agent", "swaggerhub-maven-plugin")
+                .put(RequestBody.create(mediaType, content))
                 .build();
     }
 
-    private HttpUrl getUploadUrl(SwaggerHubRequest swaggerHubRequest) {
-        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
-                .addEncodedQueryParameter("version", swaggerHubRequest.getVersion())
-                .addEncodedQueryParameter("isPrivate", Boolean.toString(swaggerHubRequest.isPrivate()))
-                .addEncodedQueryParameter("oas", swaggerHubRequest.getOas())
+    private HttpUrl getDownloadUrl(UploadRequest uploadRequest) {
+        return getUploadBaseUrl(uploadRequest.getOwner(), uploadRequest.getApi())
+                .addEncodedPathSegment(uploadRequest.getVersion())
                 .build();
     }
 
-    private HttpUrl.Builder getBaseUrl(String owner, String api) {
+    private HttpUrl getUploadUrl(UploadRequest uploadRequest) {
+        return getUploadBaseUrl(uploadRequest.getOwner(), uploadRequest.getApi())
+                .addEncodedQueryParameter("version", uploadRequest.getVersion())
+                .addEncodedQueryParameter("isPrivate", Boolean.toString(uploadRequest.isPrivate()))
+                .addEncodedQueryParameter("oas", uploadRequest.getOas())
+                .build();
+    }
+
+    private HttpUrl getSaveIntegrationPluginConfigURL(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) {
+
+        return new HttpUrl.Builder()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .addPathSegment("plugins")
+                .addPathSegment("configurations")
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getApiOwner())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getApi())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getVersion())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())
+                .addEncodedQueryParameter("oas", saveSCMPluginConfigRequest.getOas())
+                .build();
+    }
+
+    private HttpUrl.Builder getUploadBaseUrl(String owner, String api) {
         return new HttpUrl.Builder()
                 .scheme(protocol)
                 .host(host)
@@ -112,4 +155,5 @@ public class SwaggerHubClient {
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api);
     }
+
 }
