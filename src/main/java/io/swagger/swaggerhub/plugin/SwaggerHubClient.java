@@ -65,7 +65,7 @@ public class SwaggerHubClient {
     }
 
     public void saveDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
-        HttpUrl httpUrl = getBaseUrl(swaggerHubRequest);
+        HttpUrl httpUrl = getUploadUrl(swaggerHubRequest);
         MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
 
         final Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
@@ -122,7 +122,7 @@ public class SwaggerHubClient {
                 .build();
     }
 
-    private HttpUrl getBaseUrl(SwaggerHubRequest swaggerHubRequest) {
+    private HttpUrl getUploadUrl(SwaggerHubRequest swaggerHubRequest) {
         return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
                 .addEncodedQueryParameter("version", swaggerHubRequest.getVersion())
                 .addEncodedQueryParameter("isPrivate", Boolean.toString(swaggerHubRequest.isPrivate()))
