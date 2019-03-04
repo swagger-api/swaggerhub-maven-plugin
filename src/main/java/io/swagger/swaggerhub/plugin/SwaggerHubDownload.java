@@ -1,7 +1,7 @@
 package io.swagger.swaggerhub.plugin;
 
 
-import io.swagger.swaggerhub.plugin.requests.UploadRequest;
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -48,11 +48,11 @@ public class SwaggerHubDownload extends AbstractMojo {
                 + ", format-" + format
                 + ", outputFile-" + outputFile);
 
-        UploadRequest uploadRequest = new UploadRequest.Builder(api, owner, version)
+        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
                 .format(format)
                 .build();
 
-        String swaggerJson = swaggerHubClient.getDefinition(uploadRequest);
+        String swaggerJson = swaggerHubClient.getDefinition(swaggerHubRequest);
         try {
             File file = new File(outputFile);
 

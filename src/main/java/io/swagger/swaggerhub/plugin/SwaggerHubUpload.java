@@ -3,7 +3,7 @@ package io.swagger.swaggerhub.plugin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.swaggerhub.interfaces.ExceptionThrowingConsumer;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
-import io.swagger.swaggerhub.plugin.requests.UploadRequest;
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import io.swagger.swaggerhub.plugin.services.DefinitionParserService;
@@ -100,8 +100,8 @@ public class SwaggerHubUpload extends AbstractMojo {
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
             String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
-            UploadRequest uploadRequest = createSwaggerHubRequest(content, owner, isPrivate, api, version, oasVersion, DefinitionFileFormat.getByFileExtensionType(format).get());
-            swaggerHubClient.saveDefinition(uploadRequest);
+            SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(content, owner, isPrivate, api, version, oasVersion, DefinitionFileFormat.getByFileExtensionType(format).get());
+            swaggerHubClient.saveDefinition(swaggerHubRequest);
         } catch (DefinitionParsingException | IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -113,16 +113,16 @@ public class SwaggerHubUpload extends AbstractMojo {
             DefinitionFileFinder.findDefinitionFiles(definitionDirectory, Optional.ofNullable(definitionFileNameRegex))
                     .stream()
                     .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
-                        UploadRequest uploadRequest = createSwaggerHubRequest(file, owner, isPrivate);
-                        getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), uploadRequest.getApi()));
-                        swaggerHubClient.saveDefinition(uploadRequest);
+                        SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file, owner, isPrivate);
+                        getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), swaggerHubRequest.getApi()));
+                        swaggerHubClient.saveDefinition(swaggerHubRequest);
                     }));
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 
-    private UploadRequest createSwaggerHubRequest(File file, String owner, Boolean isPrivate) throws IOException, DefinitionParsingException {
+    private SwaggerHubRequest createSwaggerHubRequest(File file, String owner, Boolean isPrivate) throws IOException, DefinitionParsingException {
 
         DefinitionFileFormat definitionFileFormat = DefinitionFileFormat.getByFileExtensionType(FilenameUtils.getExtension(file.getName())).get();
         ObjectMapper mapper = definitionFileFormat.getMapper();
@@ -134,17 +134,17 @@ public class SwaggerHubUpload extends AbstractMojo {
         return createSwaggerHubRequest(fileContent, owner, isPrivate, api, version, oasVersion, definitionFileFormat);
     }
 
-    private UploadRequest createSwaggerHubRequest(String fileContent, String owner, Boolean isPrivate, String api, String version, String oasVersion,
-                                                  DefinitionFileFormat definitionFileFormat){
+    private SwaggerHubRequest createSwaggerHubRequest(String fileContent, String owner, Boolean isPrivate, String api, String version, String oasVersion,
+                                                      DefinitionFileFormat definitionFileFormat){
 
-        UploadRequest uploadRequest = new UploadRequest.Builder(api, owner, version)
+        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
                 .swagger(fileContent)
                 .format(definitionFileFormat.getFileFormat())
                 .isPrivate(isPrivate)
                 .oas(oasVersion)
                 .build();
 
-        return uploadRequest;
+        return swaggerHubRequest;
     }
 
 

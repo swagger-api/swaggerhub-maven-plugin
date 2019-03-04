@@ -8,7 +8,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
-import io.swagger.swaggerhub.plugin.requests.UploadRequest;
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
@@ -31,9 +31,9 @@ public class SwaggerHubClient {
         this.token = token;
     }
 
-    public String getDefinition(UploadRequest uploadRequest) throws MojoExecutionException {
-        HttpUrl httpUrl = getDownloadUrl(uploadRequest);
-        MediaType mediaType = MediaType.parse("application/" + uploadRequest.getFormat());
+    public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
+        HttpUrl httpUrl = getDownloadUrl(swaggerHubRequest);
+        MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
 
         Request requestBuilder = buildGetRequest(httpUrl, mediaType);
 
@@ -64,11 +64,11 @@ public class SwaggerHubClient {
         return requestBuilder.build();
     }
 
-    public void saveDefinition(UploadRequest uploadRequest) throws MojoExecutionException {
-        HttpUrl httpUrl = getUploadUrl(uploadRequest);
-        MediaType mediaType = MediaType.parse("application/" + uploadRequest.getFormat());
+    public void saveDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
+        HttpUrl httpUrl = getBaseUrl(swaggerHubRequest);
+        MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
 
-        final Request httpRequest = buildPostRequest(httpUrl, mediaType, uploadRequest.getSwagger());
+        final Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
 
         try {
             Response response = client.newCall(httpRequest).execute();
@@ -116,18 +116,28 @@ public class SwaggerHubClient {
                 .build();
     }
 
-    private HttpUrl getDownloadUrl(UploadRequest uploadRequest) {
-        return getUploadBaseUrl(uploadRequest.getOwner(), uploadRequest.getApi())
-                .addEncodedPathSegment(uploadRequest.getVersion())
+    private HttpUrl getDownloadUrl(SwaggerHubRequest swaggerHubRequest) {
+        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+                .addEncodedPathSegment(swaggerHubRequest.getVersion())
                 .build();
     }
 
-    private HttpUrl getUploadUrl(UploadRequest uploadRequest) {
-        return getUploadBaseUrl(uploadRequest.getOwner(), uploadRequest.getApi())
-                .addEncodedQueryParameter("version", uploadRequest.getVersion())
-                .addEncodedQueryParameter("isPrivate", Boolean.toString(uploadRequest.isPrivate()))
-                .addEncodedQueryParameter("oas", uploadRequest.getOas())
+    private HttpUrl getBaseUrl(SwaggerHubRequest swaggerHubRequest) {
+        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+                .addEncodedQueryParameter("version", swaggerHubRequest.getVersion())
+                .addEncodedQueryParameter("isPrivate", Boolean.toString(swaggerHubRequest.isPrivate()))
+                .addEncodedQueryParameter("oas", swaggerHubRequest.getOas())
                 .build();
+    }
+
+    private HttpUrl.Builder getBaseUrl(String owner, String api) {
+        return new HttpUrl.Builder()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .addPathSegment(APIS)
+                .addEncodedPathSegment(owner)
+                .addEncodedPathSegment(api);
     }
 
     private HttpUrl getSaveIntegrationPluginConfigURL(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) {
@@ -144,16 +154,6 @@ public class SwaggerHubClient {
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())
                 .addEncodedQueryParameter("oas", saveSCMPluginConfigRequest.getOas())
                 .build();
-    }
-
-    private HttpUrl.Builder getUploadBaseUrl(String owner, String api) {
-        return new HttpUrl.Builder()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .addPathSegment(APIS)
-                .addEncodedPathSegment(owner)
-                .addEncodedPathSegment(api);
     }
 
 }

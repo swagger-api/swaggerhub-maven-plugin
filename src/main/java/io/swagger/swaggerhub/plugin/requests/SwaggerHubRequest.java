@@ -1,7 +1,10 @@
 package io.swagger.swaggerhub.plugin.requests;
 
-
-public class UploadRequest {
+/**
+ * Configuration class used to store details required to create a request to SwaggerHub to upload/download a definition
+ * The inner builder class follows the builder pattern which aids building the SwaggerHubRequest object.
+ */
+public class SwaggerHubRequest {
     private final String api;
     private final String owner;
     private final String version;
@@ -36,7 +39,7 @@ public class UploadRequest {
 
     public String getOas() { return oas; }
 
-    private UploadRequest(Builder builder) {
+    private SwaggerHubRequest(Builder builder) {
         this.api = builder.api;
         this.owner = builder.owner;
         this.version = builder.version;
@@ -81,8 +84,8 @@ public class UploadRequest {
             return this;
         }
 
-        public UploadRequest build() {
-            return new UploadRequest(this);
+        public SwaggerHubRequest build() {
+            return new SwaggerHubRequest(this);
         }
 
     }
