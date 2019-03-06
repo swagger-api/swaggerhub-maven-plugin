@@ -1,14 +1,18 @@
 package io.swagger.swaggerhub.plugin;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class SwaggerHubClient {
     private final OkHttpClient client;
@@ -79,6 +83,19 @@ public class SwaggerHubClient {
         return;
     }
 
+    public Optional<Response> saveIntegrationPluginOfType(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) throws JsonProcessingException {
+
+        HttpUrl httpUrl = getSaveIntegrationPluginConfigURL(saveSCMPluginConfigRequest);
+        MediaType mediaType = MediaType.parse("application/json");
+        Request httpRequest = buildPutRequest(httpUrl, mediaType, saveSCMPluginConfigRequest.getRequestBody());
+        try {
+            return Optional.ofNullable(client.newCall(httpRequest).execute());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+
+    }
+
     private Request buildPostRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
         return new Request.Builder()
                 .url(httpUrl)
@@ -86,6 +103,16 @@ public class SwaggerHubClient {
                 .addHeader("Authorization", token)
                 .addHeader("User-Agent", "swaggerhub-maven-plugin")
                 .post(RequestBody.create(mediaType, content))
+                .build();
+    }
+
+    private Request buildPutRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
+        return new Request.Builder()
+                .url(httpUrl)
+                .addHeader("Content-Type", mediaType.toString())
+                .addHeader("Authorization", token)
+                .addHeader("User-Agent", "swaggerhub-maven-plugin")
+                .put(RequestBody.create(mediaType, content))
                 .build();
     }
 
@@ -112,4 +139,21 @@ public class SwaggerHubClient {
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api);
     }
+
+    private HttpUrl getSaveIntegrationPluginConfigURL(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) {
+
+        return new HttpUrl.Builder()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .addPathSegment("plugins")
+                .addPathSegment("configurations")
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getApiOwner())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getApi())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getVersion())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())
+                .addEncodedQueryParameter("oas", saveSCMPluginConfigRequest.getOas())
+                .build();
+    }
+
 }

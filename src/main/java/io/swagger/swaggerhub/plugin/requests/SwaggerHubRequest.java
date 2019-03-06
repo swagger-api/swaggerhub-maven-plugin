@@ -1,6 +1,9 @@
-package io.swagger.swaggerhub.plugin;
+package io.swagger.swaggerhub.plugin.requests;
 
-
+/**
+ * Configuration class used to store details required to create a request to SwaggerHub to upload/download a definition
+ * The inner builder class follows the builder pattern which aids building the SwaggerHubRequest object.
+ */
 public class SwaggerHubRequest {
     private final String api;
     private final String owner;

@@ -3,10 +3,14 @@ package io.swagger.swaggerhub.plugin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.swaggerhub.interfaces.ExceptionThrowingConsumer;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
+import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
+import io.swagger.swaggerhub.plugin.requests.dtos.SCMIntegrationPluginConfiguration;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import io.swagger.swaggerhub.plugin.services.DefinitionParserService;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -26,6 +31,8 @@ import java.util.Optional;
 public class SwaggerHubUpload extends AbstractMojo {
 
     private static final String UTF_8 = "UTF-8";
+    private static final String REPOSITORY_LOCATION = System.getProperty("user.dir");
+    private static final String SWAGGERHUB_PLUGIN_CONFIGURATION_NAME = "SwaggerHub SCM Bidirectional Plugin";
 
     @Parameter(property = "upload.owner", required = true)
     private String owner;
@@ -54,6 +61,27 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.uploadType", required = true)
     private String uploadType;
 
+    /*
+    SCM related parameters
+     */
+    @Parameter(property = "upload.scmProvider")
+    private String scmProvider;
+
+    @Parameter(property = "upload.scmToken")
+    private String scmToken;
+
+    @Parameter(property = "upload.repository")
+    private String repository;
+
+    @Parameter(property = "upload.repositoryOwner")
+    private String repositoryOwner;
+
+    @Parameter(property = "upload.branch", defaultValue = "SWAGGERHUB")
+    private String branch;
+
+    @Parameter(property = "upload.enableScmIntegration", defaultValue = "true")
+    private boolean enableScmIntegration;
+
     private SwaggerHubClient swaggerHubClient;
 
     @Override
@@ -70,7 +98,13 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", isPrivate: " + isPrivate
                 + ", definitionDirectory: " + definitionDirectory
                 + ", definitionFileNameRegex: " + definitionFileNameRegex
-                + ", uploadType: " + uploadType);
+                + ", uploadType: " + uploadType
+                + ", scmProvider: " + scmProvider
+                + ", scmToken: " + scmToken
+                + ", repository: " + repository
+                + ", repositoryOwner: " + repositoryOwner
+                + ", branch: " + branch
+                + ", enableScmIntegration: " + enableScmIntegration);
 
         Optional<DefinitionUploadType> definitionUploadType = DefinitionUploadType.getByParamValue(uploadType);
         definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
@@ -78,6 +112,26 @@ public class SwaggerHubUpload extends AbstractMojo {
         }));
 
         definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile and directory.", uploadType)));
+
+
+        //EXECUTE SCM
+        if(StringUtils.isNotEmpty(scmProvider)){
+
+            //Preemptive setup
+            SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
+                    .scmProvider(scmProvider)
+                    .branch(branch)
+                    .enabled(enableScmIntegration)
+                    .repositoryOwner(repositoryOwner)
+                    .repository(repository)
+                    .token(scmToken)
+                    .name(SWAGGERHUB_PLUGIN_CONFIGURATION_NAME)
+                    .build();
+
+            definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
+                executeSCMIntegrationPluginCreation(saveSCMPluginConfigRequest, inputFile, format, definitionDirectory, definitionFileNameRegex, type);
+            }));
+        }
     }
 
     private void executeUpload(DefinitionUploadType definitionUploadType, String inputFile, String format, String owner,
@@ -122,7 +176,6 @@ public class SwaggerHubUpload extends AbstractMojo {
     }
 
     private SwaggerHubRequest createSwaggerHubRequest(File file, String owner, Boolean isPrivate) throws IOException, DefinitionParsingException {
-
         DefinitionFileFormat definitionFileFormat = DefinitionFileFormat.getByFileExtensionType(FilenameUtils.getExtension(file.getName())).get();
         ObjectMapper mapper = definitionFileFormat.getMapper();
         String fileContent = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), Charset.forName(UTF_8));
@@ -132,6 +185,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         return createSwaggerHubRequest(fileContent, owner, isPrivate, api, version, oasVersion, definitionFileFormat);
     }
+
 
     private SwaggerHubRequest createSwaggerHubRequest(String fileContent, String owner, Boolean isPrivate, String api, String version, String oasVersion,
                                                       DefinitionFileFormat definitionFileFormat){
@@ -146,5 +200,116 @@ public class SwaggerHubUpload extends AbstractMojo {
         return swaggerHubRequest;
     }
 
+
+    private void executeSCMIntegrationPluginCreation(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest, String inputFile, String inputFileFormat, String definitionDirectory, String definitionFileNameRegex, DefinitionUploadType definitionUploadType) throws MojoExecutionException {
+
+        switch (definitionUploadType){
+            case INPUT_FILE:
+                executeInputFileBasedSCMPluginCreation(saveSCMPluginConfigRequest, inputFile, inputFileFormat);
+                break;
+            case DIRECTORY:
+                executeDirectoryBasedSCMPluginCreation(saveSCMPluginConfigRequest, definitionFileNameRegex, definitionDirectory);
+                break;
+        }
+    }
+
+    private void executeInputFileBasedSCMPluginCreation(SaveSCMPluginConfigRequest saveSCMPluginConfigRequestInput, String inputFile, String format) throws MojoExecutionException {
+
+        try {
+            String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
+            String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
+            String languageTarget = DefinitionFileFormat.valueOf(format.toUpperCase()).getLanguageTarget();
+            SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = createSaveSCMPluginConfigRequest(saveSCMPluginConfigRequestInput, inputFile, oasVersion, languageTarget);
+
+            logSaveSCMPluginConfigRequestDetailsPriorToRequest(saveSCMPluginConfigRequest);
+
+            swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
+        }catch (DefinitionParsingException | IOException e){
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+
+    }
+
+    private void executeDirectoryBasedSCMPluginCreation(SaveSCMPluginConfigRequest scmPluginConfigRequest, String definitionFileNameRegex, String definitionDirectory)  throws MojoExecutionException {
+
+        try {
+            DefinitionFileFinder.findDefinitionFiles(definitionDirectory, Optional.ofNullable(definitionFileNameRegex))
+                    .stream()
+                    .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
+                        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = createSaveSCMPluginConfigRequest(scmPluginConfigRequest, file);
+                        logSaveSCMPluginConfigRequestDetailsPriorToRequest(saveSCMPluginConfigRequest);
+                        swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
+                    }));
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+
+    }
+
+
+    private SaveSCMPluginConfigRequest createSaveSCMPluginConfigRequest(SaveSCMPluginConfigRequest input, File file) throws IOException, DefinitionParsingException {
+
+        DefinitionFileFormat definitionFileFormat = DefinitionFileFormat.getByFileExtensionType(FilenameUtils.getExtension(file.getName())).get();
+        ObjectMapper mapper = definitionFileFormat.getMapper();
+        String fileContent = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), Charset.forName(UTF_8));
+        String api = DefinitionParserService.getApiId(mapper.readTree(fileContent));
+        String oasVersion = DefinitionParserService.getOASVersion(mapper.readTree(fileContent));
+        String version = DefinitionParserService.getVersion(mapper.readTree(fileContent));
+        String outputFolder = getOutputFolder(file.getPath());
+
+        return new SaveSCMPluginConfigRequest.Builder(input.getApiOwner(), api, version)
+                .saveSCMPluginConfigRequest(input)
+                .oas(oasVersion)
+                .outputFolder(outputFolder)
+                .managedPaths(new String[]{file.getName()})
+                .outputFile(file.getName())
+                .target(definitionFileFormat.getLanguageTarget())
+                .build();
+    }
+
+    /**
+     * This version of createSaveSCMPluginConfigRequest is for input file based upload
+     * @param input
+     * @param oasVersion
+     * @return
+     */
+    private SaveSCMPluginConfigRequest createSaveSCMPluginConfigRequest(SaveSCMPluginConfigRequest input, String inputFile, String oasVersion, String languageTarget){
+
+        String outputFolder = FilenameUtils.getFullPath(inputFile);
+        outputFolder = getOutputFolder(outputFolder);
+
+        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(input.getApiOwner(), input.getApi(), input.getVersion())
+                .saveSCMPluginConfigRequest(input)
+                .oas(oasVersion)
+                .target(languageTarget)
+                .outputFolder(outputFolder)
+                .managedPaths(new String[]{FilenameUtils.getName(inputFile)})
+                .outputFile(FilenameUtils.getName(inputFile))
+                .build();
+
+        return saveSCMPluginConfigRequest;
+    }
+
+    /**
+     * Used to format the output folder as SwaggerHub expects it.
+     * @param path
+     * @return
+     */
+    private String getOutputFolder(String path){
+
+        //Remove the portion of the path which is prior to our repositories file path
+        path = StringUtils.removeStart(FilenameUtils.getFullPath(path), REPOSITORY_LOCATION);
+        //Return the path without leading and ending /
+        return StringUtils.strip(path,"/");
+    }
+
+    /**
+     * Log out request details prior to making a request to SwaggerHub to save a SCMPluginConfig
+     * @param saveSCMPluginConfigRequest
+     */
+    private void logSaveSCMPluginConfigRequestDetailsPriorToRequest(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest){
+        getLog().info(String.format("Provisioning %s Plugin Integration for %s", scmProvider, saveSCMPluginConfigRequest.getApi()));
+        getLog().debug(new SCMIntegrationPluginConfiguration(saveSCMPluginConfigRequest).toString());
+    }
 
 }
