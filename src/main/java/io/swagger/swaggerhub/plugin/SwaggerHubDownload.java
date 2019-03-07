@@ -40,7 +40,7 @@ public class SwaggerHubDownload extends AbstractMojo {
 
 
     public void execute() throws MojoExecutionException {
-        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog());
         getLog().info("Downloading from " + host
                 + ": api-" + api
                 + ", owner-" + owner

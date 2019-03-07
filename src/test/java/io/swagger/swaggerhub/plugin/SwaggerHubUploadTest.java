@@ -1,6 +1,7 @@
 package io.swagger.swaggerhub.plugin;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.created;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToIgnoreCase;
@@ -245,6 +247,67 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
     }
 
+    @Test
+    public void testMultiSaveDefinitionRequestMade_despiteSaveFailures() throws Exception {
+
+        //Given
+        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions-save-github-plugins.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
+
+        String isPrivate = config.getChild("isPrivate").getValue();
+        String token = config.getChild("token").getValue();
+        String owner = config.getChild("owner").getValue();
+
+        int port = Integer.parseInt(config.getChild("port").getValue());
+        startMockServer(port);
+
+        UrlPathPattern uploadDefinitionRequest1 = stubSaveDefinitionRequest(owner, API_1_TITLE, API_1_VERSION, isPrivate, OAS3, YAML,token);
+        UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(owner, API_2_TITLE, API_2_VERSION, isPrivate, OAS2, JSON,token);
+        UrlPathPattern uploadDefinitionRequest3 = stubSaveDefinitionRequest(owner, API_3_TITLE, API_3_VERSION, isPrivate, OAS3, YAML,token);
+
+        //When
+        swaggerHubUpload.execute();
+
+        //Then
+        verify(1, postRequestedFor(uploadDefinitionRequest1));
+        verify(1, postRequestedFor(uploadDefinitionRequest2));
+        verify(1, postRequestedFor(uploadDefinitionRequest3));
+
+    }
+
+    @Test
+    public void testBuildFails_whenSaveDefinitionFails_andFailuresArentSkipped() throws Exception {
+
+        //Given
+        File pom = getTestFile("src/test/resources/testProjects/fail_build_on_failed_requests.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
+
+        String isPrivate = config.getChild("isPrivate").getValue();
+        String token = config.getChild("token").getValue();
+        String owner = config.getChild("owner").getValue();
+
+        int port = Integer.parseInt(config.getChild("port").getValue());
+        startMockServer(port);
+
+
+        stubSaveDefinitionRequest(token, owner, API_1_TITLE, API_1_VERSION, isPrivate, OAS3, YAML, badRequest());
+        UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(owner, API_2_TITLE, API_2_VERSION, isPrivate, OAS2, JSON,token);
+
+        //When
+        boolean executionFailure = false;
+        try {
+            swaggerHubUpload.execute();
+        }catch (Exception e){
+            executionFailure = true;
+            verify(0, postRequestedFor(uploadDefinitionRequest2));
+        } // @Test(expected = MojoExecutionException.class) is not working as expected. This catch is a workaround
+
+        assertTrue(executionFailure);
+
+    }
+
     private void runTest(File pom, String expectedOasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
@@ -276,6 +339,11 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
     }
 
     private UrlPathPattern stubSaveDefinitionRequest(String owner, String api, String version, String isPrivate, String oasVersion, String format, String token){
+        return stubSaveDefinitionRequest(token, owner, api, version, isPrivate, oasVersion, format, created());
+    }
+
+
+    private UrlPathPattern stubSaveDefinitionRequest(String token, String owner, String api, String version, String isPrivate, String oasVersion, String format, ResponseDefinitionBuilder responseDefinitionBuilder){
         UrlPathPattern url = urlPathEqualTo("/apis/" + owner + "/" + api);
         stubFor(post(url)
                 .withQueryParam("version", equalTo(version))
@@ -285,7 +353,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
                         String.format("application/%s; charset=UTF-8", format != null ? format : "json")))
                 .withHeader("Authorization", equalTo(token))
                 .withHeader("User-Agent", equalTo("swaggerhub-maven-plugin"))
-                .willReturn(created()));
+                .willReturn(responseDefinitionBuilder));
         return url;
     }
 

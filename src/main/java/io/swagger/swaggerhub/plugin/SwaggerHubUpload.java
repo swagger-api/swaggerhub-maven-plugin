@@ -1,6 +1,7 @@
 package io.swagger.swaggerhub.plugin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.interfaces.ExceptionThrowingConsumer;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
@@ -21,8 +22,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Uploads API definition to SwaggerHub
@@ -80,14 +82,17 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String branch;
 
     @Parameter(property = "upload.enableScmIntegration", defaultValue = "true")
-    private boolean enableScmIntegration;
+    private Boolean enableScmIntegration;
+
+    @Parameter(property = "upload.skipFailures", defaultValue = "false")
+    private Boolean skipFailures;
 
     private SwaggerHubClient swaggerHubClient;
 
     @Override
     public void execute() throws MojoExecutionException {
 
-        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
+        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog());
 
         getLog().info("Uploading to " + host
                 + ": api: " + api
@@ -100,11 +105,12 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", definitionFileNameRegex: " + definitionFileNameRegex
                 + ", uploadType: " + uploadType
                 + ", scmProvider: " + scmProvider
-                + ", scmToken: " + scmToken
+                + ", scmToken: " + (null!=scmToken ? scmToken.replaceAll(".", "*"):"")
                 + ", repository: " + repository
                 + ", repositoryOwner: " + repositoryOwner
                 + ", branch: " + branch
-                + ", enableScmIntegration: " + enableScmIntegration);
+                + ", enableScmIntegration: " + enableScmIntegration
+                + ", skipFailures: " + skipFailures);
 
         Optional<DefinitionUploadType> definitionUploadType = DefinitionUploadType.getByParamValue(uploadType);
         definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
@@ -149,12 +155,14 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     private void executeInputFileBasedUpload(String inputFile, String format, String owner, Boolean isPrivate, String api, String version) throws MojoExecutionException {
 
-        getLog().info(String.format("Uploading API name [%s]", api));
+        getLog().info(String.format("Uploading API name %s", api));
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
             String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
             SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(content, owner, isPrivate, api, version, oasVersion, DefinitionFileFormat.getByFileExtensionType(format).get());
-            swaggerHubClient.saveDefinition(swaggerHubRequest);
+            swaggerHubClient.saveDefinition(swaggerHubRequest)
+                    .filter(shouldErrorFailBuild(skipFailures))
+                    .orElseThrow(returnMojoExceptionForBuildFailure(String.format("Error when attempting to save API %s .", swaggerHubRequest.getApi())));
         } catch (DefinitionParsingException | IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -167,8 +175,10 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .stream()
                     .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
                         SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file, owner, isPrivate);
-                        getLog().info(String.format("Uploading API definition file [%s]. API name [%s]",file.getName(), swaggerHubRequest.getApi()));
-                        swaggerHubClient.saveDefinition(swaggerHubRequest);
+                        getLog().info(String.format("Uploading API definition file %s. API name %s",file.getName(), swaggerHubRequest.getApi()));
+                        swaggerHubClient.saveDefinition(swaggerHubRequest)
+                                .filter(shouldErrorFailBuild(skipFailures))
+                                .orElseThrow(returnMojoExceptionForBuildFailure(String.format("Error when attempting to save API %s.", swaggerHubRequest.getApi())));
                     }));
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
@@ -223,7 +233,10 @@ public class SwaggerHubUpload extends AbstractMojo {
 
             logSaveSCMPluginConfigRequestDetailsPriorToRequest(saveSCMPluginConfigRequest);
 
-            swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
+            swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest)
+                    .filter(shouldErrorFailBuild(skipFailures))
+                    .orElseThrow( returnMojoExceptionForBuildFailure("Error faced when attempting to save plugin integration."));
+
         }catch (DefinitionParsingException | IOException e){
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -238,7 +251,9 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
                         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = createSaveSCMPluginConfigRequest(scmPluginConfigRequest, file);
                         logSaveSCMPluginConfigRequestDetailsPriorToRequest(saveSCMPluginConfigRequest);
-                        swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
+                        swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest)
+                                .filter(shouldErrorFailBuild(skipFailures))
+                                .orElseThrow( returnMojoExceptionForBuildFailure("Error faced when attempting to save plugin integration."));
                     }));
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
@@ -310,6 +325,18 @@ public class SwaggerHubUpload extends AbstractMojo {
     private void logSaveSCMPluginConfigRequestDetailsPriorToRequest(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest){
         getLog().info(String.format("Provisioning %s Plugin Integration for %s", scmProvider, saveSCMPluginConfigRequest.getApi()));
         getLog().debug(new SCMIntegrationPluginConfiguration(saveSCMPluginConfigRequest).toString());
+    }
+
+    /**
+     * Returns a function that will return if a build should fail due to user configuration and the response to a request made
+     * @return
+     */
+    private Predicate<Response> shouldErrorFailBuild(boolean skipFailures){
+        return  x -> skipFailures || x.isSuccessful();
+    }
+
+    private Supplier<MojoExecutionException> returnMojoExceptionForBuildFailure(String errorMessage){
+        return () -> new MojoExecutionException(errorMessage + " Build unable to continue.");
     }
 
 }

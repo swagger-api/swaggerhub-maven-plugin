@@ -25,6 +25,7 @@
                     <enableScmIntegration>true</enableScmIntegration>
                     <scmProvider>GITHUB</scmProvider>
                     <scmToken>t0k3n123!</scmToken>
+                    <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
         </plugins>

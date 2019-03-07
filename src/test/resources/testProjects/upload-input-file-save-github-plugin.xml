@@ -28,6 +28,7 @@
                     <repository>repo123</repository>
                     <repositoryOwner>repo-owner</repositoryOwner>
                     <enableScmIntegration>true</enableScmIntegration>
+                    <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
         </plugins>

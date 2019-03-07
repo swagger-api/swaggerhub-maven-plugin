@@ -101,7 +101,7 @@ public class SCMIntegrationPluginConfiguration {
     public String toString() {
         return "SCMIntegrationPluginConfiguration{" +
                 "configType='" + configType + '\'' +
-                ", token='" + token + '\'' +
+                ", token='" + (null !=token ? token.replace(".", "*"):"") + '\'' +
                 ", branch='" + branch + '\'' +
                 ", owner='" + owner + '\'' +
                 ", repository='" + repository + '\'' +

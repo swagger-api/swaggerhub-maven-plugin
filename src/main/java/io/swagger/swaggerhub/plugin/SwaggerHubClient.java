@@ -10,6 +10,7 @@ import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
 import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -21,14 +22,16 @@ public class SwaggerHubClient {
     private final String token;
     private final String protocol;
     private static final String APIS = "apis";
+    private Log log;
 
 
-    public SwaggerHubClient(String host, int port, String protocol, String token) {
+    public SwaggerHubClient(String host, int port, String protocol, String token, Log log) {
         client = new OkHttpClient();
         this.host = host;
         this.port = port;
         this.protocol = protocol;
         this.token = token;
+        this.log=log;
     }
 
     public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
@@ -64,24 +67,22 @@ public class SwaggerHubClient {
         return requestBuilder.build();
     }
 
-    public void saveDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
+    public Optional<Response> saveDefinition(SwaggerHubRequest swaggerHubRequest) {
         HttpUrl httpUrl = getUploadUrl(swaggerHubRequest);
         MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
-
-        final Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
-
+        Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
         try {
             Response response = client.newCall(httpRequest).execute();
-            if (!response.isSuccessful()) {
-                throw new MojoExecutionException(
-                        String.format("Failed to upload definition: %s", response.body().string())
-                );
+            if(!response.isSuccessful()){
+                log.error(String.format("Error when attempting to save API %s.", swaggerHubRequest.getApi()));
             }
+            return Optional.ofNullable(response);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to upload definition", e);
+            log.error(String.format("Error when attempting to save API %s. Error %s", swaggerHubRequest.getApi(), e.getMessage()));
+            return Optional.empty();
         }
-        return;
     }
+
 
     public Optional<Response> saveIntegrationPluginOfType(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) throws JsonProcessingException {
 
@@ -89,8 +90,13 @@ public class SwaggerHubClient {
         MediaType mediaType = MediaType.parse("application/json");
         Request httpRequest = buildPutRequest(httpUrl, mediaType, saveSCMPluginConfigRequest.getRequestBody());
         try {
-            return Optional.ofNullable(client.newCall(httpRequest).execute());
+            Response response = client.newCall(httpRequest).execute();
+            if(!response.isSuccessful()){
+                log.error(String.format("Error when attempting to save %s plugin integration for API %s.", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi()));
+            }
+            return Optional.ofNullable(response);
         } catch (IOException e) {
+            log.error(String.format("Error when attempting to save % plugin integration for API %s. Error %s", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), e.getMessage()));
             return Optional.empty();
         }
 

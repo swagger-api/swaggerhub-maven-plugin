@@ -22,6 +22,7 @@
                     <inputFile>src/test/resources/TestAPI.json</inputFile>
                     <token>dUmMyTokEn.1234abc</token>
                     <uploadType>inputFile</uploadType>
+                    <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
 

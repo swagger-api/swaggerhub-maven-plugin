@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import org.apache.maven.plugin.testing.SilentLog;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -42,7 +43,7 @@ public class SwaggerHubClientTest {
     @Before
     public void setUpTest(){
         wireMockServer.resetMappings();
-        swaggerHubClient = new SwaggerHubClient("localhost",wireMockServer.port(), "http", "fake_token");
+        swaggerHubClient = new SwaggerHubClient("localhost",wireMockServer.port(), "http", "fake_token", new SilentLog());
     }
 
     @AfterClass
