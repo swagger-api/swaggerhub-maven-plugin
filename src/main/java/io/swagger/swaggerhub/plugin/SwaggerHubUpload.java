@@ -119,8 +119,6 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile and directory.", uploadType)));
 
-
-        //EXECUTE SCM
         if(StringUtils.isNotEmpty(scmProvider)){
 
             //Preemptive setup

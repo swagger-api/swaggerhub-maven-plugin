@@ -24,6 +24,16 @@ public class SCMIntegrationPluginConfiguration {
     private final String syncMethod = "Advanced Sync";
     private boolean enabled;
     private String outputFolder;
+    /*
+    The following 3 members must match the following format
+    providedPaths and ignoredPaths must be an empty list. managedPaths should contain only 1 item, the name of the file itself
+
+    This is the format required by the SwaggerHub Plugin framework.
+    By matching this, any SCM integration plugins will only overwrite/update the filename in the managedPaths array.
+    Other files in the outputFolder will be untouched.
+    Getters have been created for these final members, this is to allow correct marshalling by the underlying Jackson framework on the SwaggerHub backend.
+    The plugin framework requires an empty list for these members instead of null members.
+     */
     private final String[] providedPaths = {};
     private final String[] ignoredPaths = {};
     private String[] managedPaths = {};
