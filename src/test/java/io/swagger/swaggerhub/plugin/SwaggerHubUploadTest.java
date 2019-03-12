@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
+import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -81,7 +82,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         runTest(pom, OAS2);
     }
 
-    @Test
+    @Test(expected = MojoExecutionException.class)
     public void testUploadFails_whenUploadTypeIsUnknown() throws Exception {
         //Given
         File pom = getTestFile("src/test/resources/testProjects/incorrect-upload-type.xml");
@@ -306,6 +307,70 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
         assertTrue(executionFailure);
 
+    }
+
+    @Test
+    public void testBuildFailsWhenInputFileUploadParametersArentSet() throws Exception {
+
+        //Given
+        File pom = getTestFile("src/test/resources/testProjects/upload-input-file-missing-api-param.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+
+        //When
+        boolean executionFailure = false;
+        try {
+            swaggerHubUpload.execute();
+        }catch (UploadParametersException e){
+            e.printStackTrace();
+            executionFailure = true;
+        } catch (MojoExecutionException e) {
+            executionFailure = false;
+        }
+
+        //Then
+        assertTrue(executionFailure);
+    }
+
+    @Test
+    public void testBuildFailsWhenDefinitionDirectoryUploadParametersArentSet() throws Exception {
+        //Given
+        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions-missing-directory-param.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+
+        //When
+        boolean executionFailure = false;
+        try {
+            swaggerHubUpload.execute();
+        }catch (UploadParametersException e){
+            e.printStackTrace();
+            executionFailure = true;
+        } catch (MojoExecutionException e) {
+            executionFailure = false;
+        }
+
+        //Then
+        assertTrue(executionFailure);
+    }
+
+    @Test
+    public void testBuildFailsWhenRequiredSCMParamsArentSet() throws Exception {
+        //Given
+        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions-missing-scm-params.xml");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+
+        //When
+        boolean executionFailure = false;
+        try {
+            swaggerHubUpload.execute();
+        }catch (UploadParametersException e){
+            e.printStackTrace();
+            executionFailure = true;
+        } catch (MojoExecutionException e) {
+            executionFailure = false;
+        }
+
+        //Then
+        assertTrue(executionFailure);
     }
 
     private void runTest(File pom, String expectedOasVersion) throws Exception {

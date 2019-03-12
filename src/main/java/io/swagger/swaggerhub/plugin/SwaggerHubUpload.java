@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.interfaces.ExceptionThrowingConsumer;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
+import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
 import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import io.swagger.swaggerhub.plugin.requests.dtos.SCMIntegrationPluginConfiguration;
@@ -22,12 +23,15 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
- * Uploads API definition to SwaggerHub
+ * Uploads API definition to SwaggerHub. Can also be configured to create SCM integration plugins on upload
  */
 @Mojo(name = "upload")
 public class SwaggerHubUpload extends AbstractMojo {
@@ -112,12 +116,32 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", enableScmIntegration: " + enableScmIntegration
                 + ", skipFailures: " + skipFailures);
 
+
+        /*
+        Verify that the upload type has been set and that the fields required for that upload type are available.
+        If the upload type is unrecognised or the the required fields aren't set, stop the upload
+         */
         Optional<DefinitionUploadType> definitionUploadType = DefinitionUploadType.getByParamValue(uploadType);
+        definitionUploadType.orElseThrow(() -> new UploadParametersException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile and directory.", uploadType)));
+
+        List<String> requiredEmptyUploadFields = returnEmptyRequiredFields(definitionUploadType.get().getRequiredFields(), this);
+        if(!requiredEmptyUploadFields.isEmpty()){
+            throw new UploadParametersException(String.format("The following required fields aren't set for %s upload: %s", uploadType,
+                    StringUtils.join(returnEmptyRequiredFields(definitionUploadType.get().getRequiredFields(), this),", ")));
+        }
+
+        if(StringUtils.isNotEmpty(scmProvider)){
+            //Verify that the required fields for SCM integration plugin set up are set
+            List<String> requiredEmptyScmFields = returnEmptyRequiredFields(Arrays.asList("repositoryOwner", "repository", "scmToken"), this);
+            if(!requiredEmptyScmFields.isEmpty()){
+                throw new UploadParametersException(String.format("The following required fields aren't set for SCM integration plugin configuration: %s",
+                        StringUtils.join(requiredEmptyScmFields,", ")));
+            }
+        }
+
         definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
             executeUpload(type, inputFile, format, owner, isPrivate, api, version, definitionDirectory, definitionFileNameRegex);
         }));
-
-        definitionUploadType.orElseThrow(() -> new MojoExecutionException(String.format("Unknown uploadType [%s] specified. Supported types are inputFile and directory.", uploadType)));
 
         if(StringUtils.isNotEmpty(scmProvider)){
 
@@ -143,9 +167,11 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         switch (definitionUploadType){
             case INPUT_FILE:
+                getLog().debug("Executing input file based upload...");
                 executeInputFileBasedUpload(inputFile, format, owner, isPrivate, api, version);
                 break;
             case DIRECTORY:
+                getLog().debug("Executing definition directory based upload...");
                 executeDirectoryBasedUpload(definitionDirectory, definitionFileNameRegex, owner, isPrivate);
                 break;
         }
@@ -314,6 +340,26 @@ public class SwaggerHubUpload extends AbstractMojo {
         path = StringUtils.removeStart(FilenameUtils.getFullPath(path), REPOSITORY_LOCATION);
         //Return the path without leading and ending /
         return StringUtils.strip(path,"/");
+    }
+
+    /**
+     * Check the object and return a list of fields that are empty from the list of requiredFields
+     * @param requiredFields
+     * @param givenObject
+     * @return
+     */
+    private List<String> returnEmptyRequiredFields(List<String> requiredFields, Object givenObject){
+        return requiredFields.stream()
+                .filter(x -> {
+                    try {
+                        return StringUtils.isEmpty((String) givenObject.getClass().getDeclaredField(x).get(givenObject));
+                    } catch (Exception e) {
+                        //Not going to try and account for exceptions; if there is an exception we probably have greater issues than an empty/null field
+                        getLog().debug(String.format("Unable to ascertain if %s is null/empty",x));
+                        return true;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     /**

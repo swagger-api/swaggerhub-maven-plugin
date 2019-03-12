@@ -16,20 +16,17 @@
                     <host>localhost</host>
                     <port>8089</port>
                     <protocol>http</protocol>
-                    <owner>swaggerhubuser</owner>
+                    <owner>testUser</owner>
+                    <version>1.1.0</version>
+                    <inputFile>src/test/resources/TestOAS3API.yaml</inputFile>
                     <token>dUmMyTokEn.1234abc</token>
                     <format>yaml</format>
-                    <uploadType>directory</uploadType>
-                    <definitionDirectory>src/test/resources/file-finder-test-definitions</definitionDirectory>
-                    <branch>SWAGGERHUB_BRANCH</branch>
-                    <enableScmIntegration>true</enableScmIntegration>
-                    <scmProvider>GITHUB</scmProvider>
-                    <scmToken>t0k3n123!</scmToken>
-                    <repositoryOwner>repo_owner</repositoryOwner>
-                    <repository>repo</repository>
+                    <uploadType>inputFile</uploadType>
                     <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
+
+
         </plugins>
     </build>
 </project>
