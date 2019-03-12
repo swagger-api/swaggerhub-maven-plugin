@@ -93,6 +93,13 @@ Definitions that don't have one of the following file extension types will be ig
  
  If any one of the definitions in the specified directory are unable to be uploaded, the build will fail and subsequent definitions will not be uploaded.
 
+### SwaggerHub SCM Integrations
+
+On upload, there is the option to automatically create an [SCM Integration](https://app.swaggerhub.com/help/integrations/index) 
+which will allow changes to the definition to be pushed back to source control. This functionality is available for both input file and directory based upload.
+
+The user must define the following parameters to configure such an integration: `scmProvider`, `scmToken`. `repository`, `repositoryOwner`, `branch`
+
 #### Example Usage
 * Upload a single API definition in json format as a public API in SwaggerHub via a specified input file.
 ```xml
@@ -214,7 +221,33 @@ Definitions that don't have one of the following file extension types will be ig
         </executions>
     </plugin>
 ```
-
+* Upload multiple API definitions via a specified directory and configure GitHub integrations for each definition
+```xml
+    <plugin>
+        <groupId>io.swagger</groupId>
+        <artifactId>swaggerhub-maven-plugin</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
+        <executions>
+            <execution>
+                <phase>deploy</phase>
+                <goals>
+                    <goal>upload</goal>
+                </goals>
+                <configuration>
+                    <owner>jsfrench</owner>
+                    <token>${SWAGGERHUB_APIKEY}</token>
+                    <uploadType>directory</uploadType>
+                    <definitionDirectory>${project.basedir}/api-definitions</definitionDirectory>
+                    <scmToken>${GITHUB_APIKEY}</scmToken>
+                    <scmProvider>GITHUB</scmProvider>
+                    <repository>my_definitions_repository</repository>
+                    <repositoryOwner>githubUser</repositoryOwner>
+                    <branch>develop</branch>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+```
 
 #### Parameters
 Parameter | Description | Required | Default
@@ -232,7 +265,13 @@ Parameter | Description | Required | Default
 **`definitionDirectory`** | Directory containing definitions for upload | false | -
 **`definitionFileNameRegex`** | Regex pattern used to filter definition filenames in the definition directory| false | -
 **`uploadType`** | Upload of a single definition via `inputFile` or multiple definitions stored in a directory via `directory`| true | -
+**`scmToken`** | The API token for the chosen SCM| false | -
+**`scmProvider`** | The SCM provider to integrate with| false | -
+**`repository`** | The repository to which the SCM integration is configured to push to | false | -
+**`repositoryOwner`** | The owner(SCM account) of the repository to which the integration is configured to push to| false | -
+**`branch`** | The branch to which the SCM integration is configured to push to| false | SWAGGERHUB
+**`enableScmIntegration`** | Enable the SCM integration once created| false | true
+**`skipFailures`** | If failures are encountered on definition upload or plugin set up, proceed with the build.| false | false
 
- 
 
 
