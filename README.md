@@ -8,6 +8,7 @@ A simple Maven plugin to access [SwaggerHub](https://swaggerhub.com) hosting of 
 * Upload multiple API definitions at once.
 * Authenticate with an API key for restricted operations (for example, to download private definitions).
 * Supports YAML and JSON format for API definitions.
+* Automatically provision an SCM Integration to update source control with changes made to definitions.
 
 ## Example use cases
 
@@ -98,6 +99,8 @@ Parameter | Description | Required? | Default
 
 This goal creates or updates one or more API definitions on SwaggerHub. All definitions are saved in the `owner` account (organization or user), and the `token` owner must have permissions to create and update definitions in this account.
 
+Additionally, there is the option of provisioning a SwaggerHub SCM integration which will allow changes made in SwaggerHub to be pushed back to source control.
+
 There are two `uploadType` modes:
 
 * `inputFile` - Upload a single API definition.
@@ -113,6 +116,7 @@ Parameter | Description | Required? | Default
 **`owner`** | The account name (case-sensitive) to upload the definitions to | yes | -
 **`token`** | SwaggerHub API key. The API key owner must have permissions to create and update definitions in the `owner` account | yes | -
 **`isPrivate`** | Specifies whether the uploaded APIs will be made public (`false`) or private (`true`) | no | `false`
+**`skipFailures`** | Specifies whether a build should fail when errors are encountered | no | false
 **`host`**, **`protocol`**, **`port`** | Reserved for future use | no |
 
 Additional parameters for `uploadType`=`inputFile`:
@@ -130,6 +134,17 @@ Parameter | Description | Required? | Default
 --------- | ----------- | -------- | -------
 **`definitionDirectory`** | Directory containing the definitions to be uploaded to SwaggerHub. Note that subdirectories are not included in the upload. | yes | -
 **`definitionFileNameRegex`** | [Regular expression](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum) that specifies the files to be uploaded. This regex matches against file names without extensions. If not specified, all .json, .yaml and .yml files from the `definitionDirectory` will be uploaded. | no | -
+
+Additional parameters for SCM Provisioning:
+
+Parameter | Description | Required? | Default
+--------- | ----------- | -------- | -------
+**`scmProvider`** | SCM to create a SwaggerHub Integration for. | yes | -
+**`scmToken`** | User generated API token to be used for SCM requests | yes | -
+**`repository`** | The repository to push SwaggerHub changes to | yes | -
+**`repositoryOwner`** | The SCM account which owns the above repository | yes | -
+**`enableScmIntegration`** | Specifies whether to enable the SCM integration. If enabled, SwaggerHub changes will be pushed automatically on save | no | true
+**`branch`** | The repository branch to push SwaggerHub changes to | no | SWAGGERHUB
 
 #### Multi-upload considerations
 
@@ -275,6 +290,33 @@ This example uploads all JSON and YAML files from the specified directory whose 
                     <uploadType>directory</uploadType>
                     <definitionDirectory>${project.basedir}/api-definitions</definitionDirectory>
                     <definitionFileNameRegex>^definition\w*</definitionDirectory>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+```
+##### Upload multiple API definitions via a specified directory and configure GitHub integrations for each definition
+```xml
+    <plugin>
+        <groupId>io.swagger</groupId>
+        <artifactId>swaggerhub-maven-plugin</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
+        <executions>
+            <execution>
+                <phase>deploy</phase>
+                <goals>
+                    <goal>upload</goal>
+                </goals>
+                <configuration>
+                    <owner>jsfrench</owner>
+                    <token>${SWAGGERHUB_APIKEY}</token>
+                    <uploadType>directory</uploadType>
+                    <definitionDirectory>${project.basedir}/api-definitions</definitionDirectory>
+                    <scmToken>${GITHUB_APIKEY}</scmToken>
+                    <scmProvider>GITHUB</scmProvider>
+                    <repository>my_definitions_repository</repository>
+                    <repositoryOwner>githubUser</repositoryOwner>
+                    <branch>develop</branch>
                 </configuration>
             </execution>
         </executions>
