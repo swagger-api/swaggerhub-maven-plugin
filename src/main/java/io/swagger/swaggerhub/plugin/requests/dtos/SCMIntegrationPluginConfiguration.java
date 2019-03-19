@@ -1,6 +1,7 @@
 package io.swagger.swaggerhub.plugin.requests.dtos;
 
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
@@ -111,7 +112,7 @@ public class SCMIntegrationPluginConfiguration {
     public String toString() {
         return "SCMIntegrationPluginConfiguration{" +
                 "configType='" + configType + '\'' +
-                ", token='" + (null !=token ? token.replace(".", "*"):"") + '\'' +
+                ", token='" + (StringUtils.isNotEmpty(token) ? token.substring(0,1)+token.substring(1).replaceAll(".", "*"):"") + '\'' +
                 ", branch='" + branch + '\'' +
                 ", owner='" + owner + '\'' +
                 ", repository='" + repository + '\'' +

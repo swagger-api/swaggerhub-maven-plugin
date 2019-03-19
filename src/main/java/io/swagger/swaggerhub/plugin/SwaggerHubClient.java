@@ -163,7 +163,7 @@ public class SwaggerHubClient {
                 .port(port)
                 .addPathSegment("plugins")
                 .addPathSegment("configurations")
-                .addEncodedPathSegment(saveSCMPluginConfigRequest.getApiOwner())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getOwner())
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getApi())
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getVersion())
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())

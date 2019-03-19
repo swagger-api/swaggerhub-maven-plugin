@@ -9,15 +9,7 @@ import io.swagger.swaggerhub.plugin.requests.dtos.SCMIntegrationPluginConfigurat
  * The inner builder class follows the builder pattern which aids building the SaveSCMPluginConfigRequest object.
  * {@link SCMIntegrationPluginConfiguration} represents the object when being sent as part of a request body.
  */
-public class SaveSCMPluginConfigRequest {
-
-    /*
-    Path Params
-     */
-    private String apiOwner;
-    private String api;
-    private String version;
-    private String oas;
+public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
     /*
     Request body params
@@ -35,10 +27,7 @@ public class SaveSCMPluginConfigRequest {
     private String[] managedPaths;
 
     private SaveSCMPluginConfigRequest(Builder builder) {
-        this.apiOwner = builder.apiOwner;
-        this.api = builder.api;
-        this.version = builder.version;
-        this.oas = builder.oas;
+        super(builder.api, builder.apiOwner, builder.version, builder.oas);
         this.scmProvider = builder.scmProvider;
         this.token = builder.token;
         this.repository = builder.repository;
@@ -50,22 +39,6 @@ public class SaveSCMPluginConfigRequest {
         this.outputFolder = builder.outputFolder;
         this.name = builder.name;
         this.managedPaths = builder.managedPaths;
-    }
-
-    public String getApiOwner() {
-        return apiOwner;
-    }
-
-    public String getApi() {
-        return api;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public String getOas() {
-        return oas;
     }
 
     public String getScmProvider() {
