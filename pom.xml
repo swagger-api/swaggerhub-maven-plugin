@@ -9,7 +9,7 @@
 
     <groupId>io.swagger</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <packaging>maven-plugin</packaging>
     <name>SwaggerHub Maven Plugin</name>
     <description>A maven plugin for downloading and uploading Swagger/OAS definitions from/to SwaggerHub as
