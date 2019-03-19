@@ -65,7 +65,7 @@ This goal downloads an API definition from SwaggerHub to a local file as part of
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>generate-resources</phase>
@@ -174,7 +174,7 @@ This example uploads the specified API definition in JSON format as a public API
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -223,7 +223,7 @@ This example uses the [Swagger Maven plugin](https://github.com/swagger-api/swag
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -251,7 +251,7 @@ This example uploads all JSON and YAML files from the `${project.basedir}/api-de
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -277,7 +277,7 @@ This example uploads all JSON and YAML files from the specified directory whose 
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -300,7 +300,7 @@ This example uploads all JSON and YAML files from the specified directory whose 
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
