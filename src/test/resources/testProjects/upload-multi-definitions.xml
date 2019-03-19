@@ -21,6 +21,7 @@
                     <format>yaml</format>
                     <uploadType>directory</uploadType>
                     <definitionDirectory>src/test/resources/file-finder-test-definitions</definitionDirectory>
+                    <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
         </plugins>

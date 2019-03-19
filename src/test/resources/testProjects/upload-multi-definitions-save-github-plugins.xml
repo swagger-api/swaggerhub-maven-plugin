@@ -18,9 +18,13 @@
                     <protocol>http</protocol>
                     <owner>swaggerhubuser</owner>
                     <token>dUmMyTokEn.1234abc</token>
+                    <format>yaml</format>
                     <uploadType>directory</uploadType>
                     <definitionDirectory>src/test/resources/file-finder-test-definitions</definitionDirectory>
-                    <definitionFileNameRegex>^api-\w*</definitionFileNameRegex>
+                    <branch>SWAGGERHUB_BRANCH</branch>
+                    <enableScmIntegration>true</enableScmIntegration>
+                    <scmProvider>GITHUB</scmProvider>
+                    <scmToken>t0k3n123!</scmToken>
                     <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>

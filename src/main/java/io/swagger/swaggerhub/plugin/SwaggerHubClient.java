@@ -1,14 +1,20 @@
 package io.swagger.swaggerhub.plugin;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class SwaggerHubClient {
     private final OkHttpClient client;
@@ -17,14 +23,24 @@ public class SwaggerHubClient {
     private final String token;
     private final String protocol;
     private static final String APIS = "apis";
+    private Log log;
 
 
-    public SwaggerHubClient(String host, int port, String protocol, String token) {
-        client = new OkHttpClient();
+    public SwaggerHubClient(String host, int port, String protocol, String token, Log log) {
+        client = setupHttpClient();
         this.host = host;
         this.port = port;
         this.protocol = protocol;
         this.token = token;
+        this.log=log;
+    }
+
+    private OkHttpClient setupHttpClient(){
+        OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(30, TimeUnit.SECONDS);
+        client.setReadTimeout(30, TimeUnit.SECONDS);
+        client.setWriteTimeout(30, TimeUnit.SECONDS);
+        return client;
     }
 
     public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
@@ -60,23 +76,39 @@ public class SwaggerHubClient {
         return requestBuilder.build();
     }
 
-    public void saveDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
+    public Optional<Response> saveDefinition(SwaggerHubRequest swaggerHubRequest) {
         HttpUrl httpUrl = getUploadUrl(swaggerHubRequest);
         MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
-
-        final Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
-
+        Request httpRequest = buildPostRequest(httpUrl, mediaType, swaggerHubRequest.getSwagger());
         try {
             Response response = client.newCall(httpRequest).execute();
-            if (!response.isSuccessful()) {
-                throw new MojoExecutionException(
-                        String.format("Failed to upload definition: %s", response.body().string())
-                );
+            if(!response.isSuccessful()){
+                log.error(String.format("Error when attempting to save API %s. Response code %s, Response message %s", swaggerHubRequest.getApi(), response.code(), response.message()));
             }
+            return Optional.ofNullable(response);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to upload definition", e);
+            log.error(String.format("Error when attempting to save API %s. Error message %s", swaggerHubRequest.getApi(), e.getMessage()));
+            return Optional.empty();
         }
-        return;
+    }
+
+
+    public Optional<Response> saveIntegrationPluginOfType(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) throws JsonProcessingException {
+
+        HttpUrl httpUrl = getSaveIntegrationPluginConfigURL(saveSCMPluginConfigRequest);
+        MediaType mediaType = MediaType.parse("application/json");
+        Request httpRequest = buildPutRequest(httpUrl, mediaType, saveSCMPluginConfigRequest.getRequestBody());
+        try {
+            Response response = client.newCall(httpRequest).execute();
+            if(!response.isSuccessful()){
+                log.error(String.format("Error when attempting to save %s plugin integration for API %s. Response code %s, Response message %s.", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), response.code(), response.message()));
+            }
+            return Optional.ofNullable(response);
+        } catch (IOException e) {
+            log.error(String.format("Error when attempting to save % plugin integration for API %s. Error message %s", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), e.getMessage()));
+            return Optional.empty();
+        }
+
     }
 
     private Request buildPostRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
@@ -86,6 +118,16 @@ public class SwaggerHubClient {
                 .addHeader("Authorization", token)
                 .addHeader("User-Agent", "swaggerhub-maven-plugin")
                 .post(RequestBody.create(mediaType, content))
+                .build();
+    }
+
+    private Request buildPutRequest(HttpUrl httpUrl, MediaType mediaType, String content) {
+        return new Request.Builder()
+                .url(httpUrl)
+                .addHeader("Content-Type", mediaType.toString())
+                .addHeader("Authorization", token)
+                .addHeader("User-Agent", "swaggerhub-maven-plugin")
+                .put(RequestBody.create(mediaType, content))
                 .build();
     }
 
@@ -112,4 +154,21 @@ public class SwaggerHubClient {
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api);
     }
+
+    private HttpUrl getSaveIntegrationPluginConfigURL(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) {
+
+        return new HttpUrl.Builder()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .addPathSegment("plugins")
+                .addPathSegment("configurations")
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getOwner())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getApi())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getVersion())
+                .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())
+                .addEncodedQueryParameter("oas", saveSCMPluginConfigRequest.getOas())
+                .build();
+    }
+
 }

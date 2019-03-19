@@ -23,6 +23,7 @@
                     <token>dUmMyTokEn.1234abc</token>
                     <isPrivate>true</isPrivate>
                     <uploadType>inputFile</uploadType>
+                    <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
 

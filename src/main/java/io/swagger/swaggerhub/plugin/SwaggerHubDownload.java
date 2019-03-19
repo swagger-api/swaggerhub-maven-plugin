@@ -1,6 +1,7 @@
 package io.swagger.swaggerhub.plugin;
 
 
+import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -10,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -40,7 +40,7 @@ public class SwaggerHubDownload extends AbstractMojo {
 
 
     public void execute() throws MojoExecutionException {
-        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token);
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog());
         getLog().info("Downloading from " + host
                 + ": api-" + api
                 + ", owner-" + owner

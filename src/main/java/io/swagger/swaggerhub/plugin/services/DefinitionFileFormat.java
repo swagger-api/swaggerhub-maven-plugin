@@ -15,17 +15,19 @@ import java.util.function.Predicate;
  */
 public enum DefinitionFileFormat {
 
-    JSON(Json.mapper(), Arrays.asList("json"), "json"),
-    YAML(Yaml.mapper(), Arrays.asList("yaml", "yml"), "yaml");
+    JSON(Json.mapper(), Arrays.asList("json"), "json", "JSON (Unresolved)"),
+    YAML(Yaml.mapper(), Arrays.asList("yaml", "yml"), "yaml", "YAML (Unresolved)");
 
     private final String fileFormat;
     private ObjectMapper mapper;
     private List<String> supportedFileExtensions;
+    private String languageTarget;
 
-    DefinitionFileFormat(ObjectMapper mapper, List<String> supportedFileExtensions, String fileFormat) {
+    DefinitionFileFormat(ObjectMapper mapper, List<String> supportedFileExtensions, String fileFormat, String languageTarget) {
         this.mapper = mapper;
         this.supportedFileExtensions = supportedFileExtensions;
         this.fileFormat = fileFormat;
+        this.languageTarget = languageTarget;
     }
 
     public ObjectMapper getMapper() {
@@ -38,6 +40,10 @@ public enum DefinitionFileFormat {
 
     public List<String> getSupportedFileExtensions() {
         return supportedFileExtensions;
+    }
+
+    public String getLanguageTarget() {
+        return languageTarget;
     }
 
     public static Optional<DefinitionFileFormat> getByFileExtensionType(String value){
