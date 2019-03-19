@@ -334,7 +334,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
     @Test
     public void testBuildFailsWhenDefinitionDirectoryUploadParametersArentSet() throws Exception {
         //Given
-        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions-missing-directory-param.xml");
+        File pom = getTestFile("src/test/resources/testProjects/upload-multi-definitions-missing-scm-params.xml");
         SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
 
         //When
