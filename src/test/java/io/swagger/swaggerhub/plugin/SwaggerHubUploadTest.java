@@ -82,7 +82,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         runTest(pom, OAS2);
     }
 
-    @Test(expected = MojoExecutionException.class)
+    @Test
     public void testUploadFails_whenUploadTypeIsUnknown() throws Exception {
         //Given
         File pom = getTestFile("src/test/resources/testProjects/incorrect-upload-type.xml");
