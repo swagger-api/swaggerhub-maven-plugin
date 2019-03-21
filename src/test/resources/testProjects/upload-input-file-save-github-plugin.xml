@@ -17,7 +17,7 @@
                     <port>8089</port>
                     <protocol>http</protocol>
                     <api>TestAPI</api>
-                    <owner>testUser</owner>
+                    <owner>swaggerhubuser</owner>
                     <version>1.1.0</version>
                     <inputFile>src/test/resources/TestAPI.json</inputFile>
                     <token>dUmMyTokEn.1234abc</token>
@@ -25,8 +25,8 @@
                     <scmProvider>GITHUB</scmProvider>
                     <scmToken>scm-token</scmToken>
                     <branch>test-branch</branch>
-                    <repository>repo123</repository>
-                    <repositoryOwner>repo-owner</repositoryOwner>
+                    <repository>repo</repository>
+                    <repositoryOwner>repo_owner</repositoryOwner>
                     <enableScmIntegration>true</enableScmIntegration>
                     <skipFailures>true</skipFailures>
                 </configuration>

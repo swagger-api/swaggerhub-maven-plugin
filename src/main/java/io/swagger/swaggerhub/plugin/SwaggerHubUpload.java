@@ -91,6 +91,12 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.skipFailures", defaultValue = "false")
     private Boolean skipFailures;
 
+    @Parameter(property = "upload.scmUsername")
+    private String scmUsername;
+
+    @Parameter(property = "upload.scmPassword")
+    private String scmPassword;
+
     private SwaggerHubClient swaggerHubClient;
 
     @Override
@@ -114,7 +120,9 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", repositoryOwner: " + repositoryOwner
                 + ", branch: " + branch
                 + ", enableScmIntegration: " + enableScmIntegration
-                + ", skipFailures: " + skipFailures);
+                + ", skipFailures: " + skipFailures
+                + ", scmUsername: " + scmUsername
+                + ", scmPassword: " + scmPassword);
 
 
         /*
@@ -132,7 +140,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         if(StringUtils.isNotEmpty(scmProvider)){
             //Verify that the required fields for SCM integration plugin set up are set
-            List<String> requiredEmptyScmFields = returnEmptyRequiredFields(Arrays.asList("repositoryOwner", "repository", "scmToken"), this);
+            List<String> requiredEmptyScmFields = returnEmptyRequiredFields(Arrays.asList("repositoryOwner", "repository"), this);
             if(!requiredEmptyScmFields.isEmpty()){
                 throw new UploadParametersException(String.format("The following required fields aren't set for SCM integration plugin configuration: %s",
                         StringUtils.join(requiredEmptyScmFields,", ")));
@@ -153,6 +161,8 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .repositoryOwner(repositoryOwner)
                     .repository(repository)
                     .token(scmToken)
+                    .scmPassword(scmPassword)
+                    .scmUsername(scmUsername)
                     .name(SWAGGERHUB_PLUGIN_CONFIGURATION_NAME)
                     .build();
 
@@ -259,7 +269,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
             swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest)
                     .filter(shouldErrorFailBuild(skipFailures))
-                    .orElseThrow( returnMojoExceptionForBuildFailure("Error when attempting to save plugin integration."));
+                    .orElseThrow(returnMojoExceptionForBuildFailure("Error when attempting to save plugin integration."));
 
         }catch (DefinitionParsingException | IOException e){
             throw new MojoExecutionException(e.getMessage(), e);
