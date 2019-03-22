@@ -189,7 +189,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     private void executeInputFileBasedUpload(String inputFile, String format, String owner, Boolean isPrivate, String api, String version) throws MojoExecutionException {
 
-        getLog().info(String.format("Uploading API name %s version %s", api, version));
+        getLog().info(String.format("Uploading API name %s", api));
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
             String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
@@ -209,7 +209,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .stream()
                     .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
                         SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file, owner, isPrivate);
-                        getLog().info(String.format("Uploading API definition file %s. API name %s version %s",file.getName(), swaggerHubRequest.getApi(), swaggerHubRequest.getVersion()));
+                        getLog().info(String.format("Uploading API definition file %s. API name %s",file.getName(), swaggerHubRequest.getApi()));
                         swaggerHubClient.saveDefinition(swaggerHubRequest)
                                 .filter(shouldErrorFailBuild(skipFailures))
                                 .orElseThrow(returnMojoExceptionForBuildFailure(String.format("Error when attempting to save API %s.", swaggerHubRequest.getApi())));
@@ -287,7 +287,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                         logSaveSCMPluginConfigRequestDetailsPriorToRequest(saveSCMPluginConfigRequest);
                         swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest)
                                 .filter(shouldErrorFailBuild(skipFailures))
-                                .orElseThrow(returnMojoExceptionForBuildFailure("Error when attempting to save plugin integration."));
+                                .orElseThrow( returnMojoExceptionForBuildFailure("Error when attempting to save plugin integration."));
                     }));
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
