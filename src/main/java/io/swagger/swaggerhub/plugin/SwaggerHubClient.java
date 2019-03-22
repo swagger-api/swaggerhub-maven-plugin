@@ -1,6 +1,9 @@
 package io.swagger.swaggerhub.plugin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
@@ -83,7 +86,7 @@ public class SwaggerHubClient {
         try {
             Response response = client.newCall(httpRequest).execute();
             if(!response.isSuccessful()){
-                log.error(String.format("Error when attempting to save API %s. Response code %s, Response message %s", swaggerHubRequest.getApi(), response.code(), response.message()));
+                log.error(String.format("Error when attempting to save API %s. Response code %s, Response message %s", swaggerHubRequest.getApi(), response.code(), getSwaggerHubResponseBodyMessage(response)));
             }
             return Optional.ofNullable(response);
         } catch (IOException e) {
@@ -101,7 +104,7 @@ public class SwaggerHubClient {
         try {
             Response response = client.newCall(httpRequest).execute();
             if(!response.isSuccessful()){
-                log.error(String.format("Error when attempting to save %s plugin integration for API %s. Response code %s, Response message %s.", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), response.code(), response.message()));
+                log.error(String.format("Error when attempting to save %s plugin integration for API %s. Response code %s, Response message %s.", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), response.code(), getSwaggerHubResponseBodyMessage(response)));
             }
             return Optional.ofNullable(response);
         } catch (IOException e) {
@@ -169,6 +172,17 @@ public class SwaggerHubClient {
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())
                 .addEncodedQueryParameter("oas", saveSCMPluginConfigRequest.getOas())
                 .build();
+    }
+
+    private String getSwaggerHubResponseBodyMessage(Response response) throws IOException {
+        if(null!=response.body()) {
+            String responseBody = response.body().string();
+            JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
+            return jsonNode.get("message").textValue();
+        }else {
+            return response.message();
+        }
+
     }
 
 }
