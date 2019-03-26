@@ -170,7 +170,7 @@ If an error occurs while uploading any definition, the build will fail and subse
 
 * Supported SCM's include: `GITHUB`, `BITBUCKET`
 
-* Care should be taken when specifying SCM parameters. Validation does not take prior to making the request to SwaggerHub and issues can arise due to incorrectly configured integrations
+* Care should be taken when specifying SCM parameters. Validation does not take place prior to making the request to SwaggerHub and issues can arise due to incorrectly configured integrations
 
 * Use only the parameters that are required for the SCM of your choice. For example `BITBUCKET` relies on `scmUsername` and `scmPassword`;
  if an `scmToken` is also included, the BitBucket integration will attempt to authenticate with the token. This is not possible and will cause integration errors.

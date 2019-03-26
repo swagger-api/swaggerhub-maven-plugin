@@ -37,7 +37,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         startMockServer(WIREMOCK_PORT);
-        wireMockServer.resetMappings();;
+        wireMockServer.resetMappings();
     }
 
     @Override

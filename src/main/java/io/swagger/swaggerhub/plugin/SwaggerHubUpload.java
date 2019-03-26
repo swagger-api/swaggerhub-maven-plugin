@@ -122,7 +122,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", enableScmIntegration: " + enableScmIntegration
                 + ", skipFailures: " + skipFailures
                 + ", scmUsername: " + scmUsername
-                + ", scmPassword: " + scmPassword);
+                + ", scmPassword: " + (StringUtils.isNotEmpty(scmPassword) ? scmPassword.substring(0,1)+scmPassword.substring(1).replaceAll(".", "*"):""));
 
 
         /*
@@ -136,15 +136,6 @@ public class SwaggerHubUpload extends AbstractMojo {
         if(!requiredEmptyUploadFields.isEmpty()){
             throw new UploadParametersException(String.format("The following required fields aren't set for %s upload: %s", uploadType,
                     StringUtils.join(returnEmptyRequiredFields(definitionUploadType.get().getRequiredFields(), this),", ")));
-        }
-
-        if(StringUtils.isNotEmpty(scmProvider)){
-            //Verify that the required fields for SCM integration plugin set up are set
-            List<String> requiredEmptyScmFields = returnEmptyRequiredFields(Arrays.asList("repositoryOwner", "repository"), this);
-            if(!requiredEmptyScmFields.isEmpty()){
-                throw new UploadParametersException(String.format("The following required fields aren't set for SCM integration plugin configuration: %s",
-                        StringUtils.join(requiredEmptyScmFields,", ")));
-            }
         }
 
         definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
@@ -189,7 +180,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     private void executeInputFileBasedUpload(String inputFile, String format, String owner, Boolean isPrivate, String api, String version) throws MojoExecutionException {
 
-        getLog().info(String.format("Uploading API name %s", api));
+        getLog().info(String.format("Uploading API name %s version %s", api, version));
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
             String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
@@ -209,7 +200,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .stream()
                     .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
                         SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file, owner, isPrivate);
-                        getLog().info(String.format("Uploading API definition file %s. API name %s",file.getName(), swaggerHubRequest.getApi()));
+                        getLog().info(String.format("Uploading API definition file %s. API name %s version %s",file.getName(), swaggerHubRequest.getApi(), swaggerHubRequest.getVersion()));
                         swaggerHubClient.saveDefinition(swaggerHubRequest)
                                 .filter(shouldErrorFailBuild(skipFailures))
                                 .orElseThrow(returnMojoExceptionForBuildFailure(String.format("Error when attempting to save API %s.", swaggerHubRequest.getApi())));
