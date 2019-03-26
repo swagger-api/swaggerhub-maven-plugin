@@ -296,26 +296,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         //When
         boolean executionFailure = false;
         try {
-            getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-missing-scm-params.xml").execute();
-        }catch (UploadParametersException e){
-            e.printStackTrace();
-            executionFailure = true;
-        } catch (MojoExecutionException e) {
-            executionFailure = false;
-        }
-
-        //Then
-        assertTrue(executionFailure);
-    }
-
-    @Test
-    public void testBuildFailsWhenRequiredSCMParamsArentSet() throws Exception {
-        //Given
-
-        //When
-        boolean executionFailure = false;
-        try {
-            getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-missing-scm-params.xml").execute();
+            getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-missing-directory-param.xml").execute();
         }catch (UploadParametersException e){
             e.printStackTrace();
             executionFailure = true;
