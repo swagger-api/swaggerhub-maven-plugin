@@ -9,7 +9,7 @@ public class SwaggerHubUploadTestConstants {
     public static final int WIREMOCK_PORT = 8089;
 
     public static final String API_OWNER = "swaggerhubuser";
-    public static final String IS_PRIVATE = "true";
+    public static final String IS_PRIVATE = "false";
     public static final String SWAGGERHUB_API_TOKEN = "dUmMyTokEn.1234abc";
 
     public static final String SCM_BRANCH = "test-branch";
