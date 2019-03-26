@@ -176,7 +176,11 @@ If an error occurs while uploading any definition, the build will fail and subse
  if an `scmToken` is also included, the BitBucket integration will attempt to authenticate with the token. This is not possible and will cause integration errors.
  
 * `BITBUCKET` can use app passwords to authenticate. App passwords are substitute passwords for a user account which you can use for scripts and integrating tools to avoid putting your real password into configuration files.
- Documentation on how to generate an app password can be found [here](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html).
+App password permissions required are: 
+    * **Account** : _Email, Read_
+    * **Repositories** : _Read, Write_
+    
+Documentation on how to generate an app password can be found [here](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html).
 
 Further documentation of SwaggerHub Integrations can be found [here](https://app.swaggerhub.com/help/integrations/index).
 
