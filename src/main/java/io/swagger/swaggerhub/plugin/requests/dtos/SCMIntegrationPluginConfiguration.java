@@ -25,6 +25,8 @@ public class SCMIntegrationPluginConfiguration {
     private final String syncMethod = "Advanced Sync";
     private boolean enabled;
     private String outputFolder;
+    private String username;
+    private String password;
     /*
     The following 3 members must match the following format
     providedPaths and ignoredPaths must be an empty list. managedPaths should contain only 1 item, the name of the file itself
@@ -52,6 +54,8 @@ public class SCMIntegrationPluginConfiguration {
         this.outputFolder = configRequest.getOutputFolder();
         this.name = configRequest.getName();
         this.managedPaths = configRequest.getManagedPaths();
+        this.username = configRequest.getScmUsername();
+        this.password = configRequest.getScmPassword();
     }
 
     public String getConfigType() {
@@ -104,6 +108,14 @@ public class SCMIntegrationPluginConfiguration {
         return managedPaths;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
     public String getName() {
         return name;
     }
@@ -112,8 +124,7 @@ public class SCMIntegrationPluginConfiguration {
     public String toString() {
         return "SCMIntegrationPluginConfiguration{" +
                 "configType='" + configType + '\'' +
-                ", token='" + (StringUtils.isNotEmpty(token) ? token.substring(0,1)+token.substring(1).replaceAll(".", "*"):"") + '\'' +
-                ", branch='" + branch + '\'' +
+                ", token='" + (StringUtils.isNotEmpty(token) ? token.substring(0,1)+token.substring(1).replaceAll(".", "*"):"") + '\'' +                ", branch='" + branch + '\'' +
                 ", owner='" + owner + '\'' +
                 ", repository='" + repository + '\'' +
                 ", outputFile='" + outputFile + '\'' +
@@ -121,6 +132,8 @@ public class SCMIntegrationPluginConfiguration {
                 ", syncMethod='" + syncMethod + '\'' +
                 ", enabled=" + enabled +
                 ", outputFolder='" + outputFolder + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + (StringUtils.isNotEmpty(password) ? password.substring(0,1)+password.substring(1).replaceAll(".", "*"):"") + '\'' +
                 ", providedPaths=" + Arrays.toString(providedPaths) +
                 ", ignoredPaths=" + Arrays.toString(ignoredPaths) +
                 ", managedPaths=" + Arrays.toString(managedPaths) +
