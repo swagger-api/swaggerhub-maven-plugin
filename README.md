@@ -36,7 +36,7 @@ The usage pattern depends on whether you use the [code-first or design-first](ht
   <dependency>
     <groupId>io.swagger</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
   </dependency>
 ```
 
