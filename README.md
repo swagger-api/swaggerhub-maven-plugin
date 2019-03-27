@@ -39,7 +39,7 @@ The usage pattern depends on whether you use the [code-first or design-first](ht
     <version>1.0.3</version>
   </dependency>
 ```
-
+V
 ### Snapshots
 Snapshots are available from the [Sonatype Nexus Snapshots](https://oss.sonatype.org/content/repositories/snapshots) repository. To use a snapshot version, add the following to the `<repositories>` section of your `pom.xml`:
 
@@ -173,7 +173,7 @@ If an error occurs while uploading any definition, the build will fail and subse
 * Care should be taken when specifying SCM parameters. Validation does not take place prior to making the request to SwaggerHub and issues can arise due to incorrectly configured integrations
 
 * Use only the parameters that are required for the SCM of your choice. For example `BITBUCKET` relies on `scmUsername` and `scmPassword`;
- if an `scmToken` is also included, the BitBucket integration will attempt to authenticate with the token. This is not possible and will cause integration errors.
+ if an `scmToken` is also included, the Bitbucket integration will attempt to authenticate with the token. This is not possible and will cause integration errors.
  
 * `BITBUCKET` can use app passwords to authenticate. App passwords are substitute passwords for a user account which you can use for scripts and integrating tools to avoid putting your real password into configuration files.
 App password permissions required are: 
