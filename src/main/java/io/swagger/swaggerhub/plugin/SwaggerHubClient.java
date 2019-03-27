@@ -85,6 +85,7 @@ public class SwaggerHubClient {
             if(!response.isSuccessful()){
                 log.error(String.format("Error when attempting to save API %s version %s", swaggerHubRequest.getApi(), swaggerHubRequest.getVersion()));
                 log.error("Error response: "+response.body().string());
+                response.body().close();
             }
             return Optional.ofNullable(response);
         } catch (IOException e) {
@@ -104,6 +105,7 @@ public class SwaggerHubClient {
             if(!response.isSuccessful()){
                 log.error(String.format("Error when attempting to save %s plugin integration for API %s version %s", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(),saveSCMPluginConfigRequest.getVersion()));
                 log.error("Error response: "+response.body().string());
+                response.body().close();
             }
             return Optional.ofNullable(response);
         } catch (IOException e) {
