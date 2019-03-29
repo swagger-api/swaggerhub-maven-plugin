@@ -37,11 +37,14 @@ public class SwaggerHubDownload extends AbstractMojo {
     private String token;
     @Parameter(property = "download.outputFile", required = true)
     private String outputFile;
+    @Parameter(property = "download.basepath")
+    private String basepath;
 
 
     public void execute() throws MojoExecutionException {
-        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog());
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath);
         getLog().info("Downloading from " + host
+                + ": basepath-" + basepath
                 + ": api-" + api
                 + ", owner-" + owner
                 + ", version-" + version

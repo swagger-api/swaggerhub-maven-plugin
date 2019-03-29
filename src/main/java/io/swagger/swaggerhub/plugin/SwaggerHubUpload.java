@@ -62,6 +62,8 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String definitionFileNameRegex;
     @Parameter(property = "upload.uploadType", required = true)
     private String uploadType;
+    @Parameter(property = "upload.basepath", required = true)
+    private String basepath;
 
     /*
     SCM related parameters
@@ -92,7 +94,7 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
 
-        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog());
+        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath);
 
         getLog().info("Uploading to " + host
                 + ": api: " + api
