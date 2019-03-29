@@ -66,7 +66,7 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String definitionFileNameRegex;
     @Parameter(property = "upload.uploadType", required = true)
     private String uploadType;
-    @Parameter(property = "upload.basepath", required = true)
+    @Parameter(property = "upload.basepath")
     private String basepath;
 
     /*

@@ -35,6 +35,24 @@ public class SwaggerHubClientTest {
 
     private SwaggerHubClient swaggerHubClient;
 
+    private static String OWNER = "owner";
+    private static String API = "api";
+    private static String VERSION = "1.0.0";
+    private static String OAS = "3.0.0";
+    private static String BRANCH = "branch-test";
+    private static boolean ENABLED = true;
+    private static String OUTPUT_FILE = "outputFile";
+    private static String REPOSITORY = "repository";
+    private static String REPOSITORY_OWNER = "repositoryOwner";
+    private static String SCM_PROVIDER = "GITHUB";
+    private static String TOKEN = "token";
+    private static String TARGET = "JSON (Unresolved)";
+    private static String SYNC_METHOD = "Advanced Sync";
+    private static String NAME = "Integration Name";
+    private static String OUTPUT_FOLDER = "output/folder";
+    private static String SCM_USERNAME = "scmUsername";
+    private static String SCM_PASSOWRD = "P455m07d";
+
     @BeforeClass
     public static void setUpWiremockInstance(){
         wireMockServer = new WireMockServer(options().port(8089));
@@ -67,60 +85,15 @@ public class SwaggerHubClientTest {
     @Test
     public void verifySaveIntegrationPluginOfType_postsExpectedRequestBody() throws JsonProcessingException {
         swaggerHubClient = buildSwaggerHubClient( null);
-        //Given
-        String owner = "owner";
-        String api = "api";
-        String version = "1.0.0";
-        String oas = "3.0.0";
-        String branch = "branch-test";
-        boolean enabled = true;
-        String outputFile = "outputFile";
-        String repository = "repository";
-        String repositoryOwner = "repositoryOwner";
-        String scmProvider = "GITHUB";
-        String token = "token";
-        String target = "JSON (Unresolved)";
-        String syncMethod = "Advanced Sync";
-        String name = "Integration Name";
-        String outputFolder = "output/folder";
-        String scmUsername = "scmUsername";
-        String scmPassword = "P455m07d";
 
-        SaveSCMPluginConfigRequest.Builder requestBuilder = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
-                .oas(oas)
-                .branch(branch)
-                .enabled(enabled)
-                .outputFile(outputFile)
-                .repository(repository)
-                .repositoryOwner(repositoryOwner)
-                .scmProvider(scmProvider)
-                .target(target)
-                .token(token)
-                .outputFolder(outputFolder)
-                .managedPaths(new String[]{outputFile})
-                .name(name)
-                .scmUsername(scmUsername)
-                .scmPassword(scmPassword);
+        SaveSCMPluginConfigRequest.Builder requestBuilder = requestBuilder();
 
         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
 
-        String requestUrl = String.format("/plugins/configurations/%s/%s/%s/%s?oas=%s", owner, api, version, scmProvider, oas);
+        String requestUrl = String.format("/plugins/configurations/%s/%s/%s/%s?oas=%s", OWNER, API, VERSION, SCM_PROVIDER, OAS);
         stubFor(put(requestUrl).willReturn(created()));
 
-        RequestPatternBuilder putRequestPattern = putRequestedFor(urlPathEqualTo(String.format("/plugins/configurations/%s/%s/%s/%s", owner, api, version, scmProvider)))
-                .withQueryParam("oas", equalTo(oas))
-                .withRequestBody(matchingJsonPath("$.branch", equalTo(branch)))
-                .withRequestBody(matchingJsonPath("$.enabled", equalTo("true")))
-                .withRequestBody(matchingJsonPath("$.outputFile", equalTo(outputFile)))
-                .withRequestBody(matchingJsonPath("$.repository", equalTo(repository)))
-                .withRequestBody(matchingJsonPath("$.owner", equalTo(repositoryOwner)))
-                .withRequestBody(matchingJsonPath("$.syncMethod", equalTo(syncMethod)))
-                .withRequestBody(matchingJsonPath("$.target", equalTo(target)))
-                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(outputFolder)))
-                .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\""+outputFile+"\"]")))
-                .withRequestBody(matchingJsonPath("$.name", equalTo(name)))
-                .withRequestBody(matchingJsonPath("$.username", equalTo(scmUsername)))
-                .withRequestBody(matchingJsonPath("$.password", equalTo(scmPassword)));
+        RequestPatternBuilder putRequestPattern = putRequestPattern("/plugins/configurations/%s/%s/%s/%s");
 
         //When
         Optional<Response> response = swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
@@ -141,54 +114,15 @@ public class SwaggerHubClientTest {
     @Test
     public void verifySaveIntegrationPluginOfType_postsExpectedRequestBodyWithBasePath() throws JsonProcessingException {
         swaggerHubClient = buildSwaggerHubClient("basePath");
-        //Given
-        String owner = "owner";
-        String api = "api";
-        String version = "1.0.0";
-        String oas = "3.0.0";
-        String branch = "branch-test";
-        boolean enabled = true;
-        String outputFile = "outputFile";
-        String repository = "repository";
-        String repositoryOwner = "repositoryOwner";
-        String scmProvider = "GITHUB";
-        String token = "token";
-        String target = "JSON (Unresolved)";
-        String syncMethod = "Advanced Sync";
-        String name = "Integration Name";
-        String outputFolder = "output/folder";
 
-        SaveSCMPluginConfigRequest.Builder requestBuilder = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
-                .oas(oas)
-                .branch(branch)
-                .enabled(enabled)
-                .outputFile(outputFile)
-                .repository(repository)
-                .repositoryOwner(repositoryOwner)
-                .scmProvider(scmProvider)
-                .target(target)
-                .token(token)
-                .outputFolder(outputFolder)
-                .managedPaths(new String[]{outputFile})
-                .name(name);
+        SaveSCMPluginConfigRequest.Builder requestBuilder = requestBuilder();
 
         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
 
-        String requestUrl = String.format("/basePath/plugins/configurations/%s/%s/%s/%s?oas=%s", owner, api, version, scmProvider, oas);
+        String requestUrl = String.format("/basePath/plugins/configurations/%s/%s/%s/%s?oas=%s", OWNER, API, VERSION, SCM_PROVIDER, OAS);
         stubFor(put(requestUrl).willReturn(created()));
 
-        RequestPatternBuilder putRequestPattern = putRequestedFor(urlPathEqualTo(String.format("/basePath/plugins/configurations/%s/%s/%s/%s", owner, api, version, scmProvider)))
-                .withQueryParam("oas", equalTo(oas))
-                .withRequestBody(matchingJsonPath("$.branch", equalTo(branch)))
-                .withRequestBody(matchingJsonPath("$.enabled", equalTo("true")))
-                .withRequestBody(matchingJsonPath("$.outputFile", equalTo(outputFile)))
-                .withRequestBody(matchingJsonPath("$.repository", equalTo(repository)))
-                .withRequestBody(matchingJsonPath("$.owner", equalTo(repositoryOwner)))
-                .withRequestBody(matchingJsonPath("$.syncMethod", equalTo(syncMethod)))
-                .withRequestBody(matchingJsonPath("$.target", equalTo(target)))
-                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(outputFolder)))
-                .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\""+outputFile+"\"]")))
-                .withRequestBody(matchingJsonPath("$.name", equalTo(name)));
+        RequestPatternBuilder putRequestPattern = putRequestPattern("/basePath/plugins/configurations/%s/%s/%s/%s");
 
         //When
         Optional<Response> response = swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
@@ -204,4 +138,40 @@ public class SwaggerHubClientTest {
     private SwaggerHubClient buildSwaggerHubClient(String basePath){
         return new SwaggerHubClient("localhost", wireMockServer.port(), "http", "fake_token", new SilentLog(), basePath);
     }
+
+    private SaveSCMPluginConfigRequest.Builder requestBuilder(){
+        return new SaveSCMPluginConfigRequest.Builder(OWNER, API, VERSION)
+                .oas(OAS)
+                .branch(BRANCH)
+                .enabled(ENABLED)
+                .outputFile(OUTPUT_FILE)
+                .repository(REPOSITORY)
+                .repositoryOwner(REPOSITORY_OWNER)
+                .scmProvider(SCM_PROVIDER)
+                .target(TARGET)
+                .token(TOKEN)
+                .outputFolder(OUTPUT_FOLDER)
+                .managedPaths(new String[]{OUTPUT_FILE})
+                .name(NAME)
+                .scmUsername(SCM_USERNAME)
+                .scmPassword(SCM_PASSOWRD);
+    }
+
+    private RequestPatternBuilder putRequestPattern(String url){
+        return putRequestedFor(urlPathEqualTo(String.format(url, OWNER, API, VERSION, SCM_PROVIDER)))
+                .withQueryParam("oas", equalTo(OAS))
+                .withRequestBody(matchingJsonPath("$.branch", equalTo(BRANCH)))
+                .withRequestBody(matchingJsonPath("$.enabled", equalTo("true")))
+                .withRequestBody(matchingJsonPath("$.outputFile", equalTo(OUTPUT_FILE)))
+                .withRequestBody(matchingJsonPath("$.repository", equalTo(REPOSITORY)))
+                .withRequestBody(matchingJsonPath("$.owner", equalTo(REPOSITORY_OWNER)))
+                .withRequestBody(matchingJsonPath("$.syncMethod", equalTo(SYNC_METHOD)))
+                .withRequestBody(matchingJsonPath("$.target", equalTo(TARGET)))
+                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(OUTPUT_FOLDER)))
+                .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\""+OUTPUT_FILE+"\"]")))
+                .withRequestBody(matchingJsonPath("$.name", equalTo(NAME)))
+                .withRequestBody(matchingJsonPath("$.username", equalTo(SCM_USERNAME)))
+                .withRequestBody(matchingJsonPath("$.password", equalTo(SCM_PASSOWRD)));
+    }
+
 }
