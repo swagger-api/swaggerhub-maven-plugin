@@ -83,6 +83,8 @@ public class SwaggerHubClientTest {
         String syncMethod = "Advanced Sync";
         String name = "Integration Name";
         String outputFolder = "output/folder";
+        String scmUsername = "scmUsername";
+        String scmPassword = "P455m07d";
 
         SaveSCMPluginConfigRequest.Builder requestBuilder = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
                 .oas(oas)
@@ -96,7 +98,9 @@ public class SwaggerHubClientTest {
                 .token(token)
                 .outputFolder(outputFolder)
                 .managedPaths(new String[]{outputFile})
-                .name(name);
+                .name(name)
+                .scmUsername(scmUsername)
+                .scmPassword(scmPassword);
 
         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
 
@@ -114,7 +118,9 @@ public class SwaggerHubClientTest {
                 .withRequestBody(matchingJsonPath("$.target", equalTo(target)))
                 .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(outputFolder)))
                 .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\""+outputFile+"\"]")))
-                .withRequestBody(matchingJsonPath("$.name", equalTo(name)));
+                .withRequestBody(matchingJsonPath("$.name", equalTo(name)))
+                .withRequestBody(matchingJsonPath("$.username", equalTo(scmUsername)))
+                .withRequestBody(matchingJsonPath("$.password", equalTo(scmPassword)));
 
         //When
         Optional<Response> response = swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);

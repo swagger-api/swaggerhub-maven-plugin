@@ -1,22 +1,32 @@
 package io.swagger.swaggerhub.plugin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public enum DefinitionUploadType {
 
-    INPUT_FILE("inputFile"),
-    DIRECTORY("directory");
+    INPUT_FILE("inputFile", Arrays.asList("api","version", "format", "inputFile")),
+    DIRECTORY("directory", Arrays.asList("definitionDirectory"));
 
     private String paramValue;
+    private List<String> requiredFields;
 
-    DefinitionUploadType(String paramValue){
+    DefinitionUploadType(String paramValue, List<String> requiredFields){
         this.paramValue = paramValue;
+        this.requiredFields = requiredFields;
     }
 
     public String getParamValue() {
         return paramValue;
+    }
+
+    public List<String> getRequiredFields() {
+        return requiredFields;
     }
 
     /**

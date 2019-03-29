@@ -19,13 +19,8 @@
                     <owner>swaggerhubuser</owner>
                     <token>dUmMyTokEn.1234abc</token>
                     <uploadType>directory</uploadType>
-                    <definitionDirectory>src/test/resources/file-finder-test-definitions</definitionDirectory>
-                    <branch>test-branch</branch>
-                    <enableScmIntegration>true</enableScmIntegration>
+                    <definitionDirectory>directory</definitionDirectory>
                     <scmProvider>GITHUB</scmProvider>
-                    <scmToken>scm-token</scmToken>
-                    <repositoryOwner>repo_owner</repositoryOwner>
-                    <repository>repo</repository>
                     <skipFailures>true</skipFailures>
                 </configuration>
             </plugin>
