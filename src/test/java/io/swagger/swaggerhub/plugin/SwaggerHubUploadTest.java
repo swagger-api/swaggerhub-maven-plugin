@@ -7,14 +7,11 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.junit.Test;
 
 import java.io.File;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.created;
@@ -32,7 +29,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.*;
 
-@RunWith(JUnit4.class)
 public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
     private WireMockServer wireMockServer;
@@ -254,14 +250,22 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
     }
 
-    @Test(expected = HttpHostConnectException.class)
+    @Test
     public void testBuildFails_whenSaveDefinitionFails_andFailuresArentSkipped() throws Exception {
         //Given
         stubSaveDefinitionRequest(SWAGGERHUB_API_TOKEN, API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, badRequest());
         UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
 
         //When
-        getSwaggerUpload("src/test/resources/testProjects/fail_build_on_failed_requests.xml").execute();
+        boolean executionFailure = false;
+        try {
+            getSwaggerUpload("src/test/resources/testProjects/fail_build_on_failed_requests.xml").execute();
+        }catch (Exception e){
+            executionFailure = true;
+            verify(0, postRequestedFor(uploadDefinitionRequest2));
+        } // @Test(expected = MojoExecutionException.class) is not working as expected. This catch is a workaround
+
+        assertTrue(executionFailure);
 
     }
 
