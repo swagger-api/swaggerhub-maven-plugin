@@ -261,7 +261,6 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
         UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
 
         //When
-        boolean executionFailure = false;
         getSwaggerUpload("src/test/resources/testProjects/fail_build_on_failed_requests.xml").execute();
 
     }
