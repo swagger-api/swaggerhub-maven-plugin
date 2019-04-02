@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNotNull;
  * This also provides new methods, {@link #newMavenSession()} to conveniently create a maven session,
  * and {@link #lookupConfiguredMojo(File, String)} so you don't have to always build the project yourself.
  */
-public abstract class BetterAbstractMojoTestCase extends MojoRule {
+public class BetterMojoRule extends MojoRule {
 
     protected MavenSession newMavenSession() {
         try {

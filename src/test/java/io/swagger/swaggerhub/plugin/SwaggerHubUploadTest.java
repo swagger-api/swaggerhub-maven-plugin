@@ -41,7 +41,7 @@ public class SwaggerHubUploadTest {
     private WireMockServer wireMockServer;
 
     @Rule
-    public BetterAbstractMojoTestCase rule = new BetterAbstractMojoTestCase()
+    public BetterMojoRule rule = new BetterMojoRule()
     {
         @Override
         protected void before() throws Throwable

@@ -12,7 +12,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.WIREMOCK_PORT;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
@@ -20,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 public class SwaggerHubDownloadTest {
 
     @Rule
-    public BetterAbstractMojoTestCase rule = new BetterAbstractMojoTestCase()
+    public BetterMojoRule rule = new BetterMojoRule()
     {
         @Override
         protected void before() throws Throwable{
