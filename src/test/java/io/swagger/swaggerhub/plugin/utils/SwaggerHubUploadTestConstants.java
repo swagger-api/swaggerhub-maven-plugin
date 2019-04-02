@@ -9,6 +9,10 @@ public class SwaggerHubUploadTestConstants {
     public static final int WIREMOCK_PORT = 8089;
 
     public static final String API_OWNER = "swaggerhubuser";
+    public static final String API_NAME = "api";
+    public static final String API_VERSION = "1.0.0";
+
+
     public static final String IS_PRIVATE = "false";
     public static final String SWAGGERHUB_API_TOKEN = "dUmMyTokEn.1234abc";
 
@@ -19,6 +23,17 @@ public class SwaggerHubUploadTestConstants {
     public static final String SCM_TOKEN = "scm-token";
     public static final String SCM_USERNAME = "scm-username";
     public static final String SCM_PASSWORD = "scm-password";
+
+    public static final boolean SCM_INTEGRATION_ENABLED = true;
+    public static final String SCM_INTEGRATION_OUTPUT_FILE = "outputFile";
+    public static final String SCM_INTEGRATION_REPOSITORY = "repository";
+    public static final String SCM_INTEGRATION_PROVIDER_GITHUB = "GITHUB";
+    public static final String SCM_INTEGRATION_TARGET = "JSON (Unresolved)";
+    public static final String SCM_INTEGRATION_SYNC_METHOD = "Advanced Sync";
+    public static final String SCM_INTEGRATION_NAME = "Integration Name";
+    public static final String SCM_INTEGRATION_OUTPUT_FOLDER = "output/folder";
+
+
 
     public static final String INPUT_FILE_API = "TestAPI";
     public static final String INPUT_FILE_API_VERSION = "1.1.0";
@@ -41,8 +56,5 @@ public class SwaggerHubUploadTestConstants {
 
     public static final String FILE_FINDER_DIRECTORY = "src/test/resources/file-finder-test-definitions";
     public static final String TEST_RESOURCES_DIRECTORY = "src/test/resources";
-
-
-
 
 }

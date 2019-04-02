@@ -6,7 +6,10 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.testing.SilentLog;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,6 +17,24 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.API_NAME;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.API_VERSION;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.OAS3;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PASSWORD;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_USERNAME;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_REPOSITORY_OWNER;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_ENABLED;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_NAME;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_OUTPUT_FILE;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_OUTPUT_FOLDER;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_SYNC_METHOD;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_TARGET;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_PROVIDER_GITHUB;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_REPOSITORY;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.API_OWNER;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_BRANCH;
+
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SWAGGERHUB_API_TOKEN;
 import static com.github.tomakehurst.wiremock.client.WireMock.created;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -33,6 +54,7 @@ public class SwaggerHubClientTest {
 
     private SwaggerHubClient swaggerHubClient;
 
+
     @BeforeClass
     public static void setUpWiremockInstance(){
         wireMockServer = new WireMockServer(options().port(8089));
@@ -43,7 +65,11 @@ public class SwaggerHubClientTest {
     @Before
     public void setUpTest(){
         wireMockServer.resetMappings();
-        swaggerHubClient = new SwaggerHubClient("localhost",wireMockServer.port(), "http", "fake_token", new SilentLog());
+    }
+
+    @After
+    public void cleanUptest(){
+        swaggerHubClient = null;
     }
 
     @AfterClass
@@ -60,60 +86,16 @@ public class SwaggerHubClientTest {
      */
     @Test
     public void verifySaveIntegrationPluginOfType_postsExpectedRequestBody() throws JsonProcessingException {
-        //Given
-        String owner = "owner";
-        String api = "api";
-        String version = "1.0.0";
-        String oas = "3.0.0";
-        String branch = "branch-test";
-        boolean enabled = true;
-        String outputFile = "outputFile";
-        String repository = "repository";
-        String repositoryOwner = "repositoryOwner";
-        String scmProvider = "GITHUB";
-        String token = "token";
-        String target = "JSON (Unresolved)";
-        String syncMethod = "Advanced Sync";
-        String name = "Integration Name";
-        String outputFolder = "output/folder";
-        String scmUsername = "scmUsername";
-        String scmPassword = "P455m07d";
+        swaggerHubClient = buildSwaggerHubClient( null);
 
-        SaveSCMPluginConfigRequest.Builder requestBuilder = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
-                .oas(oas)
-                .branch(branch)
-                .enabled(enabled)
-                .outputFile(outputFile)
-                .repository(repository)
-                .repositoryOwner(repositoryOwner)
-                .scmProvider(scmProvider)
-                .target(target)
-                .token(token)
-                .outputFolder(outputFolder)
-                .managedPaths(new String[]{outputFile})
-                .name(name)
-                .scmUsername(scmUsername)
-                .scmPassword(scmPassword);
+        SaveSCMPluginConfigRequest.Builder requestBuilder = requestBuilder();
 
         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
 
-        String requestUrl = String.format("/plugins/configurations/%s/%s/%s/%s?oas=%s", owner, api, version, scmProvider, oas);
+        String requestUrl = String.format("/plugins/configurations/%s/%s/%s/%s?oas=%s", API_OWNER, API_NAME, API_VERSION, SCM_INTEGRATION_PROVIDER_GITHUB, OAS3);
         stubFor(put(requestUrl).willReturn(created()));
 
-        RequestPatternBuilder putRequestPattern = putRequestedFor(urlPathEqualTo(String.format("/plugins/configurations/%s/%s/%s/%s", owner, api, version, scmProvider)))
-                .withQueryParam("oas", equalTo(oas))
-                .withRequestBody(matchingJsonPath("$.branch", equalTo(branch)))
-                .withRequestBody(matchingJsonPath("$.enabled", equalTo("true")))
-                .withRequestBody(matchingJsonPath("$.outputFile", equalTo(outputFile)))
-                .withRequestBody(matchingJsonPath("$.repository", equalTo(repository)))
-                .withRequestBody(matchingJsonPath("$.owner", equalTo(repositoryOwner)))
-                .withRequestBody(matchingJsonPath("$.syncMethod", equalTo(syncMethod)))
-                .withRequestBody(matchingJsonPath("$.target", equalTo(target)))
-                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(outputFolder)))
-                .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\""+outputFile+"\"]")))
-                .withRequestBody(matchingJsonPath("$.name", equalTo(name)))
-                .withRequestBody(matchingJsonPath("$.username", equalTo(scmUsername)))
-                .withRequestBody(matchingJsonPath("$.password", equalTo(scmPassword)));
+        RequestPatternBuilder putRequestPattern = putRequestPattern("/plugins/configurations/%s/%s/%s/%s");
 
         //When
         Optional<Response> response = swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
@@ -125,4 +107,73 @@ public class SwaggerHubClientTest {
             fail();
         }
     }
+
+    /**
+     * This test defines the expected request format to be made to SwaggerHub to create an Integration plugin
+     * The values defined as part of the request matcher are what is expected to be set due to the users configuration.
+     * @throws JsonProcessingException
+     */
+    @Test
+    public void verifySaveIntegrationPluginOfType_postsExpectedRequestBodyWithBasePath() throws JsonProcessingException {
+        swaggerHubClient = buildSwaggerHubClient("basePath");
+
+        SaveSCMPluginConfigRequest.Builder requestBuilder = requestBuilder();
+
+        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
+
+        String requestUrl = String.format("/basePath/plugins/configurations/%s/%s/%s/%s?oas=%s", API_OWNER, API_NAME, API_VERSION, SCM_INTEGRATION_PROVIDER_GITHUB, OAS3);
+        stubFor(put(requestUrl).willReturn(created()));
+
+        RequestPatternBuilder putRequestPattern = putRequestPattern("/basePath/plugins/configurations/%s/%s/%s/%s");
+
+        //When
+        Optional<Response> response = swaggerHubClient.saveIntegrationPluginOfType(saveSCMPluginConfigRequest);
+
+        //Then
+        verify(1, putRequestPattern);
+        response.ifPresent( x -> assertEquals(201, response.get().code()));
+        if(!response.isPresent()){
+            fail();
+        }
+    }
+
+    private SwaggerHubClient buildSwaggerHubClient(String basePath){
+        return new SwaggerHubClient("localhost", wireMockServer.port(), "http", "fake_token", new SilentLog(), basePath);
+    }
+
+    private SaveSCMPluginConfigRequest.Builder requestBuilder(){
+        return new SaveSCMPluginConfigRequest.Builder(API_OWNER, API_NAME, API_VERSION)
+                .oas(OAS3)
+                .branch(SCM_BRANCH)
+                .enabled(SCM_INTEGRATION_ENABLED)
+                .outputFile(SCM_INTEGRATION_OUTPUT_FILE)
+                .repository(SCM_INTEGRATION_REPOSITORY)
+                .repositoryOwner(SCM_REPOSITORY_OWNER)
+                .scmProvider(SCM_INTEGRATION_PROVIDER_GITHUB)
+                .target(SCM_INTEGRATION_TARGET)
+                .token(SWAGGERHUB_API_TOKEN)
+                .outputFolder(SCM_INTEGRATION_OUTPUT_FOLDER)
+                .managedPaths(new String[]{SCM_INTEGRATION_OUTPUT_FILE})
+                .name(SCM_INTEGRATION_NAME)
+                .scmUsername(SCM_USERNAME)
+                .scmPassword(SCM_PASSWORD);
+    }
+
+    private RequestPatternBuilder putRequestPattern(String url){
+        return putRequestedFor(urlPathEqualTo(String.format(url, API_OWNER, API_NAME, API_VERSION, SCM_INTEGRATION_PROVIDER_GITHUB)))
+                .withQueryParam("oas", equalTo(OAS3))
+                .withRequestBody(matchingJsonPath("$.branch", equalTo(SCM_BRANCH)))
+                .withRequestBody(matchingJsonPath("$.enabled", equalTo("true")))
+                .withRequestBody(matchingJsonPath("$.outputFile", equalTo(SCM_INTEGRATION_OUTPUT_FILE)))
+                .withRequestBody(matchingJsonPath("$.repository", equalTo(SCM_INTEGRATION_REPOSITORY)))
+                .withRequestBody(matchingJsonPath("$.owner", equalTo(SCM_REPOSITORY_OWNER)))
+                .withRequestBody(matchingJsonPath("$.syncMethod", equalTo(SCM_INTEGRATION_SYNC_METHOD)))
+                .withRequestBody(matchingJsonPath("$.target", equalTo(SCM_INTEGRATION_TARGET)))
+                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(SCM_INTEGRATION_OUTPUT_FOLDER)))
+                .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\"" + SCM_INTEGRATION_OUTPUT_FILE + "\"]")))
+                .withRequestBody(matchingJsonPath("$.name", equalTo(SCM_INTEGRATION_NAME)))
+                .withRequestBody(matchingJsonPath("$.username", equalTo(SCM_USERNAME)))
+                .withRequestBody(matchingJsonPath("$.password", equalTo(SCM_PASSWORD)));
+    }
+
 }
