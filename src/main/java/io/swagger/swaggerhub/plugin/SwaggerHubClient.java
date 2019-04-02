@@ -9,6 +9,8 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
 import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
@@ -24,15 +26,16 @@ public class SwaggerHubClient {
     private final String protocol;
     private static final String APIS = "apis";
     private Log log;
+    private String basePath;
 
-
-    public SwaggerHubClient(String host, int port, String protocol, String token, Log log) {
+    public SwaggerHubClient(String host, int port, String protocol, String token, Log log, String basePath) {
         client = setupHttpClient();
         this.host = host;
         this.port = port;
         this.protocol = protocol;
         this.token = token;
         this.log=log;
+        this.basePath = basePath;
     }
 
     private OkHttpClient setupHttpClient(){
@@ -150,21 +153,22 @@ public class SwaggerHubClient {
     }
 
     private HttpUrl.Builder getBaseUrl(String owner, String api) {
-        return new HttpUrl.Builder()
+        HttpUrl.Builder httpUrlBuilder = new HttpUrl.Builder()
                 .scheme(protocol)
                 .host(host)
-                .port(port)
+                .port(port);
+                return addOptionalPathSegment(httpUrlBuilder, basePath)
                 .addPathSegment(APIS)
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api);
     }
 
     private HttpUrl getSaveIntegrationPluginConfigURL(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) {
-
-        return new HttpUrl.Builder()
+        HttpUrl.Builder httpUrlBuilder = new HttpUrl.Builder()
                 .scheme(protocol)
                 .host(host)
-                .port(port)
+                .port(port);
+                return addOptionalPathSegment(httpUrlBuilder, basePath)
                 .addPathSegment("plugins")
                 .addPathSegment("configurations")
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getOwner())
@@ -173,6 +177,14 @@ public class SwaggerHubClient {
                 .addEncodedPathSegment(saveSCMPluginConfigRequest.getScmProvider())
                 .addEncodedQueryParameter("oas", saveSCMPluginConfigRequest.getOas())
                 .build();
+    }
+
+    private HttpUrl.Builder addOptionalPathSegment(HttpUrl.Builder builder, String pathSegment){
+        if(StringUtils.isEmpty(pathSegment)){
+            return builder;
+        }
+        return builder.addPathSegment(pathSegment);
+
     }
 
 }
