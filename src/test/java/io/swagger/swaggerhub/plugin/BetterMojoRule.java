@@ -10,6 +10,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.plugin.testing.MojoRule;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -19,6 +20,9 @@ import org.eclipse.aether.repository.LocalRepository;
 
 import java.io.File;
 import java.util.Arrays;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Copied from https://github.com/ahgittin/license-audit-maven-plugin
@@ -39,7 +43,7 @@ import java.util.Arrays;
  * This also provides new methods, {@link #newMavenSession()} to conveniently create a maven session,
  * and {@link #lookupConfiguredMojo(File, String)} so you don't have to always build the project yourself.
  */
-public abstract class BetterAbstractMojoTestCase extends AbstractMojoTestCase {
+public class BetterMojoRule extends MojoRule {
 
     protected MavenSession newMavenSession() {
         try {
@@ -80,7 +84,7 @@ public abstract class BetterAbstractMojoTestCase extends AbstractMojoTestCase {
      * which sets the defaults one expects from maven; the standard test case leaves a lot of things blank
      */
     @Override
-    protected MavenSession newMavenSession(MavenProject project) {
+    public MavenSession newMavenSession(MavenProject project) {
         MavenSession session = newMavenSession();
         session.setCurrentProject(project);
         session.setProjects(Arrays.asList(project));
@@ -91,7 +95,7 @@ public abstract class BetterAbstractMojoTestCase extends AbstractMojoTestCase {
      * As {@link #lookupConfiguredMojo(MavenProject, String)} but taking the pom file
      * and creating the {@link MavenProject}.
      */
-    protected Mojo lookupConfiguredMojo(File pom, String goal) throws Exception {
+    public Mojo lookupConfiguredMojo(File pom, String goal) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
 
@@ -100,6 +104,25 @@ public abstract class BetterAbstractMojoTestCase extends AbstractMojoTestCase {
         MavenProject project = projectBuilder.build(pom, buildingRequest).getProject();
 
         return lookupConfiguredMojo(project, goal);
+    }
+
+    public static String getBasedir() {
+
+        String path = System.getProperty("basedir");
+        return path != null ? path : (new File("")).getAbsolutePath();
+    }
+
+    public static File getTestFile(String path) {
+        return getTestFile(getBasedir(), path);
+    }
+
+    public static File getTestFile(String basedir, String path) {
+        File root = new File(basedir);
+        if (!root.isAbsolute()) {
+            root = new File(getBasedir(), basedir);
+        }
+
+        return new File(root, path);
     }
 
 }

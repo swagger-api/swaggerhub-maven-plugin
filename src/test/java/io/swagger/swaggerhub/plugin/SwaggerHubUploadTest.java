@@ -9,7 +9,10 @@ import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.File;
 
@@ -28,65 +31,71 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
 
-public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
+public class SwaggerHubUploadTest {
 
     private WireMockServer wireMockServer;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        startMockServer(WIREMOCK_PORT);
-        wireMockServer.resetMappings();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        if (null!= wireMockServer && wireMockServer.isRunning()) {
-            wireMockServer.stop();
+    @Rule
+    public BetterMojoRule rule = new BetterMojoRule()
+    {
+        @Override
+        protected void before() throws Throwable
+        {
+            super.before();
+            startMockServer(WIREMOCK_PORT);
+            wireMockServer.resetMappings();
         }
-    }
+
+        @Override
+        protected void after()
+        {
+            super.after();
+            if (null!= wireMockServer && wireMockServer.isRunning()) {
+                wireMockServer.stop();
+            }
+        }
+    };
+
 
     @Test
     public void testUpload() throws Exception {
-        File pom = getTestFile(
+        File pom = rule.getTestFile(
                 "src/test/resources/testProjects/upload.xml");
         runTest(pom, OAS2);
     }
 
     @Test
     public void testUploadYaml() throws Exception {
-        File pom = getTestFile("src/test/resources/testProjects/upload-yaml.xml");
+        File pom = rule.getTestFile("src/test/resources/testProjects/upload-yaml.xml");
         runTest(pom, OAS2);
     }
 
     @Test
     public void testUploadOAS3Yaml() throws Exception {
-        File pom = getTestFile("src/test/resources/testProjects/upload-oas3-yaml.xml");
+        File pom = rule.getTestFile("src/test/resources/testProjects/upload-oas3-yaml.xml");
         runTest(pom, OAS3);
     }
 
     @Test
     public void testUploadPrivate() throws Exception {
-        File pom = getTestFile("src/test/resources/testProjects/upload-private.xml");
+        File pom = rule.getTestFile("src/test/resources/testProjects/upload-private.xml");
         runTest(pom, OAS2);
     }
 
-    @Test
+    @Test(expected = MojoExecutionException.class)
     public void testUploadFails_whenUploadTypeIsUnknown() throws Exception {
         //Given
         boolean executionFailure = false;
 
         //When
-        try {
-            getSwaggerUpload("src/test/resources/testProjects/incorrect-upload-type.xml").execute();
-        }catch (MojoExecutionException me){
-            executionFailure = true;
-        } // @Test(expected = MojoExecutionException.class) is not working as expected. This catch is a workaround
+        getSwaggerUpload("src/test/resources/testProjects/incorrect-upload-type.xml").execute();
 
         //Then
-        assertTrue(executionFailure);
+        fail();
     }
 
     @Test
@@ -250,72 +259,50 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
 
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testBuildFails_whenSaveDefinitionFails_andFailuresArentSkipped() throws Exception {
         //Given
         stubSaveDefinitionRequest(SWAGGERHUB_API_TOKEN, API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, badRequest());
         UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
 
         //When
-        boolean executionFailure = false;
-        try {
-            getSwaggerUpload("src/test/resources/testProjects/fail_build_on_failed_requests.xml").execute();
-        }catch (Exception e){
-            executionFailure = true;
-            verify(0, postRequestedFor(uploadDefinitionRequest2));
-        } // @Test(expected = MojoExecutionException.class) is not working as expected. This catch is a workaround
+        getSwaggerUpload("src/test/resources/testProjects/fail_build_on_failed_requests.xml").execute();
 
-        assertTrue(executionFailure);
+        //Then
+        fail();
 
     }
 
-    @Test
+    @Test(expected = UploadParametersException.class)
     public void testBuildFailsWhenInputFileUploadParametersArentSet() throws Exception {
-
         //Given
 
         //When
-        boolean executionFailure = false;
-        try {
-            getSwaggerUpload("src/test/resources/testProjects/upload-input-file-missing-api-param.xml").execute();
-        }catch (UploadParametersException e){
-            e.printStackTrace();
-            executionFailure = true;
-        } catch (MojoExecutionException e) {
-            executionFailure = false;
-        }
+        getSwaggerUpload("src/test/resources/testProjects/upload-input-file-missing-api-param.xml").execute();
 
         //Then
-        assertTrue(executionFailure);
+        fail();
     }
 
-    @Test
+    @Test(expected = UploadParametersException.class)
     public void testBuildFailsWhenDefinitionDirectoryUploadParametersArentSet() throws Exception {
         //Given
 
         //When
-        boolean executionFailure = false;
-        try {
-            getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-missing-directory-param.xml").execute();
-        }catch (UploadParametersException e){
-            e.printStackTrace();
-            executionFailure = true;
-        } catch (MojoExecutionException e) {
-            executionFailure = false;
-        }
+        getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-missing-directory-param.xml").execute();
 
         //Then
-        assertTrue(executionFailure);
+        fail();
     }
 
     private void runTest(File pom, String expectedOasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
 
-        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        SwaggerHubUpload swaggerHubUpload = (SwaggerHubUpload) rule.lookupConfiguredMojo(pom, "upload");
         assertNotNull(swaggerHubUpload);
 
-        final PlexusConfiguration config = extractPluginConfiguration("swaggerhub-maven-plugin", pom);
+        final PlexusConfiguration config = rule.extractPluginConfiguration("swaggerhub-maven-plugin", pom);
         UrlPathPattern url = setupServerMocking(config, expectedOasVersion);
 
         swaggerHubUpload.execute();
@@ -409,7 +396,7 @@ public class SwaggerHubUploadTest extends BetterAbstractMojoTestCase {
     }
 
     private SwaggerHubUpload getSwaggerUpload(String filePath) throws Exception {
-        File pom = getTestFile(filePath);
-        return (SwaggerHubUpload) lookupConfiguredMojo(pom, "upload");
+        File pom = rule.getTestFile(filePath);
+        return (SwaggerHubUpload) rule.lookupConfiguredMojo(pom, "upload");
     }
 }
