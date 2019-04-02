@@ -12,8 +12,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
 public class SwaggerHubDownloadTest {
