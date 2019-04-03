@@ -11,6 +11,22 @@ A simple Maven plugin to access [SwaggerHub](https://swaggerhub.com) hosting of 
 * Supports YAML and JSON format for API definitions.
 * Connects to SwaggerHub SaaS by default, with an optional configuration to point to a local SwaggerHub On-Premise instance.
 
+## Table of contents
+* [Example use cases](#example-use-cases)
+  * [Code-first](#code-first)
+  * [Design-first](#design-first)
+* [Dependencies](#dependencies)
+  * [Stable version](#stable-version)
+  * [Snapshots](#snapshots)
+* [Goals](#goals)
+  * [`download`](#download)
+    * [Parameters](#parameters)
+  * [`upload`](#upload)
+    * [Parameters](#parameters-1)
+    * [Multi-upload considerations](#multi-upload-considerations)
+    * [SCM integration provisioning considerations](#scm-integration-provisioning-considerations)
+    * [Examples](#examples)
+
 ## Example use cases
 
 The usage pattern depends on whether you use the [code-first or design-first](https://swaggerhub.com/blog/api-design/design-first-or-code-first-api-development/) approach.
