@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.swagger.swaggerhub</groupId>
+    <artifactId>swaggerhub-maven-plugin-test</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Test Upload YAML</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swaggerhub-maven-plugin</artifactId>
+                <configuration>
+                    <host>localhost</host>
+                    <port>8089</port>
+                    <protocol>http</protocol>
+                    <owner>swaggerhubuser</owner>
+                    <token>dUmMyTokEn.1234abc</token>
+                    <uploadType>directory</uploadType>
+                    <definitionDirectory>src/test/resources/file-finder-test-definitions</definitionDirectory>
+                    <branch>test-branch</branch>
+                    <enableScmIntegration>true</enableScmIntegration>
+                    <scmProvider>GITHUB</scmProvider>
+                    <scmPersonalAccessToken>scm-personal-access-token</scmPersonalAccessToken>
+                    <scmOrganization>scm-account</scmOrganization>
+                    <scmProject>scm-project</scmProject>
+                    <repositoryOwner>repo_owner</repositoryOwner>
+                    <repository>repo</repository>
+                    <skipFailures>true</skipFailures>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

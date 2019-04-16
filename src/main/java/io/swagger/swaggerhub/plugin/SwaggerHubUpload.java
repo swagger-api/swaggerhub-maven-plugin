@@ -11,6 +11,7 @@ import io.swagger.swaggerhub.plugin.requests.dtos.SCMIntegrationPluginConfigurat
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import io.swagger.swaggerhub.plugin.services.DefinitionParserService;
+import io.swagger.swaggerhub.plugin.services.StringModificationService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -68,7 +68,6 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String uploadType;
     @Parameter(property = "upload.basepath")
     private String basepath;
-
     /*
     SCM related parameters
      */
@@ -99,6 +98,15 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.scmPassword")
     private String scmPassword;
 
+    @Parameter(property = "upload.scmProject")
+    private String scmProject;
+
+    @Parameter(property = "upload.scmOrganization")
+    private String scmOrganization;
+
+    @Parameter(property = "upload.scmPersonalAccessToken")
+    private String scmPersonalAccessToken;
+
     private SwaggerHubClient swaggerHubClient;
 
     @Override
@@ -107,6 +115,7 @@ public class SwaggerHubUpload extends AbstractMojo {
         swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath);
 
         getLog().info("Uploading to " + host
+                + ", basepath: " + basepath
                 + ": api: " + api
                 + ", owner: " + owner
                 + ", version: " + version
@@ -116,15 +125,8 @@ public class SwaggerHubUpload extends AbstractMojo {
                 + ", definitionDirectory: " + definitionDirectory
                 + ", definitionFileNameRegex: " + definitionFileNameRegex
                 + ", uploadType: " + uploadType
-                + ", scmProvider: " + scmProvider
-                + ", scmToken: " + (StringUtils.isNotEmpty(scmToken) ? scmToken.substring(0,1)+scmToken.substring(1).replaceAll(".", "*"):"")
-                + ", repository: " + repository
-                + ", repositoryOwner: " + repositoryOwner
-                + ", branch: " + branch
-                + ", enableScmIntegration: " + enableScmIntegration
                 + ", skipFailures: " + skipFailures
-                + ", scmUsername: " + scmUsername
-                + ", scmPassword: " + (StringUtils.isNotEmpty(scmPassword) ? scmPassword.substring(0,1)+scmPassword.substring(1).replaceAll(".", "*"):""));
+                + ", token: " + StringModificationService.obfuscateSensitiveString(token, "*"));
 
 
         /*
@@ -146,6 +148,19 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         if(StringUtils.isNotEmpty(scmProvider)){
 
+            getLog().info("Creating SCM integration using the following.."
+                    + " scmProvider: " + scmProvider
+                    + ", scmToken: " + StringModificationService.obfuscateSensitiveString(scmToken, "*")
+                    + ", repository: " + repository
+                    + ", repositoryOwner: " + repositoryOwner
+                    + ", branch: " + branch
+                    + ", enableScmIntegration: " + enableScmIntegration
+                    + ", scmUsername: " + scmUsername
+                    + ", scmPassword: " + StringModificationService.obfuscateSensitiveString(scmPassword, "*")
+                    + ", scmOrganization: " + scmOrganization
+                    + ", scmPersonalAccessToken: " + StringModificationService.obfuscateSensitiveString(scmPersonalAccessToken, "*")
+                    + ", scmProject: " + scmProject);
+
             //Preemptive setup
             SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
                     .scmProvider(scmProvider)
@@ -157,6 +172,9 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .scmPassword(scmPassword)
                     .scmUsername(scmUsername)
                     .name(SWAGGERHUB_PLUGIN_CONFIGURATION_NAME)
+                    .project(scmProject)
+                    .personalAccessToken(scmPersonalAccessToken)
+                    .account(scmOrganization)
                     .build();
 
             definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
@@ -357,7 +375,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     try {
                         return StringUtils.isEmpty((String) givenObject.getClass().getDeclaredField(x).get(givenObject));
                     } catch (Exception e) {
-                        //Not going to try and account for exceptions; if there is an exception we probably have greater issues than an empty/null field
+                        //Not going to try and scmOrganization for exceptions; if there is an exception we probably have greater issues than an empty/null field
                         getLog().debug(String.format("Unable to ascertain if %s is null/empty",x));
                         return true;
                     }

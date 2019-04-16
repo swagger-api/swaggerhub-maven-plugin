@@ -1,6 +1,7 @@
 package io.swagger.swaggerhub.plugin.requests.dtos;
 
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
+import io.swagger.swaggerhub.plugin.services.StringModificationService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -27,6 +28,9 @@ public class SCMIntegrationPluginConfiguration {
     private String outputFolder;
     private String username;
     private String password;
+    private String project;
+    private String personalAccessToken;
+    private String account;
     /*
     The following 3 members must match the following format
     providedPaths and ignoredPaths must be an empty list. managedPaths should contain only 1 item, the name of the file itself
@@ -56,6 +60,9 @@ public class SCMIntegrationPluginConfiguration {
         this.managedPaths = configRequest.getManagedPaths();
         this.username = configRequest.getScmUsername();
         this.password = configRequest.getScmPassword();
+        this.project = configRequest.getProject();
+        this.personalAccessToken = configRequest.getPersonalAccessToken();
+        this.account = configRequest.getAccount();
     }
 
     public String getConfigType() {
@@ -120,11 +127,24 @@ public class SCMIntegrationPluginConfiguration {
         return name;
     }
 
+    public String getProject() {
+        return project;
+    }
+
+    public String getPersonalAccessToken() {
+        return personalAccessToken;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
     @Override
     public String toString() {
         return "SCMIntegrationPluginConfiguration{" +
                 "configType='" + configType + '\'' +
-                ", token='" + (StringUtils.isNotEmpty(token) ? token.substring(0,1)+token.substring(1).replaceAll(".", "*"):"") + '\'' +                ", branch='" + branch + '\'' +
+                ", token='" + StringModificationService.obfuscateSensitiveString(token, "*") + '\'' +
+                ", branch='" + branch + '\'' +
                 ", owner='" + owner + '\'' +
                 ", repository='" + repository + '\'' +
                 ", outputFile='" + outputFile + '\'' +
@@ -133,11 +153,14 @@ public class SCMIntegrationPluginConfiguration {
                 ", enabled=" + enabled +
                 ", outputFolder='" + outputFolder + '\'' +
                 ", username='" + username + '\'' +
-                ", password='" + (StringUtils.isNotEmpty(password) ? password.substring(0,1)+password.substring(1).replaceAll(".", "*"):"") + '\'' +
+                ", password='" + StringModificationService.obfuscateSensitiveString(password, "*") + '\'' +
                 ", providedPaths=" + Arrays.toString(providedPaths) +
                 ", ignoredPaths=" + Arrays.toString(ignoredPaths) +
                 ", managedPaths=" + Arrays.toString(managedPaths) +
                 ", name='" + name + '\'' +
+                ", project='" + project + '\'' +
+                ", account='" + account + '\'' +
+                ", personalAccessToken='" + StringModificationService.obfuscateSensitiveString(personalAccessToken, "*") + '\'' +
                 '}';
     }
 }
