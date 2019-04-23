@@ -1,5 +1,8 @@
 package io.swagger.swaggerhub.plugin;
 
+import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.Maven;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -113,7 +116,7 @@ public class BetterMojoRule extends MojoRule {
     }
 
     public static File getTestFile(String path) {
-        return getTestFile(getBasedir(), path);
+        return getTestFile(getBasedir(), DefinitionFileFinder.modifyPathForOperatingFileSystem(path));
     }
 
     public static File getTestFile(String basedir, String path) {

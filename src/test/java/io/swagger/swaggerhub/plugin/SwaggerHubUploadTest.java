@@ -295,6 +295,22 @@ public class SwaggerHubUploadTest {
         fail();
     }
 
+    @Test
+    public void testMultiDefinitionsAreUploadedWithCorrectPath_WhenUsingWindowsSupportedFilePath() throws Exception {
+        //Given
+        UrlPathPattern definition1Request = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern definition2Request = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern definition3Request = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+
+        //When
+        getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-windows.xml").execute();
+
+        //Then
+        verify(1, postRequestedFor(definition1Request));
+        verify(1, postRequestedFor(definition2Request));
+        verify(1, postRequestedFor(definition3Request));
+    }
+
     private void runTest(File pom, String expectedOasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
