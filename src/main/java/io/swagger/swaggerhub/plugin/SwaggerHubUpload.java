@@ -341,8 +341,8 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         //Remove the portion of the path which is prior to our repositories file path
         path = StringUtils.removeStart(FilenameUtils.getFullPath(path), REPOSITORY_LOCATION);
-        //Return the path without leading and ending /
-        return DefinitionFileFinder.modifyPathForOperatingFileSystem(StringUtils.strip(StringUtils.strip(path,"/"),"\\"));
+        //Return the path without leading and ending / and ensures the file path uses forward slashes instead of backslashes
+        return StringUtils.strip(StringUtils.strip(path,"/"),"\\").replace("\\", "/");
     }
 
     /**
