@@ -24,7 +24,7 @@ public class DefinitionFileFinder {
     public static List<File> findDefinitionFiles(String directory, Optional<String> fileNameRegexPattern) throws IOException {
 
 
-        File directoryFile = new File(directory);
+        File directoryFile = new File(modifyPathForOperatingFileSystem(directory));
         if(!directoryFile.exists()){
             throw new IOException(String.format("The given directory [%s] cannot be found", directory));
         }
@@ -54,5 +54,14 @@ public class DefinitionFileFinder {
         }
 
         return files;
+    }
+
+    /**
+     * Utility function that modifies the path given to match the operating system that is being used to run the plugin.
+     * @param path
+     * @return
+     */
+    public static String modifyPathForOperatingFileSystem(String path){
+        return path.replace("/",File.separator).replace("\\", File.separator);
     }
 }

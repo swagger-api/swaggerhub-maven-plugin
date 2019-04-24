@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
+import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -344,6 +345,43 @@ public class SwaggerHubUploadTest {
 
         //Then
         fail();
+    }
+
+    @Test
+    public void testMultiDefinitionsAreUploadedWithCorrectPath_WhenUsingWindowsSupportedFilePath() throws Exception {
+        //Given
+        UrlPathPattern definition1Request = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern definition2Request = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern definition3Request = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+
+
+        UrlPathPattern saveSCMPluginConfigurationRequest1 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest2 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest3 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SWAGGERHUB_API_TOKEN);
+
+        RequestPatternBuilder putRequestPattern1 = createPutSCMConfigRequestPatternWithToken(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_1_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_TOKEN);
+        RequestPatternBuilder putRequestPattern2 = createPutSCMConfigRequestPatternWithToken(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_2_FILENAME, DefinitionFileFormat.JSON.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_TOKEN);
+        RequestPatternBuilder putRequestPattern3 = createPutSCMConfigRequestPatternWithToken(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_3_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_TOKEN);
+
+        //When
+        getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-windows.xml").execute();
+
+        //Then
+        verify(1, postRequestedFor(definition1Request));
+        verify(1, postRequestedFor(definition2Request));
+        verify(1, postRequestedFor(definition3Request));
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest1));
+        verify(putRequestPattern1);
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest2));
+        verify(putRequestPattern2);
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest3));
+        verify(putRequestPattern3);
     }
 
     private void runTest(File pom, String expectedOasVersion) throws Exception {
