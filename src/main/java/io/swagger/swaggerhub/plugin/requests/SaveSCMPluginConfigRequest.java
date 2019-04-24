@@ -27,6 +27,9 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
     private String[] managedPaths;
     private String scmPassword;
     private String scmUsername;
+    private String project;
+    private String personalAccessToken;
+    private String account;
 
     private SaveSCMPluginConfigRequest(Builder builder) {
         super(builder.api, builder.apiOwner, builder.version, builder.oas);
@@ -43,6 +46,9 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         this.managedPaths = builder.managedPaths;
         this.scmPassword = builder.scmPassword;
         this.scmUsername = builder.scmUsername;
+        this.project = builder.project;
+        this.personalAccessToken = builder.personalAccessToken;
+        this.account = builder.account;
     }
 
     public String getScmProvider() {
@@ -93,6 +99,12 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
     public String getScmUsername() { return scmUsername; }
 
+    public String getProject() { return project; }
+
+    public String getAccount() { return account; }
+
+    public String getPersonalAccessToken() { return personalAccessToken; }
+
     public String getRequestBody() throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(new SCMIntegrationPluginConfiguration(this));
     }
@@ -116,6 +128,9 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         private String[] managedPaths;
         private String scmPassword;
         private String scmUsername;
+        private String project;
+        private String personalAccessToken;
+        private String account;
 
         public Builder(String apiOwner, String api, String version) {
             this.api = api;
@@ -138,6 +153,9 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
             this.managedPaths=saveSCMPluginConfigRequest.getManagedPaths();
             this.scmPassword=saveSCMPluginConfigRequest.getScmPassword();
             this.scmUsername=saveSCMPluginConfigRequest.getScmUsername();
+            this.project=saveSCMPluginConfigRequest.getProject();
+            this.personalAccessToken=saveSCMPluginConfigRequest.getPersonalAccessToken();
+            this.account=saveSCMPluginConfigRequest.getAccount();
             return this;
         }
 
@@ -208,6 +226,21 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
         public SaveSCMPluginConfigRequest.Builder scmPassword(String scmPassword){
             this.scmPassword = scmPassword;
+            return this;
+        }
+
+        public SaveSCMPluginConfigRequest.Builder project(String project){
+            this.project = project;
+            return this;
+        }
+
+        public SaveSCMPluginConfigRequest.Builder personalAccessToken(String personalAccessToken){
+            this.personalAccessToken = personalAccessToken;
+            return this;
+        }
+
+        public SaveSCMPluginConfigRequest.Builder account(String account){
+            this.account = account;
             return this;
         }
 

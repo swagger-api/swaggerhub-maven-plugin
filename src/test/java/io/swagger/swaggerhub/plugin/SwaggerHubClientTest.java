@@ -20,7 +20,10 @@ import java.util.Optional;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.API_NAME;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.API_VERSION;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.OAS3;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_ACCOUNT;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PASSWORD;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PERSONAL_ACCESS_TOKEN;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PROJECT;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_USERNAME;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_REPOSITORY_OWNER;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_ENABLED;
@@ -86,15 +89,12 @@ public class SwaggerHubClientTest {
      */
     @Test
     public void verifySaveIntegrationPluginOfType_postsExpectedRequestBody() throws JsonProcessingException {
+        //Given
         swaggerHubClient = buildSwaggerHubClient( null);
-
         SaveSCMPluginConfigRequest.Builder requestBuilder = requestBuilder();
-
         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
-
         String requestUrl = String.format("/plugins/configurations/%s/%s/%s/%s?oas=%s", API_OWNER, API_NAME, API_VERSION, SCM_INTEGRATION_PROVIDER_GITHUB, OAS3);
         stubFor(put(requestUrl).willReturn(created()));
-
         RequestPatternBuilder putRequestPattern = putRequestPattern("/plugins/configurations/%s/%s/%s/%s");
 
         //When
@@ -115,15 +115,12 @@ public class SwaggerHubClientTest {
      */
     @Test
     public void verifySaveIntegrationPluginOfType_postsExpectedRequestBodyWithBasePath() throws JsonProcessingException {
+        //Given
         swaggerHubClient = buildSwaggerHubClient("basePath");
-
         SaveSCMPluginConfigRequest.Builder requestBuilder = requestBuilder();
-
         SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = requestBuilder.build();
-
         String requestUrl = String.format("/basePath/plugins/configurations/%s/%s/%s/%s?oas=%s", API_OWNER, API_NAME, API_VERSION, SCM_INTEGRATION_PROVIDER_GITHUB, OAS3);
         stubFor(put(requestUrl).willReturn(created()));
-
         RequestPatternBuilder putRequestPattern = putRequestPattern("/basePath/plugins/configurations/%s/%s/%s/%s");
 
         //When
@@ -156,7 +153,10 @@ public class SwaggerHubClientTest {
                 .managedPaths(new String[]{SCM_INTEGRATION_OUTPUT_FILE})
                 .name(SCM_INTEGRATION_NAME)
                 .scmUsername(SCM_USERNAME)
-                .scmPassword(SCM_PASSWORD);
+                .scmPassword(SCM_PASSWORD)
+                .project(SCM_PROJECT)
+                .account(SCM_ACCOUNT)
+                .personalAccessToken(SCM_PERSONAL_ACCESS_TOKEN);
     }
 
     private RequestPatternBuilder putRequestPattern(String url){
@@ -173,7 +173,10 @@ public class SwaggerHubClientTest {
                 .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\"" + SCM_INTEGRATION_OUTPUT_FILE + "\"]")))
                 .withRequestBody(matchingJsonPath("$.name", equalTo(SCM_INTEGRATION_NAME)))
                 .withRequestBody(matchingJsonPath("$.username", equalTo(SCM_USERNAME)))
-                .withRequestBody(matchingJsonPath("$.password", equalTo(SCM_PASSWORD)));
+                .withRequestBody(matchingJsonPath("$.password", equalTo(SCM_PASSWORD)))
+                .withRequestBody(matchingJsonPath("$.account", equalTo(SCM_ACCOUNT)))
+                .withRequestBody(matchingJsonPath("$.project", equalTo(SCM_PROJECT)))
+                .withRequestBody(matchingJsonPath("$.personalAccessToken", equalTo(SCM_PERSONAL_ACCESS_TOKEN)));
     }
 
 }

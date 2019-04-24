@@ -42,16 +42,14 @@ public class SwaggerHubUploadTest {
     public BetterMojoRule rule = new BetterMojoRule()
     {
         @Override
-        protected void before() throws Throwable
-        {
+        protected void before() throws Throwable {
             super.before();
             startMockServer(WIREMOCK_PORT);
             wireMockServer.resetMappings();
         }
 
         @Override
-        protected void after()
-        {
+        protected void after() {
             super.after();
             if (null!= wireMockServer && wireMockServer.isRunning()) {
                 wireMockServer.stop();
@@ -88,7 +86,6 @@ public class SwaggerHubUploadTest {
     @Test(expected = MojoExecutionException.class)
     public void testUploadFails_whenUploadTypeIsUnknown() throws Exception {
         //Given
-        boolean executionFailure = false;
 
         //When
         getSwaggerUpload("src/test/resources/testProjects/incorrect-upload-type.xml").execute();
@@ -169,6 +166,26 @@ public class SwaggerHubUploadTest {
     }
 
     @Test
+    public void testInputFileIsUploaded_andSCMSaveRequestMadeWithAccountPATAndProject() throws Exception {
+        //Given
+        UrlPathPattern saveDefinitionRequest = stubSaveDefinitionRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest = stubSaveSCMPluginConfigurationRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
+
+        //Add test for output file value
+        RequestPatternBuilder saveSCMConfigRequest = createPutSCMConfigRequestPatternWithAccountPATandProject(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, INPUT_FILE_FILENAME,
+                DefinitionFileFormat.JSON.getLanguageTarget(), TEST_RESOURCES_DIRECTORY, SCM_ACCOUNT, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT);
+
+        //When
+        getSwaggerUpload("src/test/resources/testProjects/upload-input-file-save-scm-plugin-with-account-pat-project.xml").execute();
+
+        //Then
+        verify(1, postRequestedFor(saveDefinitionRequest));
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest));
+        verify(1, saveSCMConfigRequest);
+    }
+
+    @Test
     public void testMultiDefinitionsAreUploaded_andSCMSaveRequestMadeWithTokenMade() throws Exception {
         //Given
         UrlPathPattern uploadDefinitionRequest1 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
@@ -225,6 +242,42 @@ public class SwaggerHubUploadTest {
 
         //When
         getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-save-scm-plugins-with-username-password.xml").execute();
+
+        //Then
+        verify(1, postRequestedFor(uploadDefinitionRequest1));
+        verify(1, postRequestedFor(uploadDefinitionRequest2));
+        verify(1, postRequestedFor(uploadDefinitionRequest3));
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest1));
+        verify(saveSCMPluginRequestPattern1);
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest2));
+        verify(saveSCMPluginRequestPattern2);
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest3));
+        verify(saveSCMPluginRequestPattern3);
+    }
+
+    @Test
+    public void testMultiDefinitionsAreUploaded_andSCMSaveRequestMadeWithAccountPATAndProject() throws Exception {
+        //Given
+        UrlPathPattern uploadDefinitionRequest1 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern uploadDefinitionRequest3 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+
+        UrlPathPattern saveSCMPluginConfigurationRequest1 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest2 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest3 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SWAGGERHUB_API_TOKEN);
+
+        RequestPatternBuilder saveSCMPluginRequestPattern1 = createPutSCMConfigRequestPatternWithAccountPATandProject(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_1_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_ACCOUNT, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT);
+        RequestPatternBuilder saveSCMPluginRequestPattern2 = createPutSCMConfigRequestPatternWithAccountPATandProject(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_2_FILENAME, DefinitionFileFormat.JSON.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_ACCOUNT, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT);
+        RequestPatternBuilder saveSCMPluginRequestPattern3 = createPutSCMConfigRequestPatternWithAccountPATandProject(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_3_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_ACCOUNT, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT);
+
+        //When
+        getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-save-scm-plugins-with-account-pat-project.xml").execute();
 
         //Then
         verify(1, postRequestedFor(uploadDefinitionRequest1));
@@ -404,6 +457,17 @@ public class SwaggerHubUploadTest {
         return createPutSCMConfigRequestPatternBase(owner, api, version, oasVersion, branch, enabled, repository, repositoryOwner, outputFile, target, outputFolder)
                 .withRequestBody(matchingJsonPath("$.username", equalTo(username)))
                 .withRequestBody(matchingJsonPath("$.password", equalTo(password)));
+
+    }
+
+    private RequestPatternBuilder createPutSCMConfigRequestPatternWithAccountPATandProject(String owner, String api, String version, String oasVersion, String branch,
+                                                                                       String enabled, String repository, String repositoryOwner, String outputFile,
+                                                                                       String target, String outputFolder, String account, String personalAccessToken, String project){
+
+        return createPutSCMConfigRequestPatternBase(owner, api, version, oasVersion, branch, enabled, repository, repositoryOwner, outputFile, target, outputFolder)
+                .withRequestBody(matchingJsonPath("$.account", equalTo(account)))
+                .withRequestBody(matchingJsonPath("$.personalAccessToken", equalTo(personalAccessToken)))
+                .withRequestBody(matchingJsonPath("$.project", equalTo(project)));
 
     }
 

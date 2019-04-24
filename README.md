@@ -164,10 +164,13 @@ Parameter | Description | Required? | SCM Specific? | Default
 --------- | ----------- | --------- | ---------------- | -------
 **`scmProvider`** | SCM to create a SwaggerHub Integration for. | yes | - | -
 **`scmToken`** | User generated API token to be used for SCM requests | no | `GITHUB` | - 
+**`scmPersonalAccessToken`** | Similar to the above | no | `AZURE_DEVOPS_SERVICES` | - 
 **`scmUsername`** | The account-name (case-sensitive) with which to authenticate | no | `BITBUCKET` | - 
 **`scmPassword`** | The password to be used in conjunction with the above `scmUsername` | no | `BITBUCKET` | - 
 **`repository`** | The repository to push SwaggerHub changes to | yes | - | - 
-**`repositoryOwner`** | The SCM account which owns the above repository | yes | - | - 
+**`repositoryOwner`** | The SCM account which owns the above repository | no | `GITHUB`. `BITBUCKET` | - 
+**`scmProject`** | Team Project which contains the target repository | no | `AZURE_DEVOPS_SERVICES` | - 
+**`scmOrganization`** | Specific to Azure DevOps Services, the organization with which to synchronize | no | `AZURE_DEVOPS_SERVICES` | - 
 **`enableScmIntegration`** | Specifies whether to enable the SCM integration. If enabled, SwaggerHub changes will be pushed automatically on save | no | - |true 
 **`branch`** | The repository branch to push SwaggerHub changes to | no | - | SWAGGERHUB 
 
@@ -195,7 +198,7 @@ If an error occurs while uploading any definition, the build will fail and subse
 
 **Note:** This is currently supported in SwaggerHub SaaS only.
 
-* Supported SCM's include: `GITHUB`, `BITBUCKET`
+* Supported SCM's include: `GITHUB`, `BITBUCKET`, `AZURE_DEVOPS_SERVICES`
 
 * Care should be taken when specifying SCM parameters. Validation does not take place prior to making the request to SwaggerHub and issues can arise due to incorrectly configured integrations
 
@@ -207,7 +210,15 @@ App password permissions required are:
     * **Account** : _Email, Read_
     * **Repositories** : _Read, Write_
     
-Documentation on how to generate an app password can be found [here](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html).
+    Documentation on how to generate an app password can be found [here](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html).
+
+* `AZURE_DEVOPS_SERVICES` uses personal access tokens which will eventually expire. In the event of token expiring, the integration will need to be deleted and recreated (either manually or via the plugin).
+
+    See Microsoft documentation here for details on creating a Personal Access Token. Please ensure that the token has at minimum the scope Code (read and write) for the organization you wish to access
+
+* A list of `AZURE_DEVOPS_SERVICES` organizations that you currently have access to can be found [here](https://aex.dev.azure.com/me). Also listed are the projects for each organization.
+
+    Enter just the organization, without ‘dev.azure.com’ at the beginning or ‘.visualstudio.com’ at the end. For example, if your organization is ‘dev.azure.com/example-user’ or 'example-user.visualstudio.com’, enter just 'example-user’. 
 
 Further documentation of SwaggerHub Integrations can be found [here](https://app.swaggerhub.com/help/integrations/index).
 
