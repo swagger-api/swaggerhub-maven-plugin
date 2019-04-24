@@ -419,7 +419,7 @@ public class SwaggerHubUploadTest {
                 .withRequestBody(matchingJsonPath("$.owner", equalTo(repositoryOwner)))
                 .withRequestBody(matchingJsonPath("$.syncMethod", equalTo("Advanced Sync")))
                 .withRequestBody(matchingJsonPath("$.target", equalTo(target)))
-                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(DefinitionFileFinder.modifyPathForOperatingFileSystem(outputFolder))))
+                .withRequestBody(matchingJsonPath("$.outputFolder", equalTo(outputFolder)))
                 .withRequestBody(matchingJsonPath("$.managedPaths", equalToJson("[\""+outputFile+"\"]")))
                 .withRequestBody(matchingJsonPath("$.providedPaths", equalToJson("[]")))
                 .withRequestBody(matchingJsonPath("$.ignoredPaths", equalToJson("[]")));
