@@ -31,6 +31,8 @@ public class SCMIntegrationPluginConfiguration {
     private String project;
     private String personalAccessToken;
     private String account;
+    private String url;
+    private String projectCollection;
     /*
     The following 3 members must match the following format
     providedPaths and ignoredPaths must be an empty list. managedPaths should contain only 1 item, the name of the file itself
@@ -63,6 +65,8 @@ public class SCMIntegrationPluginConfiguration {
         this.project = configRequest.getProject();
         this.personalAccessToken = configRequest.getPersonalAccessToken();
         this.account = configRequest.getAccount();
+        this.url = configRequest.getUrl();
+        this.projectCollection = configRequest.getProjectCollection();
     }
 
     public String getConfigType() {
@@ -139,6 +143,10 @@ public class SCMIntegrationPluginConfiguration {
         return account;
     }
 
+    public String getUrl() { return url; }
+
+    public String getProjectCollection() { return projectCollection; }
+
     @Override
     public String toString() {
         return "SCMIntegrationPluginConfiguration{" +
@@ -161,6 +169,8 @@ public class SCMIntegrationPluginConfiguration {
                 ", project='" + project + '\'' +
                 ", account='" + account + '\'' +
                 ", personalAccessToken='" + StringModificationService.obfuscateSensitiveString(personalAccessToken, "*") + '\'' +
+                ", url='" + url + '\'' +
+                ", projectCollection='" + projectCollection + '\'' +
                 '}';
     }
 }
