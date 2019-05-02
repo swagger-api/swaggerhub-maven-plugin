@@ -171,7 +171,7 @@ Parameter | Description | Required? | SCM Specific? | Default
 **`repositoryOwner`** | The SCM account which owns the above repository | no | `GITHUB`. `BITBUCKET` | - 
 **`scmProject`** | Team Project which contains the target repository | no | `AZURE_DEVOPS_SERVICES` | - 
 **`scmOrganization`** | Specific to Azure DevOps Services, the organization with which to synchronize | no | `AZURE_DEVOPS_SERVICES` | -
-**`scmUrl`** | Host URL of the Azure DevOps Server | no | `AZURE_DEVOPS_SERVER` | -
+**`scmUrl`** | Host URL of the SCM | no | `AZURE_DEVOPS_SERVER` | -
 **`scmProjectCollection`** | Project collection which contains the target repositories project | no | `AZURE_DEVOPS_SERVER` | DefaultCollection
 **`enableScmIntegration`** | Specifies whether to enable the SCM integration. If enabled, SwaggerHub changes will be pushed automatically on save | no | - |true 
 **`branch`** | The repository branch to push SwaggerHub changes to | no | - | SWAGGERHUB 
