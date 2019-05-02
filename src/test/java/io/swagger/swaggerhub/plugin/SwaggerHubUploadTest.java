@@ -6,7 +6,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
-import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -132,7 +131,6 @@ public class SwaggerHubUploadTest {
         UrlPathPattern saveDefinitionRequest = stubSaveDefinitionRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
         UrlPathPattern saveSCMPluginConfigurationRequest = stubSaveSCMPluginConfigurationRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
 
-        //Add test for output file value
         RequestPatternBuilder putRequestPattern1 = createPutSCMConfigRequestPatternWithToken(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, INPUT_FILE_FILENAME, DefinitionFileFormat.JSON.getLanguageTarget(), TEST_RESOURCES_DIRECTORY, SCM_TOKEN);
 
@@ -151,7 +149,6 @@ public class SwaggerHubUploadTest {
         UrlPathPattern saveDefinitionRequest = stubSaveDefinitionRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
         UrlPathPattern saveSCMPluginConfigurationRequest = stubSaveSCMPluginConfigurationRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
 
-        //Add test for output file value
         RequestPatternBuilder saveSCMConfigRequest = createPutSCMConfigRequestPatternWithUsernamePassword(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, INPUT_FILE_FILENAME,
                 DefinitionFileFormat.JSON.getLanguageTarget(), TEST_RESOURCES_DIRECTORY, SCM_USERNAME,SCM_PASSWORD);
@@ -171,7 +168,6 @@ public class SwaggerHubUploadTest {
         UrlPathPattern saveDefinitionRequest = stubSaveDefinitionRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
         UrlPathPattern saveSCMPluginConfigurationRequest = stubSaveSCMPluginConfigurationRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
 
-        //Add test for output file value
         RequestPatternBuilder saveSCMConfigRequest = createPutSCMConfigRequestPatternWithAccountPATandProject(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, INPUT_FILE_FILENAME,
                 DefinitionFileFormat.JSON.getLanguageTarget(), TEST_RESOURCES_DIRECTORY, SCM_ACCOUNT, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT);
@@ -307,13 +303,13 @@ public class SwaggerHubUploadTest {
 
         RequestPatternBuilder saveSCMPluginRequestPattern1 = createPutSCMConfigRequestPatternWithUrlAndProjectCollection(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_1_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_PERSONAL_ACCESS_TOKEN,
-                SCM_PROJECT, SCM_TFS_URL, SCM_TFS_PROJECT_COLLECTION);
+                SCM_PROJECT, SCM_URL, SCM_PROJECT_COLLECTION);
         RequestPatternBuilder saveSCMPluginRequestPattern2 = createPutSCMConfigRequestPatternWithUrlAndProjectCollection(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_2_FILENAME, DefinitionFileFormat.JSON.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_PERSONAL_ACCESS_TOKEN,
-                SCM_PROJECT, SCM_TFS_URL, SCM_TFS_PROJECT_COLLECTION);
+                SCM_PROJECT, SCM_URL, SCM_PROJECT_COLLECTION);
         RequestPatternBuilder saveSCMPluginRequestPattern3 = createPutSCMConfigRequestPatternWithUrlAndProjectCollection(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_3_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_PERSONAL_ACCESS_TOKEN,
-                SCM_PROJECT, SCM_TFS_URL, SCM_TFS_PROJECT_COLLECTION);
+                SCM_PROJECT, SCM_URL, SCM_PROJECT_COLLECTION);
 
         //WHEN
         getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-save-scm-plugins-with-url-and-project-collection.xml").execute();
@@ -339,10 +335,9 @@ public class SwaggerHubUploadTest {
         UrlPathPattern saveDefinitionRequest = stubSaveDefinitionRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
         UrlPathPattern saveSCMPluginConfigurationRequest = stubSaveSCMPluginConfigurationRequest(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
 
-        //Add test for output file value
         RequestPatternBuilder saveSCMConfigRequest = createPutSCMConfigRequestPatternWithUrlAndProjectCollection(API_OWNER, INPUT_FILE_API, INPUT_FILE_API_VERSION, OAS2, SCM_BRANCH,
                 SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, INPUT_FILE_FILENAME,
-                DefinitionFileFormat.JSON.getLanguageTarget(), TEST_RESOURCES_DIRECTORY, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT, SCM_TFS_URL, SCM_TFS_PROJECT_COLLECTION);
+                DefinitionFileFormat.JSON.getLanguageTarget(), TEST_RESOURCES_DIRECTORY, SCM_PERSONAL_ACCESS_TOKEN, SCM_PROJECT, SCM_URL, SCM_PROJECT_COLLECTION);
 
         //WHEN
         getSwaggerUpload("src/test/resources/testProjects/upload-input-filesave-scm-plugin-with-url-and-project-collection.xml").execute();

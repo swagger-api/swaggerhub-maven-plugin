@@ -24,8 +24,8 @@ import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.S
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PASSWORD;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PERSONAL_ACCESS_TOKEN;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PROJECT;
-import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_TFS_PROJECT_COLLECTION;
-import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_TFS_URL;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PROJECT_COLLECTION;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_URL;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_USERNAME;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_REPOSITORY_OWNER;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_INTEGRATION_ENABLED;
@@ -159,8 +159,8 @@ public class SwaggerHubClientTest {
                 .project(SCM_PROJECT)
                 .account(SCM_ACCOUNT)
                 .personalAccessToken(SCM_PERSONAL_ACCESS_TOKEN)
-                .url(SCM_TFS_URL)
-                .projectCollection(SCM_TFS_PROJECT_COLLECTION);
+                .url(SCM_URL)
+                .projectCollection(SCM_PROJECT_COLLECTION);
     }
 
     private RequestPatternBuilder putRequestPattern(String url){
@@ -181,8 +181,8 @@ public class SwaggerHubClientTest {
                 .withRequestBody(matchingJsonPath("$.account", equalTo(SCM_ACCOUNT)))
                 .withRequestBody(matchingJsonPath("$.project", equalTo(SCM_PROJECT)))
                 .withRequestBody(matchingJsonPath("$.personalAccessToken", equalTo(SCM_PERSONAL_ACCESS_TOKEN)))
-                .withRequestBody(matchingJsonPath("$.url", equalTo(SCM_TFS_URL)))
-                .withRequestBody(matchingJsonPath("$.projectCollection", equalTo(SCM_TFS_PROJECT_COLLECTION)));
+                .withRequestBody(matchingJsonPath("$.url", equalTo(SCM_URL)))
+                .withRequestBody(matchingJsonPath("$.projectCollection", equalTo(SCM_PROJECT_COLLECTION)));
     }
 
 }

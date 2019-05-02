@@ -26,8 +26,8 @@ public class SwaggerHubUploadTestConstants {
     public static final String SCM_ACCOUNT= "scm-account";
     public static final String SCM_PERSONAL_ACCESS_TOKEN = "scm-personal-access-token";
     public static final String SCM_PROJECT = "scm-project";
-    public static final String SCM_TFS_URL = "http://localhost:1234";
-    public static final String SCM_TFS_PROJECT_COLLECTION = "DefaultCollection";
+    public static final String SCM_URL = "http://localhost:1234";
+    public static final String SCM_PROJECT_COLLECTION = "DefaultCollection";
 
     public static final boolean SCM_INTEGRATION_ENABLED = true;
     public static final String SCM_INTEGRATION_OUTPUT_FILE = "outputFile";
