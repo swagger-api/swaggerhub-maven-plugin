@@ -30,6 +30,8 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
     private String project;
     private String personalAccessToken;
     private String account;
+    private String url;
+    private String projectCollection;
 
     private SaveSCMPluginConfigRequest(Builder builder) {
         super(builder.api, builder.apiOwner, builder.version, builder.oas);
@@ -49,6 +51,8 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         this.project = builder.project;
         this.personalAccessToken = builder.personalAccessToken;
         this.account = builder.account;
+        this.url = builder.url;
+        this.projectCollection = builder.projectCollection;
     }
 
     public String getScmProvider() {
@@ -105,9 +109,15 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
     public String getPersonalAccessToken() { return personalAccessToken; }
 
+    public String getUrl() { return url; }
+
+    public String getProjectCollection() { return projectCollection; }
+
     public String getRequestBody() throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(new SCMIntegrationPluginConfiguration(this));
     }
+
+
 
     public static class Builder {
 
@@ -131,6 +141,8 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         private String project;
         private String personalAccessToken;
         private String account;
+        private String url;
+        private String projectCollection;
 
         public Builder(String apiOwner, String api, String version) {
             this.api = api;
@@ -156,6 +168,8 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
             this.project=saveSCMPluginConfigRequest.getProject();
             this.personalAccessToken=saveSCMPluginConfigRequest.getPersonalAccessToken();
             this.account=saveSCMPluginConfigRequest.getAccount();
+            this.url = saveSCMPluginConfigRequest.getUrl();
+            this.projectCollection = saveSCMPluginConfigRequest.getProjectCollection();
             return this;
         }
 
@@ -241,6 +255,16 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
         public SaveSCMPluginConfigRequest.Builder account(String account){
             this.account = account;
+            return this;
+        }
+
+        public SaveSCMPluginConfigRequest.Builder url(String url){
+            this.url = url;
+            return this;
+        }
+
+        public SaveSCMPluginConfigRequest.Builder projectCollection(String projectCollection){
+            this.projectCollection = projectCollection;
             return this;
         }
 

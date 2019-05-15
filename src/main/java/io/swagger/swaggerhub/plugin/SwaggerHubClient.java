@@ -112,7 +112,7 @@ public class SwaggerHubClient {
             }
             return Optional.ofNullable(response);
         } catch (IOException e) {
-            log.error(String.format("Error when attempting to save % plugin integration for API %s. Error message %s", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), e.getMessage()));
+            log.error(String.format("Error when attempting to save %s plugin integration for API %s. Error message %s", saveSCMPluginConfigRequest.getScmProvider(), saveSCMPluginConfigRequest.getApi(), e.getMessage()));
             return Optional.empty();
         }
 

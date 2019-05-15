@@ -107,6 +107,12 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.scmPersonalAccessToken")
     private String scmPersonalAccessToken;
 
+    @Parameter(property = "upload.scmUrl")
+    private String scmUrl;
+
+    @Parameter(property = "upload.scmProjectCollection")
+    private String scmProjectCollection;
+
     private SwaggerHubClient swaggerHubClient;
 
     @Override
@@ -175,6 +181,8 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .project(scmProject)
                     .personalAccessToken(scmPersonalAccessToken)
                     .account(scmOrganization)
+                    .url(scmUrl)
+                    .projectCollection(scmProjectCollection)
                     .build();
 
             definitionUploadType.ifPresent(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(type -> {
