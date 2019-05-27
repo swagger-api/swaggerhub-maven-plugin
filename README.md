@@ -7,9 +7,11 @@ A simple Maven plugin to access [SwaggerHub](https://swaggerhub.com) hosting of 
 * Download/upload API definitions from/to SwaggerHub.
 * Upload multiple API definitions at once.
 * Authenticate with an API key for restricted operations (for example, to download private definitions).
-* Automatically provision an SCM integration to update source control with changes made to definitions. (SwaggerHub SaaS only)
+* Automatically provision an SCM integration to update source control with changes made to definitions.
 * Supports YAML and JSON format for API definitions.
 * Connects to SwaggerHub SaaS by default, with an optional configuration to point to a local SwaggerHub On-Premise instance.
+
+SwaggerHub On-Premise users need v. 1.20.0 to provision SCM integrations via SwaggerHub Maven plugin.
 
 ## Table of contents
 * [Example use cases](#example-use-cases)
@@ -158,7 +160,7 @@ Parameter | Description | Required? | Default
 **`definitionDirectory`** | Directory containing the definitions to be uploaded to SwaggerHub. Note that subdirectories are not included in the upload. | yes | -
 **`definitionFileNameRegex`** | [Regular expression](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum) that specifies the files to be uploaded. This regex matches against file names without extensions. If not specified, all .json, .yaml and .yml files from the `definitionDirectory` will be uploaded. | no | -
 
-Additional parameters for SCM integration provisioning:
+Additional parameters for [SCM integration provisioning](#scm-integration-provisioning-considerations):
 
 Parameter | Description | Required? | SCM Specific? | Default
 --------- | ----------- | --------- | ---------------- | -------
@@ -175,8 +177,6 @@ Parameter | Description | Required? | SCM Specific? | Default
 **`scmProjectCollection`** | Project collection which contains the target repositories project | no | `AZURE_DEVOPS_SERVER` | DefaultCollection
 **`enableScmIntegration`** | Specifies whether to enable the SCM integration. If enabled, SwaggerHub changes will be pushed automatically on save | no | - |true 
 **`branch`** | The repository branch to push SwaggerHub changes to | no | - | SWAGGERHUB 
-
-**Note:** SCM integration provisioning is currently supported in SwaggerHub SaaS only.
 
 #### Multi-upload considerations
 
@@ -198,9 +198,10 @@ If an error occurs while uploading any definition, the build will fail and subse
 
 ### SCM integration provisioning considerations
 
-**Note:** This is currently supported in SwaggerHub SaaS only.
 
 * Supported SCM's include: `GITHUB`, `BITBUCKET`, `AZURE_DEVOPS_SERVICES`, `AZURE_DEVOPS_SERVER`
+
+* SwaggerHub On-Premise supports this method of SCM integration provisioning since v. 1.20.0.
 
 * Care should be taken when specifying SCM parameters. Validation does not take place prior to making the request to SwaggerHub and issues can arise due to incorrectly configured integrations
 
