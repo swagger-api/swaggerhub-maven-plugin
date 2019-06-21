@@ -21,6 +21,7 @@ import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.A
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.API_VERSION;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.OAS3;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_ACCOUNT;
+import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_HOST;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PASSWORD;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PERSONAL_ACCESS_TOKEN;
 import static io.swagger.swaggerhub.plugin.utils.SwaggerHubUploadTestConstants.SCM_PROJECT;
@@ -160,7 +161,8 @@ public class SwaggerHubClientTest {
                 .account(SCM_ACCOUNT)
                 .personalAccessToken(SCM_PERSONAL_ACCESS_TOKEN)
                 .url(SCM_URL)
-                .projectCollection(SCM_PROJECT_COLLECTION);
+                .projectCollection(SCM_PROJECT_COLLECTION)
+                .host(SCM_HOST);
     }
 
     private RequestPatternBuilder putRequestPattern(String url){
@@ -182,7 +184,8 @@ public class SwaggerHubClientTest {
                 .withRequestBody(matchingJsonPath("$.project", equalTo(SCM_PROJECT)))
                 .withRequestBody(matchingJsonPath("$.personalAccessToken", equalTo(SCM_PERSONAL_ACCESS_TOKEN)))
                 .withRequestBody(matchingJsonPath("$.url", equalTo(SCM_URL)))
-                .withRequestBody(matchingJsonPath("$.projectCollection", equalTo(SCM_PROJECT_COLLECTION)));
+                .withRequestBody(matchingJsonPath("$.projectCollection", equalTo(SCM_PROJECT_COLLECTION)))
+                .withRequestBody(matchingJsonPath("$.host", equalTo(SCM_HOST)));
     }
 
 }

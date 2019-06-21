@@ -438,6 +438,42 @@ public class SwaggerHubUploadTest {
         verify(putRequestPattern3);
     }
 
+    @Test
+    public void testMultiDefinitionsAreUploaded_andSCMSaveRequestMadeWithHost() throws Exception {
+        //GIVEN
+        UrlPathPattern uploadDefinitionRequest1 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern uploadDefinitionRequest3 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, IS_PRIVATE, OAS3, YAML, SWAGGERHUB_API_TOKEN);
+
+        UrlPathPattern saveSCMPluginConfigurationRequest1 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest2 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SWAGGERHUB_API_TOKEN);
+        UrlPathPattern saveSCMPluginConfigurationRequest3 = stubSaveSCMPluginConfigurationRequest(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SWAGGERHUB_API_TOKEN);
+
+        RequestPatternBuilder saveSCMPluginRequestPattern1 = createPutSCMConfigRequestWithHost(API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, OAS3, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_1_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_HOST);
+        RequestPatternBuilder saveSCMPluginRequestPattern2 = createPutSCMConfigRequestWithHost(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, OAS2, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_2_FILENAME, DefinitionFileFormat.JSON.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_HOST);
+        RequestPatternBuilder saveSCMPluginRequestPattern3 = createPutSCMConfigRequestWithHost(API_OWNER, MULTI_UPLOAD_API_3_TITLE, MULTI_UPLOAD_API_3_VERSION, OAS3, SCM_BRANCH,
+                SCM_ENABLE_INTEGRATION, SCM_REPOSITORY, SCM_REPOSITORY_OWNER, MULTI_UPLOAD_API_3_FILENAME, DefinitionFileFormat.YAML.getLanguageTarget(), FILE_FINDER_DIRECTORY, SCM_HOST);
+
+        //WHEN
+        getSwaggerUpload("src/test/resources/testProjects/upload-multi-definitions-save-scm-plugins-with-host.xml").execute();
+
+        //THEN
+        verify(1, postRequestedFor(uploadDefinitionRequest1));
+        verify(1, postRequestedFor(uploadDefinitionRequest2));
+        verify(1, postRequestedFor(uploadDefinitionRequest3));
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest1));
+        verify(saveSCMPluginRequestPattern1);
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest2));
+        verify(saveSCMPluginRequestPattern2);
+
+        verify(1, putRequestedFor(saveSCMPluginConfigurationRequest3));
+        verify(saveSCMPluginRequestPattern3);
+    }
+
     private void runTest(File pom, String expectedOasVersion) throws Exception {
         assertNotNull(pom);
         assertTrue(pom.exists());
@@ -514,6 +550,7 @@ public class SwaggerHubUploadTest {
 
     }
 
+
     private RequestPatternBuilder createPutSCMConfigRequestPatternWithAccountPATandProject(String owner, String api, String version, String oasVersion, String branch,
                                                                                        String enabled, String repository, String repositoryOwner, String outputFile,
                                                                                        String target, String outputFolder, String account, String personalAccessToken, String project){
@@ -536,7 +573,14 @@ public class SwaggerHubUploadTest {
                 .withRequestBody(matchingJsonPath("$.projectCollection", equalTo(projectCollection)));
     }
 
-    private RequestPatternBuilder createPutSCMConfigRequestPatternBase(String owner, String api, String version, String oasVersion, String branch,
+    private RequestPatternBuilder createPutSCMConfigRequestWithHost(String owner, String api, String version, String oasVersion, String branch,
+                                                                    String enabled, String repository, String repositoryOwner, String outputFile,
+                                                                    String target, String outputFolder, String host) {
+        return createPutSCMConfigRequestPatternBase(owner, api, version, oasVersion, branch, enabled, repository, repositoryOwner, outputFile, target, outputFolder)
+                .withRequestBody(matchingJsonPath("$.host", equalTo(host)));
+    }
+
+        private RequestPatternBuilder createPutSCMConfigRequestPatternBase(String owner, String api, String version, String oasVersion, String branch,
                                                                                        String enabled, String repository, String repositoryOwner, String outputFile,
                                                                                        String target, String outputFolder){
 
