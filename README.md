@@ -224,6 +224,9 @@ App password permissions required are:
 
     Enter just the organization, without ‘dev.azure.com’ at the beginning or ‘.visualstudio.com’ at the end. For example, if your organization is ‘dev.azure.com/example-user’ or 'example-user.visualstudio.com’, enter just 'example-user’.
 
+* Due to `GITLAB`'s nested group support, when specifying `repository`  it is required to specify the full path. For example `<repository>root-level-group/sub-level-group/repo</repository>`
+
+* `scmHost` will default to _https://gitlab.com_ for `GITLAB`
 
 Further documentation of SwaggerHub Integrations can be found [here](https://app.swaggerhub.com/help/integrations/index).
 
