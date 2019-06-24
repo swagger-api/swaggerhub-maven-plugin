@@ -158,7 +158,7 @@ public class SwaggerHubUpload extends AbstractMojo {
         if(StringUtils.isNotEmpty(scmProvider)){
 
             getLog().info("Creating SCM integration using the following.."
-                    + "  scmProvider: " + scmProvider
+                    + " scmProvider: " + scmProvider
                     + ", scmToken: " + StringModificationService.obfuscateSensitiveString(scmToken, "*")
                     + ", repository: " + repository
                     + ", repositoryOwner: " + repositoryOwner
