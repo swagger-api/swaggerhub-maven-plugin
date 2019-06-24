@@ -174,6 +174,7 @@ Parameter | Description | Required? | SCM Specific? | Default
 **`scmProject`** | Team Project which contains the target repository | no | `AZURE_DEVOPS_SERVICES` | - 
 **`scmOrganization`** | Specific to Azure DevOps Services, the organization with which to synchronize | no | `AZURE_DEVOPS_SERVICES` | -
 **`scmUrl`** | Host URL of the SCM | no | `AZURE_DEVOPS_SERVER` | -
+**`scmHost`** | Similar to the above | no | `GITLAB` | -
 **`scmProjectCollection`** | Project collection which contains the target repositories project | no | `AZURE_DEVOPS_SERVER` | DefaultCollection
 **`enableScmIntegration`** | Specifies whether to enable the SCM integration. If enabled, SwaggerHub changes will be pushed automatically on save | no | - |true 
 **`branch`** | The repository branch to push SwaggerHub changes to | no | - | SWAGGERHUB 
@@ -199,7 +200,7 @@ If an error occurs while uploading any definition, the build will fail and subse
 ### SCM integration provisioning considerations
 
 
-* Supported SCM's include: `GITHUB`, `BITBUCKET`, `AZURE_DEVOPS_SERVICES`, `AZURE_DEVOPS_SERVER`
+* Supported SCM's include: `GITHUB`, `BITBUCKET`, `AZURE_DEVOPS_SERVICES`, `AZURE_DEVOPS_SERVER`, `GITLAB`
 
 * SwaggerHub On-Premise supports this method of SCM integration provisioning since v. 1.20.0.
 
@@ -223,6 +224,9 @@ App password permissions required are:
 
     Enter just the organization, without ‘dev.azure.com’ at the beginning or ‘.visualstudio.com’ at the end. For example, if your organization is ‘dev.azure.com/example-user’ or 'example-user.visualstudio.com’, enter just 'example-user’.
 
+* Due to `GITLAB`'s nested group support, when specifying `repository`  it is required to specify the full path. For example `<repository>root-level-group/sub-level-group/repo</repository>`
+
+* `scmHost` will default to _https://gitlab.com_ for `GITLAB`
 
 Further documentation of SwaggerHub Integrations can be found [here](https://app.swaggerhub.com/help/integrations/index).
 

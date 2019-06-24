@@ -32,6 +32,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
     private String account;
     private String url;
     private String projectCollection;
+    private String host;
 
     private SaveSCMPluginConfigRequest(Builder builder) {
         super(builder.api, builder.apiOwner, builder.version, builder.oas);
@@ -53,6 +54,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         this.account = builder.account;
         this.url = builder.url;
         this.projectCollection = builder.projectCollection;
+        this.host = builder.host;
     }
 
     public String getScmProvider() {
@@ -113,6 +115,8 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
     public String getProjectCollection() { return projectCollection; }
 
+    public String getHost() {return host; }
+
     public String getRequestBody() throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(new SCMIntegrationPluginConfiguration(this));
     }
@@ -143,6 +147,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         private String account;
         private String url;
         private String projectCollection;
+        private String host;
 
         public Builder(String apiOwner, String api, String version) {
             this.api = api;
@@ -170,6 +175,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
             this.account=saveSCMPluginConfigRequest.getAccount();
             this.url = saveSCMPluginConfigRequest.getUrl();
             this.projectCollection = saveSCMPluginConfigRequest.getProjectCollection();
+            this.host = saveSCMPluginConfigRequest.getHost();
             return this;
         }
 
@@ -265,6 +271,11 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
         public SaveSCMPluginConfigRequest.Builder projectCollection(String projectCollection){
             this.projectCollection = projectCollection;
+            return this;
+        }
+
+        public SaveSCMPluginConfigRequest.Builder host(String host){
+            this.host = host;
             return this;
         }
 

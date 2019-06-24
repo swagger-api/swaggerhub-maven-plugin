@@ -113,6 +113,9 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.scmProjectCollection")
     private String scmProjectCollection;
 
+    @Parameter(property = "upload.scmHost")
+    private String scmHost;
+
     private SwaggerHubClient swaggerHubClient;
 
     @Override
@@ -165,6 +168,8 @@ public class SwaggerHubUpload extends AbstractMojo {
                     + ", scmPassword: " + StringModificationService.obfuscateSensitiveString(scmPassword, "*")
                     + ", scmOrganization: " + scmOrganization
                     + ", scmPersonalAccessToken: " + StringModificationService.obfuscateSensitiveString(scmPersonalAccessToken, "*")
+                    + ", scmUrl: " + scmUrl
+                    + ", scmHost: " + scmHost
                     + ", scmProject: " + scmProject);
 
             //Preemptive setup
@@ -182,6 +187,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .personalAccessToken(scmPersonalAccessToken)
                     .account(scmOrganization)
                     .url(scmUrl)
+                    .host(scmHost)
                     .projectCollection(scmProjectCollection)
                     .build();
 
