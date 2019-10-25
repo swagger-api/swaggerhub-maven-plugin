@@ -9,7 +9,6 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
 import io.swagger.swaggerhub.plugin.requests.SwaggerHubRequest;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -24,7 +23,6 @@ public class SwaggerHubClient {
     private final int port;
     private final String token;
     private final String protocol;
-    private static final String APIS = "apis";
     private Log log;
     private String basePath;
 
@@ -139,26 +137,26 @@ public class SwaggerHubClient {
     }
 
     private HttpUrl getDownloadUrl(SwaggerHubRequest swaggerHubRequest) {
-        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+        return getBaseUrl(swaggerHubRequest.getDefinitionType(), swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
                 .addEncodedPathSegment(swaggerHubRequest.getVersion())
                 .build();
     }
 
     private HttpUrl getUploadUrl(SwaggerHubRequest swaggerHubRequest) {
-        return getBaseUrl(swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
+        return getBaseUrl(swaggerHubRequest.getDefinitionType(), swaggerHubRequest.getOwner(), swaggerHubRequest.getApi())
                 .addEncodedQueryParameter("version", swaggerHubRequest.getVersion())
                 .addEncodedQueryParameter("isPrivate", Boolean.toString(swaggerHubRequest.isPrivate()))
                 .addEncodedQueryParameter("oas", swaggerHubRequest.getOas())
                 .build();
     }
 
-    private HttpUrl.Builder getBaseUrl(String owner, String api) {
+    private HttpUrl.Builder getBaseUrl(DefinitionType definitionType, String owner, String api) {
         HttpUrl.Builder httpUrlBuilder = new HttpUrl.Builder()
                 .scheme(protocol)
                 .host(host)
                 .port(port);
                 return addOptionalPathSegment(httpUrlBuilder, basePath)
-                .addPathSegment(APIS)
+                .addPathSegment(definitionType.getPathSegment())
                 .addEncodedPathSegment(owner)
                 .addEncodedPathSegment(api);
     }

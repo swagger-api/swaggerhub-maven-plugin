@@ -2,6 +2,7 @@ package io.swagger.swaggerhub.plugin.requests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.swaggerhub.plugin.DefinitionType;
 import io.swagger.swaggerhub.plugin.requests.dtos.SCMIntegrationPluginConfiguration;
 
 /**
@@ -35,7 +36,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
     private String host;
 
     private SaveSCMPluginConfigRequest(Builder builder) {
-        super(builder.api, builder.apiOwner, builder.version, builder.oas);
+        super(builder.definitionType, builder.api, builder.apiOwner, builder.version, builder.oas);
         this.scmProvider = builder.scmProvider;
         this.token = builder.token;
         this.repository = builder.repository;
@@ -125,6 +126,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
     public static class Builder {
 
+        private DefinitionType definitionType;
         private String apiOwner;
         private String api;
         private String version;
@@ -149,7 +151,7 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         private String projectCollection;
         private String host;
 
-        public Builder(String apiOwner, String api, String version) {
+        public Builder(DefinitionType definitionType, String apiOwner, String api, String version) {
             this.api = api;
             this.apiOwner = apiOwner;
             this.version = version;

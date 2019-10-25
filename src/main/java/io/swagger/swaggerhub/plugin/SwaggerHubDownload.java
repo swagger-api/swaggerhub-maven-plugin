@@ -35,6 +35,8 @@ public class SwaggerHubDownload extends AbstractMojo {
     private String protocol;
     @Parameter(property = "download.token")
     private String token;
+    @Parameter(property = "download.definitionType", defaultValue = "API")
+    private String definitionType;
     @Parameter(property = "download.outputFile", required = true)
     private String outputFile;
     @Parameter(property = "download.basepath")
@@ -51,7 +53,8 @@ public class SwaggerHubDownload extends AbstractMojo {
                 + ", format-" + format
                 + ", outputFile-" + outputFile);
 
-        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
+        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(
+                DefinitionType.getByParamValue(definitionType), api, owner, version)
                 .format(format)
                 .build();
 

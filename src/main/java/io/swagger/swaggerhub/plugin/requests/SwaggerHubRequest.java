@@ -1,5 +1,7 @@
 package io.swagger.swaggerhub.plugin.requests;
 
+import io.swagger.swaggerhub.plugin.DefinitionType;
+
 /**
  * Configuration class used to store details required to create a request to SwaggerHub to upload/download a definition
  * The inner builder class follows the builder pattern which aids building the SwaggerHubRequest object.
@@ -23,13 +25,14 @@ public class SwaggerHubRequest extends AbstractSwaggerHubRequest{
     }
 
     private SwaggerHubRequest(Builder builder) {
-        super(builder.api, builder.owner, builder.version, builder.oas);
+        super(builder.definitionType, builder.api, builder.owner, builder.version, builder.oas);
         this.format = builder.format;
         this.swagger = builder.swagger;
         this.isPrivate = builder.isPrivate;
     }
 
     public static class Builder {
+        private final DefinitionType definitionType;
         private final String api;
         private final String owner;
         private final String version;
@@ -38,7 +41,8 @@ public class SwaggerHubRequest extends AbstractSwaggerHubRequest{
         private boolean isPrivate;
         private String oas;
 
-        public Builder(String api, String owner, String version) {
+        public Builder(DefinitionType definitionType, String api, String owner, String version) {
+            this.definitionType = definitionType;
             this.api = api;
             this.owner = owner;
             this.version = version;

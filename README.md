@@ -111,6 +111,7 @@ Parameter | Description | Required? | Default
 **`version`** | API version (case-sensitive) | yes | -
 **`outputFile`** | API definition will be saved to this file | yes | -
 **`token`** | SwaggerHub API key, required to access private definitions | no | -
+**`definitionType`** | Definition type, `API` or `domain` | no | `API`
 **`format`** | API definition format, `json` or `yaml` | no | `json`
 **`host`** | SwaggerHub hostname. Use `api.swaggerhub.com` for SwaggerHub SaaS. | no | `api.swaggerhub.com`
 **`protocol`** | SwaggerHub server protocol, `http` or `https` | no | `https`
@@ -137,6 +138,7 @@ Parameter | Description | Required? | Default
 **`uploadType`** | Possible values: `inputFile` - upload a single API definition; `directory` - upload multiple definitions stored in a directory | yes | -
 **`owner`** | The account name (case-sensitive) to upload the definitions to | yes | -
 **`token`** | SwaggerHub API key. The API key owner must have permissions to create and update definitions in the `owner` account | yes | -
+**`definitionType`** | Definition type, `API` or `domain` | no | `API`
 **`isPrivate`** | Specifies whether the uploaded APIs will be made public (`false`) or private (`true`) | no | `false`
 **`skipFailures`** | Specifies whether a build should fail when errors are encountered | no | false
 **`host`** | SwaggerHub hostname. Use `api.swaggerhub.com` for SwaggerHub SaaS. | no | `api.swaggerhub.com`
