@@ -176,8 +176,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     + ", scmProject: " + scmProject);
 
             //Preemptive setup
-            SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(
-                    DefinitionType.getByParamValue(definitionType), owner, api, version)
+            SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
                     .scmProvider(scmProvider)
                     .branch(branch)
                     .enabled(enableScmIntegration)
@@ -338,8 +337,7 @@ public class SwaggerHubUpload extends AbstractMojo {
         String version = DefinitionParserService.getVersion(mapper.readTree(fileContent));
         String outputFolder = getOutputFolder(file.getPath());
 
-        return new SaveSCMPluginConfigRequest.Builder(
-                DefinitionType.getByParamValue(definitionType), input.getOwner(), api, version)
+        return new SaveSCMPluginConfigRequest.Builder(input.getOwner(), api, version)
                 .saveSCMPluginConfigRequest(input)
                 .oas(oasVersion)
                 .outputFolder(outputFolder)
@@ -360,8 +358,7 @@ public class SwaggerHubUpload extends AbstractMojo {
         String outputFolder = FilenameUtils.getFullPath(inputFile);
         outputFolder = getOutputFolder(outputFolder);
 
-        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(
-                DefinitionType.getByParamValue(definitionType), input.getOwner(), input.getApi(), input.getVersion())
+        SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(input.getOwner(), input.getApi(), input.getVersion())
                 .saveSCMPluginConfigRequest(input)
                 .oas(oasVersion)
                 .target(languageTarget)

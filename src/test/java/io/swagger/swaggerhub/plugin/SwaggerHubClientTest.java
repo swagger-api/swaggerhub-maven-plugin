@@ -142,7 +142,7 @@ public class SwaggerHubClientTest {
     }
 
     private SaveSCMPluginConfigRequest.Builder requestBuilder(){
-        return new SaveSCMPluginConfigRequest.Builder(DefinitionType.API, API_OWNER, API_NAME, API_VERSION)
+        return new SaveSCMPluginConfigRequest.Builder(API_OWNER, API_NAME, API_VERSION)
                 .oas(OAS3)
                 .branch(SCM_BRANCH)
                 .enabled(SCM_INTEGRATION_ENABLED)

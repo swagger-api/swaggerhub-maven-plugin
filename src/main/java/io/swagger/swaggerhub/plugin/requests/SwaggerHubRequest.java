@@ -11,6 +11,7 @@ public class SwaggerHubRequest extends AbstractSwaggerHubRequest{
     private final String format;
     private final String swagger;
     private final boolean isPrivate;
+    private final DefinitionType definitionType;
 
     public String getFormat() {
         return format;
@@ -24,11 +25,16 @@ public class SwaggerHubRequest extends AbstractSwaggerHubRequest{
         return isPrivate;
     }
 
+    public DefinitionType getDefinitionType() {
+        return definitionType;
+    }
+
     private SwaggerHubRequest(Builder builder) {
-        super(builder.definitionType, builder.api, builder.owner, builder.version, builder.oas);
+        super(builder.api, builder.owner, builder.version, builder.oas);
         this.format = builder.format;
         this.swagger = builder.swagger;
         this.isPrivate = builder.isPrivate;
+        this.definitionType = builder.definitionType;
     }
 
     public static class Builder {
