@@ -82,6 +82,20 @@ public class SwaggerHubUploadTest {
         runTest(pom, OAS2);
     }
 
+    @Test
+    public void testUploadDomainDefintionType() throws Exception {
+        File pom = rule.getTestFile(
+                "src/test/resources/testProjects/upload-domain.xml");
+        runTest(pom, OAS2);
+    }
+
+    @Test
+    public void testUploadAPIDefintionType() throws Exception {
+        File pom = rule.getTestFile(
+                "src/test/resources/testProjects/upload-api.xml");
+        runTest(pom, OAS2);
+    }
+
     @Test(expected = MojoExecutionException.class)
     public void testUploadFails_whenUploadTypeIsUnknown() throws Exception {
         //Given
@@ -368,7 +382,7 @@ public class SwaggerHubUploadTest {
     @Test(expected = RuntimeException.class)
     public void testBuildFails_whenSaveDefinitionFails_andFailuresArentSkipped() throws Exception {
         //Given
-        stubSaveDefinitionRequest(SWAGGERHUB_API_TOKEN, API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, badRequest());
+        stubSaveDefinitionRequest(DefinitionType.API.getPathSegment(), SWAGGERHUB_API_TOKEN, API_OWNER, MULTI_UPLOAD_API_1_TITLE, MULTI_UPLOAD_API_1_VERSION, IS_PRIVATE, OAS3, YAML, badRequest());
         UrlPathPattern uploadDefinitionRequest2 = stubSaveDefinitionRequest(API_OWNER, MULTI_UPLOAD_API_2_TITLE, MULTI_UPLOAD_API_2_VERSION, IS_PRIVATE, OAS2, JSON, SWAGGERHUB_API_TOKEN);
 
         //When
@@ -489,6 +503,7 @@ public class SwaggerHubUploadTest {
     }
 
     private UrlPathPattern setupServerMocking(PlexusConfiguration config, String oasVersion) {
+        String definitionType = DefinitionType.getByParamValue(config.getChild("definitionType").getValue()).getPathSegment();
         String api = config.getChild("api").getValue();
         String owner = config.getChild("owner").getValue();
         String version = config.getChild("version").getValue();
@@ -496,18 +511,18 @@ public class SwaggerHubUploadTest {
         String format = config.getChild("format").getValue();
         String isPrivate = config.getChild("isPrivate").getValue();
 
-        UrlPathPattern url = stubSaveDefinitionRequest(owner, api, version, isPrivate, oasVersion, format, token);
+        UrlPathPattern url = stubSaveDefinitionRequest(definitionType, token, owner, api, version, isPrivate, oasVersion, format, created());
 
         return url;
     }
 
     private UrlPathPattern stubSaveDefinitionRequest(String owner, String api, String version, String isPrivate, String oasVersion, String format, String token){
-        return stubSaveDefinitionRequest(token, owner, api, version, isPrivate, oasVersion, format, created());
+        return stubSaveDefinitionRequest(DefinitionType.API.getPathSegment(), token, owner, api, version, isPrivate, oasVersion, format, created());
     }
 
 
-    private UrlPathPattern stubSaveDefinitionRequest(String token, String owner, String api, String version, String isPrivate, String oasVersion, String format, ResponseDefinitionBuilder responseDefinitionBuilder){
-        UrlPathPattern url = urlPathEqualTo("/apis/" + owner + "/" + api);
+    private UrlPathPattern stubSaveDefinitionRequest(String definitionPathSegment, String token, String owner, String api, String version, String isPrivate, String oasVersion, String format, ResponseDefinitionBuilder responseDefinitionBuilder){
+        UrlPathPattern url = urlPathEqualTo("/" + definitionPathSegment + "/" + owner + "/" + api);
         stubFor(post(url)
                 .withQueryParam("version", equalTo(version))
                 .withQueryParam("isPrivate", equalTo(isPrivate != null ? isPrivate : "false"))

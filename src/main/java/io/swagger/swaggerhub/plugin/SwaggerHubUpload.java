@@ -56,6 +56,8 @@ public class SwaggerHubUpload extends AbstractMojo {
     private String format;
     @Parameter(property = "upload.token", required = true)
     private String token;
+    @Parameter(property = "download.definitionType", defaultValue = "API")
+    private String definitionType;
     @Parameter(property = "upload.inputFile")
     private String inputFile;
     @Parameter(property = "upload.isPrivate", defaultValue = "false")
@@ -125,7 +127,8 @@ public class SwaggerHubUpload extends AbstractMojo {
 
         getLog().info("Uploading to " + host
                 + ", basepath: " + basepath
-                + ": api: " + api
+                + ", definitionType: " + DefinitionType.getByParamValue(definitionType).getFriendlyName()
+                + ", api: " + api
                 + ", owner: " + owner
                 + ", version: " + version
                 + ", inputFile: " + inputFile
@@ -214,7 +217,7 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     private void executeInputFileBasedUpload(String inputFile, String format, String owner, Boolean isPrivate, String api, String version) throws MojoExecutionException {
 
-        getLog().info(String.format("Uploading API name %s version %s", api, version));
+        getLog().info(String.format("Uploading %s name %s version %s", DefinitionType.getByParamValue(definitionType).getFriendlyName(), api, version));
         try {
             String content = new String(Files.readAllBytes(Paths.get(inputFile)), Charset.forName(UTF_8));
             String oasVersion = DefinitionParserService.getOASVersion(DefinitionFileFormat.valueOf(format.toUpperCase()).getMapper().readTree(content));
@@ -234,7 +237,9 @@ public class SwaggerHubUpload extends AbstractMojo {
                     .stream()
                     .forEach(ExceptionThrowingConsumer.RuntimeThrowingConsumerWrapper(file -> {
                         SwaggerHubRequest swaggerHubRequest = createSwaggerHubRequest(file, owner, isPrivate);
-                        getLog().info(String.format("Uploading API definition file %s. API name %s version %s",file.getName(), swaggerHubRequest.getApi(), swaggerHubRequest.getVersion()));
+                        getLog().info(String.format("Uploading %s definition file %s. %s name %s version %s",
+                                DefinitionType.getByParamValue(definitionType).getFriendlyName(), DefinitionType.getByParamValue(definitionType).getFriendlyName(),
+                                file.getName(), swaggerHubRequest.getApi(), swaggerHubRequest.getVersion()));
                         swaggerHubClient.saveDefinition(swaggerHubRequest)
                                 .filter(shouldErrorFailBuild(skipFailures))
                                 .orElseThrow(returnMojoExceptionForBuildFailure(String.format("Error when attempting to save API %s.", swaggerHubRequest.getApi())));
@@ -259,7 +264,8 @@ public class SwaggerHubUpload extends AbstractMojo {
     private SwaggerHubRequest createSwaggerHubRequest(String fileContent, String owner, Boolean isPrivate, String api, String version, String oasVersion,
                                                       DefinitionFileFormat definitionFileFormat){
 
-        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(api, owner, version)
+        SwaggerHubRequest swaggerHubRequest = new SwaggerHubRequest.Builder(
+                DefinitionType.getByParamValue(definitionType), api, owner, version)
                 .swagger(fileContent)
                 .format(definitionFileFormat.getFileFormat())
                 .isPrivate(isPrivate)
