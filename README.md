@@ -4,11 +4,11 @@
 A simple Maven plugin to access [SwaggerHub](https://swaggerhub.com) hosting of [OpenAPI/Swagger](https://swagger.io/specification/) definitions within a Maven build process, using the [SwaggerHub API](https://api.swaggerhub.com).
 
 ## Features
-* Download/upload API definitions from/to SwaggerHub.
-* Upload multiple API definitions at once.
+* Download/upload API and domain definitions from/to SwaggerHub.
+* Upload multiple API or domains at once.
 * Authenticate with an API key for restricted operations (for example, to download private definitions).
 * Automatically provision an SCM integration to update source control with changes made to definitions.
-* Supports YAML and JSON format for API definitions.
+* Supports YAML and JSON format for definitions.
 * Connects to SwaggerHub SaaS by default, with an optional configuration to point to a local SwaggerHub On-Premise instance.
 
 SwaggerHub On-Premise users need v. 1.20.0 to provision SCM integrations via SwaggerHub Maven plugin.
@@ -78,7 +78,7 @@ SwaggerHub Maven plugin provides two goals, `download` and `upload`.
 
 ### download
 
-This goal downloads an API definition from SwaggerHub to a local file as part of the default Maven build lifecycle.
+This goal downloads an API or domain definition from SwaggerHub to a local file as part of the default Maven build lifecycle.
 
 ```xml
     <plugin>
@@ -106,13 +106,13 @@ This goal downloads an API definition from SwaggerHub to a local file as part of
 
 Parameter | Description | Required? | Default
 --------- | ----------- | -------- | -------
-**`api`** | API name (case-sensitive) | yes  | -
-**`owner`** | API owner (case-sensitive) | yes | -
-**`version`** | API version (case-sensitive) | yes | -
-**`outputFile`** | API definition will be saved to this file | yes | -
+**`api`** | API or domain name (case-sensitive) | yes  | -
+**`owner`** | Owner name (case-sensitive) | yes | -
+**`version`** | API or domain version (case-sensitive) | yes | -
+**`outputFile`** | The definition will be saved to this file | yes | -
 **`token`** | SwaggerHub API key, required to access private definitions | no | -
 **`definitionType`** | Definition type, `API` or `domain` | no | `API`
-**`format`** | API definition format, `json` or `yaml` | no | `json`
+**`format`** | File format to download, `json` or `yaml` | no | `json`
 **`host`** | SwaggerHub hostname. Use `api.swaggerhub.com` for SwaggerHub SaaS. | no | `api.swaggerhub.com`
 **`protocol`** | SwaggerHub server protocol, `http` or `https` | no | `https`
 **`port`** | SwaggerHub server port, typically 80 for `http` and 443 for `https` | no | 443
@@ -120,14 +120,14 @@ Parameter | Description | Required? | Default
 
 ### upload
 
-This goal creates or updates one or more API definitions on SwaggerHub. All definitions are saved in the `owner` account (organization or user), and the `token` owner must have permissions to create and update definitions in this account.
+This goal creates or updates one or more API or domain definitions on SwaggerHub. All definitions are saved in the `owner` account (organization or user), and the `token` owner must have permissions to create and update definitions in this account.
 
 Additionally, there is the option of provisioning a SwaggerHub SCM integration which will allow changes made in SwaggerHub to be pushed back to source control.
 
 There are two `uploadType` modes:
 
-* `inputFile` - Upload a single API definition.
-* `directory` - Upload one or more definitions from the specified `definitionDirectory`, optionally filtered by a regular expression.
+* `inputFile` - Upload a single API or domain definition.
+* `directory` - Upload one or more definitions from the specified `definitionDirectory`, optionally filtered by a regular expression. All definitions must be of the same type - either all APIs or all domains.
 
 #### Parameters
 
@@ -135,11 +135,11 @@ Common parameters:
 
 Parameter | Description | Required? | Default
 --------- | ----------- | -------- | -------
-**`uploadType`** | Possible values: `inputFile` - upload a single API definition; `directory` - upload multiple definitions stored in a directory | yes | -
+**`uploadType`** | Possible values: `inputFile` - upload a single API or domain; `directory` - upload multiple definitions stored in a directory | yes | -
 **`owner`** | The account name (case-sensitive) to upload the definitions to | yes | -
 **`token`** | SwaggerHub API key. The API key owner must have permissions to create and update definitions in the `owner` account | yes | -
 **`definitionType`** | Definition type, `API` or `domain` | no | `API`
-**`isPrivate`** | Specifies whether the uploaded APIs will be made public (`false`) or private (`true`) | no | `false`
+**`isPrivate`** | Specifies whether the uploaded definitions will be made public (`false`) or private (`true`) | no | `false`
 **`skipFailures`** | Specifies whether a build should fail when errors are encountered | no | false
 **`host`** | SwaggerHub hostname. Use `api.swaggerhub.com` for SwaggerHub SaaS. | no | `api.swaggerhub.com`
 **`protocol`** | SwaggerHub server protocol, `http` or `https` | no | `https`
@@ -150,10 +150,10 @@ Additional parameters for `uploadType`=`inputFile`:
 
 Parameter | Description | Required? | Default
 --------- | ----------- | -------- | -------
-**`api`** | API name to create or update (case-sensitive) | yes | -
-**`version`** | API version to create or update (case-sensitive). If this version already exists, it must not be [published](https://app.swaggerhub.com/help/apis/publishing-api). | yes | -
-**`inputFile`** | Local file containing the API definition in the JSON or YAML format | yes | -
-**`format`** | API definition format, `json` or `yaml` | no | `json`
+**`api`** | The name of the API or domain to create or update (case-sensitive) | yes | -
+**`version`** | Version to create or update (case-sensitive). If this version already exists, it must not be [published](https://app.swaggerhub.com/help/apis/publishing-api). | yes | -
+**`inputFile`** | Local file containing the API or domain definition in the JSON or YAML format | yes | -
+**`format`** | Definition format, `json` or `yaml` | no | `json`
 
 Additional parameters for `uploadType`=`directory`:
 
@@ -183,7 +183,9 @@ Parameter | Description | Required? | SCM Specific? | Default
 
 #### Multi-upload considerations
 
-When using `uploadType`=`directory`, all definitions to be uploaded must be stored in the `definitionDirectory` (the directory itself, not subdirectories). The plugin only processes files with the following extensions: `.yaml`, `.yml`, `.json`. Files with other extensions are ignored. The files must be valid JSON or YAML files.
+When using `uploadType`=`directory`, all definitions to be uploaded must be stored in the `definitionDirectory` (the directory itself, not subdirectories). The `definitionType` parameter specifies whether the files will be uploaded as APIs (default) or domains.
+
+The plugin only processes files with the following extensions: `.yaml`, `.yml`, `.json`. Files with other extensions are ignored. The files must be valid JSON or YAML files.
 
 By default, the plugin uploads all JSON and YAML files from the specified directory, but you can use `definitionFileNameRegex` to narrow down the files to be uploaded. The regular expression matches against file names *without file extensions*. The matching is partial unless the regex contains the `^` (beginning of line) and `$` (end of line) anchors. To make the matching case-insensitive, include `(?i)` at the beginning, or `(?iu)` for Unicode-aware case-insensitive matching. Examples:
 
@@ -191,11 +193,11 @@ By default, the plugin uploads all JSON and YAML files from the specified direct
 * `^acme` matches file names that begin with "acme" in lower case.
 * `^(?i)acme` matches file names that begin with "acme" in any letter case.
 
-API names and versions are generated by parsing the `info` section of the definitions. The `info` section must include non-empty `title` and `version` keys.
+API/domain names and versions are generated by parsing the `info` section of the definitions. The `info` section must include non-empty `title` and `version` keys.
 
-* API names are generated based on the `info.title`, with characters other than `A-Za-z0-9_` replaced with underscores. For example, a definition with `title: Sample API` will be saved under the name `Sample_API` on SwaggerHub.
+* Names are generated based on the `info.title`, with characters other than `A-Za-z0-9_` replaced with underscores. For example, a definition with `title: Sample API` will be saved under the name `Sample_API` on SwaggerHub.
 
-* API versions are extracted from the `info.version` key. If this API version already exists, it will be updated with the new definition (unless the version is published - in this case the update will be rejected).
+* Versions are extracted from the `info.version` key. If this version already exists in SwaggerHub, it will be updated with the new definition (unless the version is published - in this case the update will be rejected).
 
 If an error occurs while uploading any definition, the build will fail and subsequent definitions will not be uploaded.
 
