@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
-import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.plugin.requests.SaveSCMPluginConfigRequest;
 
+import okhttp3.Response;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.testing.SilentLog;
 import org.junit.After;
@@ -138,7 +138,7 @@ public class SwaggerHubClientTest {
     }
 
     private SwaggerHubClient buildSwaggerHubClient(String basePath){
-        return new SwaggerHubClient("localhost", wireMockServer.port(), "http", "fake_token", new SilentLog(), basePath);
+        return new SwaggerHubClient("localhost", wireMockServer.port(), "http", "fake_token", new SilentLog(), basePath, null);
     }
 
     private SaveSCMPluginConfigRequest.Builder requestBuilder(){
