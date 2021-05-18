@@ -73,9 +73,9 @@ public class SwaggerHubClient {
     }
 
     /**
-     * Only accepts http or https protocol.
+     * Only accepts http or https protocol, otherwise returns direct connection.
      *
-     * @param String protocl
+     * @param String protocol name
      * @return java.net.Proxy.Type
      */
     private java.net.Proxy.Type getProxyType(String protocol) {
