@@ -6,6 +6,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,9 +44,12 @@ public class SwaggerHubDownload extends AbstractMojo {
     @Parameter(property = "download.basepath")
     private String basepath;
 
+    @Parameter( defaultValue = "${settings}", readonly = true )
+    private Settings settings;
+
 
     public void execute() throws MojoExecutionException {
-        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath);
+        SwaggerHubClient swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath, settings.getActiveProxy());
         getLog().info("Downloading from " + host
                 + ": basepath-" + basepath
                 + ": api-" + api

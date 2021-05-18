@@ -1,7 +1,6 @@
 package io.swagger.swaggerhub.plugin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.Response;
 import io.swagger.swaggerhub.interfaces.ExceptionThrowingConsumer;
 import io.swagger.swaggerhub.plugin.exceptions.DefinitionParsingException;
 import io.swagger.swaggerhub.plugin.exceptions.UploadParametersException;
@@ -12,12 +11,14 @@ import io.swagger.swaggerhub.plugin.services.DefinitionFileFinder;
 import io.swagger.swaggerhub.plugin.services.DefinitionFileFormat;
 import io.swagger.swaggerhub.plugin.services.DefinitionParserService;
 import io.swagger.swaggerhub.plugin.services.StringModificationService;
+import okhttp3.Response;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,12 +119,15 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.scmHost")
     private String scmHost;
 
+    @Parameter( defaultValue = "${settings}", readonly = true )
+    private Settings settings;
+
     private SwaggerHubClient swaggerHubClient;
 
     @Override
     public void execute() throws MojoExecutionException {
 
-        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath);
+        swaggerHubClient = new SwaggerHubClient(host, port, protocol, token, getLog(), basepath, settings.getActiveProxy());
 
         getLog().info("Uploading to " + host
                 + ", basepath: " + basepath
