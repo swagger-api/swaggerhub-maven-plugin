@@ -75,14 +75,14 @@ public class SwaggerHubClient {
     /**
      * Only accepts http or https protocol.
      *
-     * @param proxy
+     * @param String protocl
      * @return java.net.Proxy.Type
      */
     private java.net.Proxy.Type getProxyType(String protocol) {
         if ("http".equals(protocol) || "https".equals(protocol) || protocol == null) {
             return java.net.Proxy.Type.HTTP;
         }
-        return null;
+        return Proxy.Type.DIRECT;
     }
 
     public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
