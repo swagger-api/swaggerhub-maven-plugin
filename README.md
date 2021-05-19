@@ -55,7 +55,7 @@ The usage pattern depends on whether you use the [code-first or design-first](ht
   <dependency>
     <groupId>io.swagger</groupId>
     <artifactId>swaggerhub-maven-plugin</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
   </dependency>
 ```
 
@@ -84,7 +84,7 @@ This goal downloads an API or domain definition from SwaggerHub to a local file 
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.9-SNAPSHOT</version>
+        <version>1.0.9</version>
         <executions>
             <execution>
                 <phase>generate-resources</phase>
@@ -244,7 +244,7 @@ This example uploads the specified API definition in JSON format as a public API
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.9-SNAPSHOT</version>
+        <version>1.0.9</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -254,7 +254,7 @@ This example uploads the specified API definition in JSON format as a public API
                 <configuration>
                     <api>PetStoreAPI</api>
                     <owner>jsfrench</owner>
-                    <version>1.0.1-SNAPSHOT</version>
+                    <version>1.0.0/version>
                     <inputFile>target/petStoreAPI.json</inputFile>
                     <token>${SWAGGERHUB_APIKEY}</token>
                     <uploadType>inputFile</uploadType>
@@ -293,7 +293,7 @@ This example uses the [Swagger Maven plugin](https://github.com/swagger-api/swag
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.9-SNAPSHOT</version>
+        <version>1.0.9</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -303,7 +303,7 @@ This example uses the [Swagger Maven plugin](https://github.com/swagger-api/swag
                 <configuration>
                     <api>PetStoreAPI</api>
                     <owner>jsfrench</owner>
-                    <version>1.0.1-SNAPSHOT</version>
+                    <version>1.0.0</version>
                     <inputFile>target/petStoreAPI.json</inputFile>
                     <token>${SWAGGERHUB_APIKEY}</token>
                     <uploadType>inputFile</uploadType>
@@ -321,7 +321,7 @@ This example uploads all JSON and YAML files from the `${project.basedir}/api-de
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.9-SNAPSHOT</version>
+        <version>1.0.9</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -347,7 +347,7 @@ This example uploads all JSON and YAML files from the specified directory whose 
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.9-SNAPSHOT</version>
+        <version>1.0.9</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
@@ -370,7 +370,7 @@ This example uploads all JSON and YAML files from the specified directory whose 
     <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swaggerhub-maven-plugin</artifactId>
-        <version>1.0.9-SNAPSHOT</version>
+        <version>1.0.9</version>
         <executions>
             <execution>
                 <phase>deploy</phase>
