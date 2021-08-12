@@ -18,7 +18,6 @@ jobs:
 
       - name: Release Maven package
         uses: samuelmeuli/action-maven-publish@v1
-        if: env.RELEASE_OK == 'yes'
         with:
           gpg_private_key: ${{ secrets.OSSRH_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.OSSRH_GPG_PRIVATE_PASSPHRASE }}
