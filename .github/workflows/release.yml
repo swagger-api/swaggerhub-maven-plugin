@@ -1,0 +1,27 @@
+name: Publish package to the Maven Central Repository
+on:
+  workflow_dispatch:
+    branches:
+      - master
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Release Maven package
+        uses: samuelmeuli/action-maven-publish@
+        if: env.RELEASE_OK == 'yes'
+        with:
+          gpg_private_key: ${{ secrets.OSSRH_GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.OSSRH_GPG_PRIVATE_PASSPHRASE }}
+          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+          nexus_password: ${{ secrets.OSSRH_TOKEN }}
+          maven_profiles: "release"
