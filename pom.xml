@@ -48,12 +48,12 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <okhttp.version>4.7.2</okhttp.version>
+        <okhttp.version>4.10.0</okhttp.version>
         <maven.version>3.8.1</maven.version>
         <junit.version>4.13.2</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hamcrest-all.version>1.3</hamcrest-all.version>
-        <swagger-parser.version>1.0.54</swagger-parser.version>
+        <swagger-parser.version>1.0.65</swagger-parser.version>
         <surefire.version>3.0.0-M5</surefire.version>
     </properties>
 
