@@ -75,7 +75,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>3.18.0</version>
         </dependency>
         <!-- Required to avoid
              java.lang.ClassNotFoundException: org.apache.maven.execution.MavenExecutionResult
