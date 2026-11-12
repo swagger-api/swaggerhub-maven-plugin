@@ -139,7 +139,7 @@ public class SwaggerHubUpload extends AbstractMojo {
     @Parameter(property = "upload.scmPersonalAccessToken")
     private String scmPersonalAccessToken;
 
-    /** Repository url, for SCM providers that need one. */
+    /** SCM server base URL, for providers such as Azure DevOps Server. */
     @Parameter(property = "upload.scmUrl")
     private String scmUrl;
 
