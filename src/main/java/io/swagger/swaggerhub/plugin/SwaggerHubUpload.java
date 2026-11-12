@@ -159,7 +159,8 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     /**
      * @throws UploadParametersException if {@code uploadType} is unknown or parameters required for it are not set
-     * @throws MojoExecutionException    if a definition cannot be read or uploaded, unless {@code skipFailures} is set
+     * @throws RuntimeException if reading, parsing, uploading, or SCM integration creation fails;
+     *                          {@code skipFailures} only suppresses unsuccessful HTTP responses
      */
     @Override
     public void execute() throws MojoExecutionException {
