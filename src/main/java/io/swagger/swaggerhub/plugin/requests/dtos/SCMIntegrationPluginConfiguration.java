@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 
 /**
- * Data transfer object used to send a potential SCM plugin configuration as a request body on a POST/PUT request
+ * Data transfer object used to send a potential SCM plugin configuration as a request body on a PUT request
  */
 public class SCMIntegrationPluginConfiguration {
 
@@ -50,6 +50,9 @@ public class SCMIntegrationPluginConfiguration {
     private String name;
 
 
+    /**
+     * @param configRequest the request to copy the configuration from
+     */
     public SCMIntegrationPluginConfiguration(SaveSCMPluginConfigRequest configRequest){
         this.token = configRequest.getToken();
         this.branch = configRequest.getBranch();

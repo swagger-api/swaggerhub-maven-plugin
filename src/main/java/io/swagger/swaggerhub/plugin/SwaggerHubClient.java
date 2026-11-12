@@ -22,6 +22,9 @@ import java.net.Proxy;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Thin client for the SwaggerHub registry API, used by the upload and download goals.
+ */
 public class SwaggerHubClient {
     private final OkHttpClient client;
     private final String host;
@@ -31,6 +34,15 @@ public class SwaggerHubClient {
     private Log log;
     private String basePath;
 
+    /**
+     * @param host     SwaggerHub host name
+     * @param port     SwaggerHub port
+     * @param protocol {@code http} or {@code https}
+     * @param token    API key sent in the {@code Authorization} header. May be {@code null} for downloads of public definitions, but is required for uploads
+     * @param log      Maven log used to report failed requests
+     * @param basePath optional path prefix in front of the API paths, may be {@code null} or empty
+     * @param proxy    active Maven proxy, or {@code null} to connect directly
+     */
     public SwaggerHubClient(String host, int port, String protocol, String token, Log log, String basePath, org.apache.maven.settings.Proxy proxy) {
         client = setupHttpClient(proxy);
         this.host = host;
@@ -73,10 +85,10 @@ public class SwaggerHubClient {
     }
 
     /**
-     * Only accepts http or https protocol, otherwise returns direct connection.
+     * Only accepts http or https protocol (a {@code null} protocol is treated as http), otherwise returns direct connection.
      *
-     * @param String protocol name
-     * @return java.net.Proxy.Type
+     * @param protocol the Maven proxy protocol
+     * @return {@link java.net.Proxy.Type#HTTP} or {@link java.net.Proxy.Type#DIRECT}
      */
     private java.net.Proxy.Type getProxyType(String protocol) {
         if ("http".equals(protocol) || "https".equals(protocol) || protocol == null) {
@@ -85,6 +97,13 @@ public class SwaggerHubClient {
         return Proxy.Type.DIRECT;
     }
 
+    /**
+     * Downloads a definition.
+     *
+     * @param swaggerHubRequest identifies the definition and the requested format
+     * @return the definition content
+     * @throws MojoExecutionException if the request fails or SwaggerHub does not answer with a successful status
+     */
     public String getDefinition(SwaggerHubRequest swaggerHubRequest) throws MojoExecutionException {
         HttpUrl httpUrl = getDownloadUrl(swaggerHubRequest);
         MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
@@ -118,6 +137,12 @@ public class SwaggerHubClient {
         return requestBuilder.build();
     }
 
+    /**
+     * Uploads a definition. Failures are logged rather than thrown so that callers can decide whether to skip them.
+     *
+     * @param swaggerHubRequest the definition and its coordinates
+     * @return the response (also when unsuccessful, in which case its body has already been consumed), or empty if the request could not be sent
+     */
     public Optional<Response> saveDefinition(SwaggerHubRequest swaggerHubRequest) {
         HttpUrl httpUrl = getUploadUrl(swaggerHubRequest);
         MediaType mediaType = MediaType.parse("application/" + swaggerHubRequest.getFormat());
@@ -137,6 +162,14 @@ public class SwaggerHubClient {
     }
 
 
+    /**
+     * Creates or updates an SCM integration plugin configuration for a definition.
+     * Failures are logged rather than thrown so that callers can decide whether to skip them.
+     *
+     * @param saveSCMPluginConfigRequest the integration configuration
+     * @return the response (also when unsuccessful, in which case its body has already been consumed), or empty if the request could not be sent
+     * @throws JsonProcessingException if the request body cannot be serialized
+     */
     public Optional<Response> saveIntegrationPluginOfType(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest) throws JsonProcessingException {
 
         HttpUrl httpUrl = getSaveIntegrationPluginConfigURL(saveSCMPluginConfigRequest);
