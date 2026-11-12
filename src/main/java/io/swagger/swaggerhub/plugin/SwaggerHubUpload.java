@@ -32,7 +32,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Uploads API definition to SwaggerHub. Can also be configured to create SCM integration plugins on upload
+ * Uploads API definitions to SwaggerHub, either a single file ({@code uploadType} {@code inputFile}) or every definition
+ * file found in a directory ({@code uploadType} {@code directory}).
+ * Can also be configured to create SCM integration plugins on upload.
  */
 @Mojo(name = "upload")
 public class SwaggerHubUpload extends AbstractMojo {
@@ -41,89 +43,124 @@ public class SwaggerHubUpload extends AbstractMojo {
     private static final String REPOSITORY_LOCATION = System.getProperty("user.dir");
     private static final String SWAGGERHUB_PLUGIN_CONFIGURATION_NAME = "SwaggerHub SCM Bidirectional Plugin";
 
+    /** SwaggerHub owner (user or organization) to upload to. */
     @Parameter(property = "upload.owner", required = true)
     private String owner;
+    /** API name. Required for {@code inputFile} uploads; for {@code directory} uploads it is taken from {@code info.title} of each definition. */
     @Parameter(property = "upload.api")
     private String api;
+    /** API version. Required for {@code inputFile} uploads; for {@code directory} uploads it is taken from {@code info.version} of each definition. */
     @Parameter(property = "upload.version")
     private String version;
+    /** SwaggerHub host name. */
     @Parameter(property = "upload.host", defaultValue = "api.swaggerhub.com")
     private String host;
+    /** SwaggerHub port. */
     @Parameter(property = "upload.port", defaultValue = "443")
     private int port;
+    /** Protocol used to connect, {@code http} or {@code https}. */
     @Parameter(property = "upload.protocol", defaultValue = "https")
     private String protocol;
+    /** Format of the {@code inputFile}, {@code json} or {@code yaml}. Ignored for {@code directory} uploads, where it is derived from the file extension. */
     @Parameter(property = "upload.format", defaultValue = "json")
     private String format;
+    /** SwaggerHub API key. */
     @Parameter(property = "upload.token", required = true)
     private String token;
+    /** Kind of definition to upload, {@code API} or {@code domain} (case insensitive). Unrecognised values mean {@code API}. */
     @Parameter(property = "download.definitionType", defaultValue = "API")
     private String definitionType;
+    /** Definition file to upload. Required for {@code inputFile} uploads. */
     @Parameter(property = "upload.inputFile")
     private String inputFile;
+    /** Whether the uploaded definitions are private. */
     @Parameter(property = "upload.isPrivate", defaultValue = "false")
     private Boolean isPrivate;
+    /** Directory to search for definition files ({@code json}, {@code yaml}, {@code yml}). Required for {@code directory} uploads. */
     @Parameter(property = "upload.definitionDirectory")
     private String definitionDirectory;
+    /** Optional regular expression the file name, without extension, must match for a file in {@code definitionDirectory} to be uploaded. */
     @Parameter(property = "upload.definitionFileNameRegex")
     private String definitionFileNameRegex;
+    /** What to upload, {@code inputFile} or {@code directory}. */
     @Parameter(property = "upload.uploadType", required = true)
     private String uploadType;
+    /** Optional path prefix in front of the SwaggerHub API paths, e.g. for on-premise installations. */
     @Parameter(property = "upload.basepath")
     private String basepath;
     /*
     SCM related parameters
      */
+    /** SCM provider to create an integration for. No integration is created when empty. */
     @Parameter(property = "upload.scmProvider")
     private String scmProvider;
 
+    /** Token used by SwaggerHub to access the SCM repository. */
     @Parameter(property = "upload.scmToken")
     private String scmToken;
 
+    /** Name of the SCM repository to sync with. */
     @Parameter(property = "upload.repository")
     private String repository;
 
+    /** Owner of the SCM repository. */
     @Parameter(property = "upload.repositoryOwner")
     private String repositoryOwner;
 
+    /** Branch SwaggerHub syncs with. */
     @Parameter(property = "upload.branch", defaultValue = "SWAGGERHUB")
     private String branch;
 
+    /** Whether the created SCM integration is enabled. */
     @Parameter(property = "upload.enableScmIntegration", defaultValue = "true")
     private Boolean enableScmIntegration;
 
+    /** If {@code true}, unsuccessful SwaggerHub responses are logged but do not fail the build. */
     @Parameter(property = "upload.skipFailures", defaultValue = "false")
     private Boolean skipFailures;
 
+    /** Username for SCM providers that use basic authentication. */
     @Parameter(property = "upload.scmUsername")
     private String scmUsername;
 
+    /** Password for SCM providers that use basic authentication. */
     @Parameter(property = "upload.scmPassword")
     private String scmPassword;
 
+    /** Project name, for SCM providers that group repositories in projects. */
     @Parameter(property = "upload.scmProject")
     private String scmProject;
 
+    /** Organization or account name, for SCM providers that need one. */
     @Parameter(property = "upload.scmOrganization")
     private String scmOrganization;
 
+    /** Personal access token, for SCM providers that use one. */
     @Parameter(property = "upload.scmPersonalAccessToken")
     private String scmPersonalAccessToken;
 
+    /** Repository url, for SCM providers that need one. */
     @Parameter(property = "upload.scmUrl")
     private String scmUrl;
 
+    /** Project collection, for SCM providers that need one. */
     @Parameter(property = "upload.scmProjectCollection")
     private String scmProjectCollection;
 
+    /** SCM host name, for self-hosted SCM providers. */
     @Parameter(property = "upload.scmHost")
     private String scmHost;
 
+    /** Maven settings, used to pick up the active proxy. */
     @Parameter( defaultValue = "${settings}", readonly = true )
     private Settings settings;
 
     private SwaggerHubClient swaggerHubClient;
 
+    /**
+     * @throws UploadParametersException if {@code uploadType} is unknown or parameters required for it are not set
+     * @throws MojoExecutionException    if a definition cannot be read or uploaded, unless {@code skipFailures} is set
+     */
     @Override
     public void execute() throws MojoExecutionException {
 
@@ -179,7 +216,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     + ", scmHost: " + scmHost
                     + ", scmProject: " + scmProject);
 
-            //Preemptive setup
+            //Build the integration request from the plugin parameters; file specific values are filled in per definition below
             SaveSCMPluginConfigRequest saveSCMPluginConfigRequest = new SaveSCMPluginConfigRequest.Builder(owner, api, version)
                     .scmProvider(scmProvider)
                     .branch(branch)
@@ -331,6 +368,15 @@ public class SwaggerHubUpload extends AbstractMojo {
     }
 
 
+    /**
+     * This version of createSaveSCMPluginConfigRequest is for directory based upload. API, version and OAS version are read from the file.
+     *
+     * @param input request holding the settings common to all definitions
+     * @param file  the definition file
+     * @return a copy of {@code input} completed with the values of the definition file
+     * @throws IOException                if the file cannot be read
+     * @throws DefinitionParsingException if the file is not a valid definition
+     */
     private SaveSCMPluginConfigRequest createSaveSCMPluginConfigRequest(SaveSCMPluginConfigRequest input, File file) throws IOException, DefinitionParsingException {
 
         DefinitionFileFormat definitionFileFormat = DefinitionFileFormat.getByFileExtensionType(FilenameUtils.getExtension(file.getName())).get();
@@ -353,9 +399,12 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     /**
      * This version of createSaveSCMPluginConfigRequest is for input file based upload
-     * @param input
-     * @param oasVersion
-     * @return
+     *
+     * @param input          request holding the settings common to all definitions
+     * @param inputFile      path of the definition file, used for the output folder and file name
+     * @param oasVersion     OpenAPI/Swagger specification version of the definition
+     * @param languageTarget SwaggerHub SCM integration target matching the file format
+     * @return a copy of {@code input} completed with the file specific values
      */
     private SaveSCMPluginConfigRequest createSaveSCMPluginConfigRequest(SaveSCMPluginConfigRequest input, String inputFile, String oasVersion, String languageTarget){
 
@@ -375,9 +424,11 @@ public class SwaggerHubUpload extends AbstractMojo {
     }
 
     /**
-     * Used to format the output folder as SwaggerHub expects it.
-     * @param path
-     * @return
+     * Used to format the output folder as SwaggerHub expects it: relative to the directory the build runs in,
+     * with forward slashes and no leading or trailing slash.
+     *
+     * @param path path of a definition file or of its folder
+     * @return the output folder
      */
     private String getOutputFolder(String path){
 
@@ -389,9 +440,10 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     /**
      * Check the object and return a list of fields that are empty from the list of requiredFields
-     * @param requiredFields
-     * @param givenObject
-     * @return
+     *
+     * @param requiredFields names of the declared String fields to check
+     * @param givenObject    the object holding the fields
+     * @return the names of the fields which are empty, or which could not be read
      */
     private List<String> returnEmptyRequiredFields(List<String> requiredFields, Object givenObject){
         return requiredFields.stream()
@@ -399,7 +451,7 @@ public class SwaggerHubUpload extends AbstractMojo {
                     try {
                         return StringUtils.isEmpty((String) givenObject.getClass().getDeclaredField(x).get(givenObject));
                     } catch (Exception e) {
-                        //Not going to try and scmOrganization for exceptions; if there is an exception we probably have greater issues than an empty/null field
+                        //Not going to try and recover from exceptions; if there is an exception we probably have greater issues than an empty/null field
                         getLog().debug(String.format("Unable to ascertain if %s is null/empty",x));
                         return true;
                     }
@@ -409,7 +461,8 @@ public class SwaggerHubUpload extends AbstractMojo {
 
     /**
      * Log out request details prior to making a request to SwaggerHub to save a SCMPluginConfig
-     * @param saveSCMPluginConfigRequest
+     *
+     * @param saveSCMPluginConfigRequest the request about to be sent
      */
     private void logSaveSCMPluginConfigRequestDetailsPriorToRequest(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest){
         getLog().info(String.format("Provisioning %s Plugin Integration for %s", scmProvider, saveSCMPluginConfigRequest.getApi()));
@@ -417,8 +470,11 @@ public class SwaggerHubUpload extends AbstractMojo {
     }
 
     /**
-     * Returns a function that will return if a build should fail due to user configuration and the response to a request made
-     * @return
+     * Returns a predicate telling whether a response is acceptable, i.e. whether the build may continue.
+     * It holds when failures are skipped by user configuration or the response was successful.
+     *
+     * @param skipFailures whether unsuccessful responses must not fail the build
+     * @return predicate which is {@code false} for a response that must fail the build
      */
     private Predicate<Response> shouldErrorFailBuild(boolean skipFailures){
         return  x -> skipFailures || x.isSuccessful();

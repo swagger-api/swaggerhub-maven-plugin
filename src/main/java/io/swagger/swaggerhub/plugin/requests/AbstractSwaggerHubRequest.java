@@ -10,6 +10,12 @@ public class AbstractSwaggerHubRequest {
     protected final String version;
     protected final String oas;
 
+    /**
+     * @param api     API name
+     * @param owner   SwaggerHub owner (user or organization) of the API
+     * @param version API version
+     * @param oas     OpenAPI/Swagger specification version of the definition
+     */
     public AbstractSwaggerHubRequest(String api, String owner, String version, String oas) {
         this.api = api;
         this.owner = owner;

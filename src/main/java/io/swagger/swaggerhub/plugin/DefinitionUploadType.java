@@ -8,9 +8,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+/**
+ * Supported values of the {@code uploadType} plugin parameter, together with the plugin parameters that must be set for each.
+ */
 public enum DefinitionUploadType {
 
+    /** Upload the single file given by {@code inputFile}. */
     INPUT_FILE("inputFile", Arrays.asList("api","version", "format", "inputFile")),
+    /** Upload every matching definition file in {@code definitionDirectory}. */
     DIRECTORY("directory", Arrays.asList("definitionDirectory"));
 
     private String paramValue;
@@ -21,18 +26,25 @@ public enum DefinitionUploadType {
         this.requiredFields = requiredFields;
     }
 
+    /**
+     * @return the value users give in the {@code uploadType} plugin parameter
+     */
     public String getParamValue() {
         return paramValue;
     }
 
+    /**
+     * @return names of the {@link SwaggerHubUpload} fields which must be non-empty for this upload type
+     */
     public List<String> getRequiredFields() {
         return requiredFields;
     }
 
     /**
-     * Returns the appropriate enum by matching the given input to the enums param value
-     * @param userInputValue
-     * @return
+     * Returns the upload type whose {@link #getParamValue() param value} equals the given input (case sensitive).
+     *
+     * @param userInputValue value of the {@code uploadType} plugin parameter
+     * @return the matching type, or empty if the input is unrecognised
      */
     public static Optional<DefinitionUploadType> getByParamValue(String userInputValue){
 

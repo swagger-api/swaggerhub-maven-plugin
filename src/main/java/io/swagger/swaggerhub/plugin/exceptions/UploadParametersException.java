@@ -7,10 +7,17 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class UploadParametersException extends MojoExecutionException {
     
+    /**
+     * @param message description of the misconfiguration
+     * @param cause   underlying cause
+     */
     public UploadParametersException(String message, Exception cause) {
         super(message, cause);
     }
 
+    /**
+     * @param message description of the misconfiguration
+     */
     public UploadParametersException(String message) {
         super(message);
     }

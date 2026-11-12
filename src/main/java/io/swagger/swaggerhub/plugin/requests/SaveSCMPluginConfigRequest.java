@@ -117,12 +117,19 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
     public String getHost() {return host; }
 
+    /**
+     * @return this request serialized as the JSON body SwaggerHub expects, see {@link SCMIntegrationPluginConfiguration}
+     * @throws JsonProcessingException if serialization fails
+     */
     public String getRequestBody() throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(new SCMIntegrationPluginConfiguration(this));
     }
 
 
 
+    /**
+     * Builder for {@link SaveSCMPluginConfigRequest}. Owner, API and version are mandatory, everything else is optional.
+     */
     public static class Builder {
 
         private String apiOwner;
@@ -149,12 +156,23 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
         private String projectCollection;
         private String host;
 
+        /**
+         * @param apiOwner SwaggerHub owner (user or organization) of the API
+         * @param api      API name
+         * @param version  API version
+         */
         public Builder(String apiOwner, String api, String version) {
             this.api = api;
             this.apiOwner = apiOwner;
             this.version = version;
         }
 
+        /**
+         * Copies all settings except owner, API and version from an existing request, replacing any set so far.
+         *
+         * @param saveSCMPluginConfigRequest the request to copy from
+         * @return this builder
+         */
         public SaveSCMPluginConfigRequest.Builder saveSCMPluginConfigRequest(SaveSCMPluginConfigRequest saveSCMPluginConfigRequest){
             this.oas = saveSCMPluginConfigRequest.getOas();
             this.scmProvider = saveSCMPluginConfigRequest.getScmProvider();
@@ -234,6 +252,10 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
             return this;
         }
 
+        /**
+         * @param managedPaths the files SwaggerHub may overwrite in the output folder; normally only the definition file itself
+         * @return this builder
+         */
         public SaveSCMPluginConfigRequest.Builder managedPaths(String[] managedPaths){
             this.managedPaths = managedPaths;
             return this;
@@ -279,6 +301,9 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
             return this;
         }
 
+        /**
+         * @return the request
+         */
         public SaveSCMPluginConfigRequest build() {
             return new SaveSCMPluginConfigRequest(this);
         }
