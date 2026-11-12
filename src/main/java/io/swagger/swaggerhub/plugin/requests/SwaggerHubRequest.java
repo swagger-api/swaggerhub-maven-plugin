@@ -50,7 +50,8 @@ public class SwaggerHubRequest extends AbstractSwaggerHubRequest{
     }
 
     /**
-     * Builder for {@link SwaggerHubRequest}. Definition type, API, owner and version are mandatory, everything else is optional.
+     * Builder for {@link SwaggerHubRequest}. Definition type, API, owner and version are constructor arguments.
+     * Set {@code format} for all requests and {@code swagger} for uploads.
      */
     public static class Builder {
         private final DefinitionType definitionType;
