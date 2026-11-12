@@ -128,7 +128,8 @@ public class SaveSCMPluginConfigRequest extends AbstractSwaggerHubRequest {
 
 
     /**
-     * Builder for {@link SaveSCMPluginConfigRequest}. Owner, API and version are mandatory, everything else is optional.
+     * Builder for {@link SaveSCMPluginConfigRequest}. Owner, API and version are constructor arguments.
+     * Set {@code scmProvider} and the provider-specific integration settings before sending the request.
      */
     public static class Builder {
 
